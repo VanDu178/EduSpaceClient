@@ -1,2 +1,3 @@
-//   <-- Các component phục vụ layout toàn trang (Header, Sidebar, Footer...)
-export { };
+export * from "./Header";
+export * from "./Footer";
+export * from "./AntdWrapper";

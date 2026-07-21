@@ -1,6 +1,33 @@
 :root {
-  --primary-color: #1e3a8a;
-  --primary-hover: #3b82f6;
-  --bg-color: #f8fafc;
-  --text-color: #1e293b;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent-purple: #8b5cf6;
+  --bg-dark: #131315;
+  --surface-dark: #18181b;
+  --card-dark: #1f1f23;
+  --border-dark: rgba(255, 255, 255, 0.08);
+  --bg-color: #131315;
+  --text-color: #f4f4f5;
+  --text-muted: #a1a1aa;
+
+  /* Typography Standard Scale */
+  --fs-h1: 2rem;           /* 32px - Page/Hero Title */
+  --fs-h1-mobile: 1.5rem;   /* 24px - Mobile H1 */
+  --fs-h2: 1.5rem;         /* 24px - Section Heading */
+  --fs-h2-mobile: 1.25rem;  /* 20px - Mobile H2 */
+  --fs-h3: 1.125rem;       /* 18px - Card / Sub-heading */
+  --fs-h3-mobile: 1rem;     /* 16px - Mobile H3 */
+  --fs-body: 1rem;          /* 16px - Main Body Text */
+  --fs-ui: 0.875rem;        /* 14px - UI Elements (Inputs, Buttons, Labels) */
+  --fs-caption: 0.75rem;    /* 12px - Small Text / Meta */
 }
+
+[data-theme="light"] {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --card-dark: #ffffff;
+  --border-dark: rgba(226, 232, 240, 0.8);
+}
+
+

@@ -2,3 +2,49 @@
 .ant-btn {
   border-radius: 8px; /* Tùy biến nút bấm của Ant Design */
 }
+
+/* Đồng bộ line-height và border giữa light/dark mode để tránh giật/nhích menu */
+.ant-menu-horizontal {
+  border-bottom: none !important;
+  box-shadow: none !important;
+  line-height: 46px !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
+  line-height: 46px !important;
+  top: 0 !important;
+}
+
+/* Đồng bộ kiểu dáng active tab giữa Dark mode và Light mode (background trong suốt, gạch chân bottom line) */
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item {
+  background-color: transparent !important;
+}
+
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected {
+  background-color: transparent !important;
+  color: #3b82f6 !important;
+}
+
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected a {
+  color: #3b82f6 !important;
+}
+
+.ant-menu-dark.ant-menu-horizontal .ant-menu-item-selected::after {
+  border-bottom: 2px solid #3b82f6 !important;
+  border-bottom-color: #3b82f6 !important;
+}
+
+/* Inline mode trên mobile drawer */
+.ant-menu-dark.ant-menu-inline .ant-menu-item-selected {
+  background-color: transparent !important;
+  color: #3b82f6 !important;
+  border-right: 2px solid #3b82f6 !important;
+}
+
+.ant-menu-dark.ant-menu-inline .ant-menu-item-selected a {
+  color: #3b82f6 !important;
+}
+
+
+
