@@ -218,7 +218,7 @@ if (shortCondition)
       <div>
         <Link
           href="/videos"
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeftIcon className="w-4 h-4" />
           <span>Quay lại kho video</span>
@@ -229,7 +229,7 @@ if (shortCondition)
         {/* Main Content (8 Cols) */}
         <main className="lg:col-span-8 space-y-6">
           {/* Video Player Frame */}
-          <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-slate-950 border border-slate-200 dark:border-white/10 group">
+          <div className="relative w-full aspect-video rounded-3xl overflow-hidden bg-slate-950 border border-slate-200 group">
             <video
               ref={videoRef}
               poster={currentVideo.thumbnail}
@@ -259,23 +259,23 @@ if (shortCondition)
           </div>
 
           {/* Video Header & Meta */}
-          <div className="space-y-4 pb-6 border-b border-slate-200 dark:border-white/10">
+          <div className="space-y-4 pb-6 border-b border-slate-200">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="bg-purple-600/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 text-xs px-3 py-1 rounded-full font-semibold border border-purple-500/20">
+              <span className="bg-purple-600/10 text-purple-600 text-xs px-3 py-1 rounded-full font-semibold border border-purple-500/20">
                 {currentVideo.tag}
               </span>
-              <span className="text-slate-400 dark:text-zinc-500">•</span>
-              <span className="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-1">
+              <span className="text-slate-400">•</span>
+              <span className="text-xs text-slate-500 flex items-center gap-1">
                 <ClockIcon className="w-3.5 h-3.5" />
                 Thời lượng: {currentVideo.duration}
               </span>
-              <span className="text-slate-400 dark:text-zinc-500">•</span>
-              <span className="text-xs text-slate-500 dark:text-zinc-400">{currentVideo.views}</span>
-              <span className="text-slate-400 dark:text-zinc-500">•</span>
-              <span className="text-xs text-slate-500 dark:text-zinc-400">{currentVideo.date}</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-xs text-slate-500">{currentVideo.views}</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-xs text-slate-500">{currentVideo.date}</span>
             </div>
 
-            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
               {currentVideo.title}
             </h1>
 
@@ -284,11 +284,11 @@ if (shortCondition)
               <div className="flex items-center gap-3">
                 <Avatar size={48} src={currentVideo.instructor.avatar} className="border-2 border-purple-500" />
                 <div>
-                  <div className="text-slate-900 dark:text-white font-bold text-sm flex items-center gap-1.5">
+                  <div className="text-slate-900 font-bold text-sm flex items-center gap-1.5">
                     {currentVideo.instructor.name}
                     <CheckCircleIcon className="w-4 h-4 text-blue-500 inline-block" />
                   </div>
-                  <div className="text-slate-500 dark:text-zinc-400 text-xs">{currentVideo.instructor.role}</div>
+                  <div className="text-slate-500 text-xs">{currentVideo.instructor.role}</div>
                 </div>
                 <Button
                   variant={isSubscribed ? "outline" : "primary"}
@@ -336,13 +336,13 @@ if (shortCondition)
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex border-b border-slate-200 dark:border-white/10 gap-6">
+          <div className="flex border-b border-slate-200 gap-6">
             <button
               onClick={() => setActiveTab("timestamps")}
               className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === "timestamps"
-                  ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400"
-                  : "border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                  ? "border-purple-600 text-purple-600"
+                  : "border-transparent text-slate-600 hover:text-slate-900"
               }`}
             >
               <ClockIcon className="w-4 h-4" />
@@ -352,8 +352,8 @@ if (shortCondition)
               onClick={() => setActiveTab("overview")}
               className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === "overview"
-                  ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400"
-                  : "border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                  ? "border-purple-600 text-purple-600"
+                  : "border-transparent text-slate-600 hover:text-slate-900"
               }`}
             >
               <SparklesIcon className="w-4 h-4" />
@@ -363,8 +363,8 @@ if (shortCondition)
               onClick={() => setActiveTab("comments")}
               className={`pb-3 text-sm font-semibold border-b-2 transition-colors flex items-center gap-2 ${
                 activeTab === "comments"
-                  ? "border-purple-600 text-purple-600 dark:border-purple-400 dark:text-purple-400"
-                  : "border-transparent text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                  ? "border-purple-600 text-purple-600"
+                  : "border-transparent text-slate-600 hover:text-slate-900"
               }`}
             >
               <ChatBubbleLeftRightIcon className="w-4 h-4" />
@@ -375,7 +375,7 @@ if (shortCondition)
           {/* Tab Content 1: Timestamps */}
           {activeTab === "timestamps" && (
             <div className="space-y-3">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">
+              <h3 className="text-base font-bold text-slate-900 mb-3">
                 Danh sách phân đoạn nội dung
               </h3>
               <div className="space-y-2">
@@ -383,17 +383,17 @@ if (shortCondition)
                   <div
                     key={idx}
                     onClick={() => handleSeek(item.seconds)}
-                    className="glass-card p-4 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-purple-500/40 flex items-center justify-between cursor-pointer group transition-all"
+                    className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-purple-500/40 flex items-center justify-between cursor-pointer group transition-all"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-purple-600/10 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                      <span className="font-mono text-xs font-semibold px-2.5 py-1 rounded-lg bg-purple-600/10 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-colors">
                         {item.time}
                       </span>
-                      <span className="text-sm font-semibold text-slate-800 dark:text-zinc-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      <span className="text-sm font-semibold text-slate-800 group-hover:text-purple-600 transition-colors">
                         {item.title}
                       </span>
                     </div>
-                    <PlayIcon className="w-5 h-5 text-slate-400 dark:text-zinc-500 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors" />
+                    <PlayIcon className="w-5 h-5 text-slate-400 group-hover:text-purple-600 transition-colors" />
                   </div>
                 ))}
               </div>
@@ -403,14 +403,14 @@ if (shortCondition)
           {/* Tab Content 2: Overview & Script Snippet */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-zinc-300 text-sm leading-relaxed">
+              <div className="prose max-w-none text-slate-700 text-sm leading-relaxed">
                 <p>{currentVideo.description}</p>
               </div>
 
               {currentVideo.scriptSnippet && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    <h3 className="text-base font-bold text-slate-900">
                       Mã nguồn chiến lược PineScript v5 tham khảo
                     </h3>
                     <button
@@ -418,13 +418,13 @@ if (shortCondition)
                         navigator.clipboard.writeText(currentVideo.scriptSnippet || "");
                         messageApi.success("Đã sao chép PineScript code!");
                       }}
-                      className="text-xs text-purple-600 dark:text-purple-400 font-semibold hover:underline"
+                      className="text-xs text-purple-600 font-semibold hover:underline"
                     >
                       Sao chép Code
                     </button>
                   </div>
 
-                  <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-900 text-zinc-100 p-5 font-mono text-xs leading-6">
+                  <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 text-zinc-100 p-5 font-mono text-xs leading-6">
                     <pre className="overflow-x-auto">
                       <code>{currentVideo.scriptSnippet}</code>
                     </pre>
@@ -438,14 +438,14 @@ if (shortCondition)
           {activeTab === "comments" && (
             <div className="space-y-6">
               {/* Comment Input */}
-              <div className="glass-card p-4 rounded-2xl border border-slate-200 dark:border-white/10 space-y-3">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Viết bình luận của bạn</h3>
+              <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
+                <h3 className="text-sm font-bold text-slate-900">Viết bình luận của bạn</h3>
                 <Input.TextArea
                   rows={3}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder="Đặt câu hỏi hoặc chia sẻ trải nghiệm áp dụng kịch bản..."
-                  className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-xl"
+                  className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-xl"
                 />
                 <div className="flex justify-end">
                   <Button variant="primary" size="sm" onClick={handleAddComment} className="btn-gradient border-none">
@@ -459,15 +459,15 @@ if (shortCondition)
                 {mockComments.map((comment) => (
                   <div
                     key={comment.id}
-                    className="glass-card p-4 rounded-2xl border border-slate-200 dark:border-white/10 flex gap-4"
+                    className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-4"
                   >
                     <Avatar size={40} src={comment.avatar} className="border border-purple-500/30 shrink-0" />
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">{comment.user}</span>
-                        <span className="text-xs text-slate-400 dark:text-zinc-500">{comment.time}</span>
+                        <span className="text-sm font-bold text-slate-900">{comment.user}</span>
+                        <span className="text-xs text-slate-400">{comment.time}</span>
                       </div>
-                      <p className="text-xs text-slate-700 dark:text-zinc-300 leading-relaxed">
+                      <p className="text-xs text-slate-700 leading-relaxed">
                         {comment.content}
                       </p>
                     </div>
@@ -481,8 +481,8 @@ if (shortCondition)
         {/* Sidebar (4 Cols) */}
         <aside className="lg:col-span-4 space-y-6">
           {/* Related Videos Card */}
-          <div className="glass-card p-5 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-3">
+          <div className="bg-white p-5 rounded-3xl border border-slate-200 space-y-4">
+            <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3">
               Video bài giảng liên quan
             </h3>
 
@@ -491,22 +491,22 @@ if (shortCondition)
                 <Link
                   key={rel.id}
                   href={`/videos/${rel.slug}`}
-                  className="flex gap-3 group p-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                  className="flex gap-3 group p-2 rounded-2xl hover:bg-slate-100 transition-colors"
                 >
-                  <div className="relative w-28 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-slate-200 dark:border-white/10">
+                  <div className="relative w-28 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-900 border border-slate-200">
                     <img src={rel.thumbnail} alt={rel.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                     <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
                       {rel.duration}
                     </div>
                   </div>
                   <div className="flex-1 flex flex-col justify-between py-0.5">
-                    <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 line-clamp-1">
+                    <span className="text-[11px] font-semibold text-purple-600 line-clamp-1">
                       {rel.tag}
                     </span>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-snug">
+                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-purple-600 transition-colors line-clamp-2 leading-snug">
                       {rel.title}
                     </h4>
-                    <span className="text-[10px] text-slate-500 dark:text-zinc-400">{rel.views}</span>
+                    <span className="text-[10px] text-slate-500">{rel.views}</span>
                   </div>
                 </Link>
               ))}

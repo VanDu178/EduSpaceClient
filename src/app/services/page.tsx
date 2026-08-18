@@ -138,10 +138,10 @@ export default function ServicesPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       {/* Header section */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
           Dịch Vụ Tư Vấn & Giải Pháp <span className="gradient-text">Quant Trading</span>
         </h1>
-        <p className="text-slate-600 dark:text-zinc-400 text-base leading-relaxed">
+        <p className="text-slate-600 text-base leading-relaxed">
           Đồng hành cùng cá nhân và quỹ đầu tư trong việc số hóa ý tưởng giao dịch, kiểm thử thuật toán, tối ưu hạ tầng dữ liệu và đào tạo định lượng thực chiến.
         </p>
 
@@ -163,12 +163,12 @@ export default function ServicesPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 rounded-3xl border border-dashed border-slate-300 dark:border-white/10 bg-slate-50/50 dark:bg-zinc-900/30">
-          <MagnifyingGlassIcon className="w-12 h-12 mx-auto text-slate-400 dark:text-zinc-600 mb-3" />
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+        <div className="text-center py-12 rounded-3xl border border-dashed border-slate-300 bg-slate-50/50">
+          <MagnifyingGlassIcon className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">
             Không tìm thấy dịch vụ phù hợp
           </h3>
-          <p className="text-sm text-slate-500 dark:text-zinc-400">
+          <p className="text-sm text-slate-500">
             Thử tìm kiếm với từ khóa khác như "Audit", "PineScript", "Data", "Hedging"...
           </p>
         </div>
@@ -177,19 +177,19 @@ export default function ServicesPage() {
       {/* CTA / Contact Section */}
       <div
         id="contact-form"
-        className="glass-card rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-white/10 bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-zinc-900 dark:via-zinc-900/80 dark:to-blue-950/20 relative overflow-hidden"
+        className="rounded-3xl p-8 sm:p-12 border border-slate-200 bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden"
       >
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 text-xs font-semibold uppercase tracking-wider">
             <ChatBubbleLeftRightIcon className="w-4 h-4" />
             Tư Vấn Giải Pháp Tùy Chỉnh
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Bạn có kịch bản giao dịch hoặc yêu cầu đặc thù?
           </h2>
 
-          <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base leading-relaxed">
+          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
             Hãy gửi ngay bài toán kỹ thuật của bạn. Đội ngũ kỹ sư EduSpace sẽ phân tích tính khả thi, đề xuất kiến trúc phù hợp và phản hồi giải pháp tối ưu nhất trong vòng 24 giờ.
           </p>
 

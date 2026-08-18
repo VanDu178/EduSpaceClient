@@ -181,7 +181,7 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
       <div>
         <Link
           href="/posts"
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeftIcon className="w-4 h-4" />
           <span>Quay lại danh sách bài viết</span>
@@ -192,19 +192,19 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
         {/* Main Reading Area (8 cols) */}
         <main className="lg:col-span-8 space-y-8">
           {/* Post Header */}
-          <header className="space-y-4 pb-8 border-b border-slate-200 dark:border-white/10">
+          <header className="space-y-4 pb-8 border-b border-slate-200">
             <div className="flex items-center gap-2">
               <Tag color="blue" className="rounded-full px-3 py-0.5 text-xs font-semibold border-none">
                 {currentPost.category}
               </Tag>
-              <span className="text-slate-400 dark:text-zinc-500">•</span>
-              <span className="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-1">
+              <span className="text-slate-400">•</span>
+              <span className="text-xs text-slate-500 flex items-center gap-1">
                 <ClockIcon className="w-3.5 h-3.5" />
                 {currentPost.readTime}
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
               {currentPost.title}
             </h1>
 
@@ -217,11 +217,11 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
                   className="border-2 border-blue-500 shrink-0"
                 />
                 <div>
-                  <div className="text-slate-900 dark:text-white font-bold text-sm flex items-center gap-1.5">
+                  <div className="text-slate-900 font-bold text-sm flex items-center gap-1.5">
                     {currentPost.author.name}
                     <CheckCircleIcon className="w-4 h-4 text-blue-500 inline-block" />
                   </div>
-                  <div className="text-slate-500 dark:text-zinc-400 text-xs flex items-center gap-2">
+                  <div className="text-slate-500 text-xs flex items-center gap-2">
                     <span className="flex items-center gap-1">
                       <CalendarIcon className="w-3 h-3" /> {currentPost.date}
                     </span>
@@ -255,7 +255,7 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
           </header>
 
           {/* Post Banner Image */}
-          <div className="rounded-3xl overflow-hidden h-72 sm:h-96 w-full relative border border-slate-200 dark:border-white/10 bg-slate-900">
+          <div className="rounded-3xl overflow-hidden h-72 sm:h-96 w-full relative border border-slate-200 bg-slate-900">
             <img
               src={currentPost.banner}
               alt={currentPost.title}
@@ -264,20 +264,20 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
           </div>
 
           {/* Post Body Content */}
-          <article className="prose dark:prose-invert max-w-none text-slate-700 dark:text-zinc-300 space-y-6 leading-relaxed text-base">
-            <p className="text-base sm:text-lg text-slate-800 dark:text-zinc-200 font-medium leading-relaxed">
+          <article className="prose max-w-none text-slate-700 space-y-6 leading-relaxed text-base">
+            <p className="text-base sm:text-lg text-slate-800 font-medium leading-relaxed">
               {currentPost.content.intro}
             </p>
 
             {currentPost.content.sections.map((section) => (
               <div key={section.id} id={section.id} className="space-y-4 pt-4">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight border-l-4 border-blue-500 pl-4">
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight border-l-4 border-blue-500 pl-4">
                   {section.heading}
                 </h2>
                 <p className="text-sm sm:text-base">{section.body}</p>
 
                 {section.code && (
-                  <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-900 text-zinc-100 p-5 font-mono text-xs sm:text-sm leading-6">
+                  <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 text-zinc-100 p-5 font-mono text-xs sm:text-sm leading-6">
                     <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-700 text-xs text-zinc-400">
                       <span className="flex items-center gap-2">
                         <span className="w-3 h-3 rounded-full bg-rose-500 inline-block" />
@@ -294,7 +294,7 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
                 )}
 
                 {section.quote && (
-                  <blockquote className="border-l-4 border-blue-500 pl-4 py-3 my-6 text-slate-700 dark:text-zinc-300 italic bg-slate-100 dark:bg-white/5 rounded-r-xl pr-4 text-sm sm:text-base">
+                  <blockquote className="border-l-4 border-blue-500 pl-4 py-3 my-6 text-slate-700 italic bg-slate-100 rounded-r-xl pr-4 text-sm sm:text-base">
                     "{section.quote}"
                   </blockquote>
                 )}
@@ -303,12 +303,12 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
           </article>
 
           {/* Download Resources Widget inside Post */}
-          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-transparent">
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-transparent">
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-base font-bold text-slate-900">
                 Tài liệu & Mã nguồn đính kèm bài viết
               </h3>
-              <p className="text-xs text-slate-600 dark:text-zinc-400 mt-1">
+              <p className="text-xs text-slate-600 mt-1">
                 Bao gồm mã nguồn Clean Architecture mẫu và cấu hình Docker Compose sẵn sàng chạy.
               </p>
             </div>
@@ -324,22 +324,22 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
           </div>
 
           {/* Comment Section */}
-          <section className="space-y-6 pt-6 border-t border-slate-200 dark:border-white/10">
+          <section className="space-y-6 pt-6 border-t border-slate-200">
             <div className="flex items-center gap-2">
-              <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              <ChatBubbleLeftRightIcon className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-bold text-slate-900">
                 Thảo luận bài viết ({mockComments.length})
               </h3>
             </div>
 
             {/* Input comment */}
-            <div className="glass-card p-4 rounded-2xl border border-slate-200 dark:border-white/10 space-y-3">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-3">
               <Input.TextArea
                 rows={3}
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Chia sẻ góc nhìn hoặc câu hỏi của bạn về bài viết..."
-                className="bg-white dark:bg-zinc-900 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-xl"
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-xl"
               />
               <div className="flex justify-end">
                 <Button variant="primary" size="sm" onClick={handleAddComment} className="btn-gradient border-none">
@@ -353,15 +353,15 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
               {mockComments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="glass-card p-4 rounded-2xl border border-slate-200 dark:border-white/10 flex gap-4"
+                  className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-4"
                 >
                   <Avatar size={40} src={comment.avatar} className="border border-blue-500/30 shrink-0" />
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">{comment.user}</span>
-                      <span className="text-xs text-slate-400 dark:text-zinc-500">{comment.time}</span>
+                      <span className="text-sm font-bold text-slate-900">{comment.user}</span>
+                      <span className="text-xs text-slate-400">{comment.time}</span>
                     </div>
-                    <p className="text-xs text-slate-700 dark:text-zinc-300 leading-relaxed">
+                    <p className="text-xs text-slate-700 leading-relaxed">
                       {comment.content}
                     </p>
                   </div>
@@ -374,17 +374,17 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
         {/* Sidebar Area (4 cols) */}
         <aside className="lg:col-span-4 space-y-8">
           {/* Table of Contents Widget */}
-          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-3 flex items-center gap-2">
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+            <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
               <ListBulletIcon className="w-5 h-5 text-blue-500" />
               Mục lục nội dung
             </h3>
-            <ul className="space-y-2 text-xs font-semibold text-slate-600 dark:text-zinc-400">
+            <ul className="space-y-2 text-xs font-semibold text-slate-600">
               {currentPost.content.sections.map((section) => (
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors block py-1"
+                    className="hover:text-blue-600 transition-colors block py-1"
                   >
                     {section.heading}
                   </a>
@@ -394,8 +394,8 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
           </div>
 
           {/* Related Posts Widget */}
-          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 pb-3">
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
+            <h3 className="text-base font-bold text-slate-900 border-b border-slate-200 pb-3">
               Bài viết cùng chủ đề
             </h3>
             <div className="space-y-4">
@@ -403,26 +403,26 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
                 <Link
                   key={idx}
                   href={`/posts/${rel.slug}`}
-                  className="block group p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                  className="block group p-3 rounded-2xl hover:bg-slate-100 transition-colors"
                 >
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-semibold mb-1">{rel.category}</div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                  <div className="text-xs text-blue-600 font-semibold mb-1">{rel.category}</div>
+                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
                     {rel.title}
                   </h4>
-                  <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-2">{rel.readTime}</div>
+                  <div className="text-[11px] text-slate-500 mt-2">{rel.readTime}</div>
                 </Link>
               ))}
             </div>
           </div>
 
           {/* Newsletter Widget */}
-          <div className="glass-card p-6 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4 bg-gradient-to-br from-blue-50 to-purple-50">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white">
               <PaperAirplaneIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">Bản tin Kỹ thuật EduSpace</h3>
-              <p className="text-xs text-slate-600 dark:text-zinc-400 mt-1 leading-relaxed">
+              <h3 className="text-base font-bold text-slate-900">Bản tin Kỹ thuật EduSpace</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Nhận tổng hợp bài viết kỹ thuật chọn lọc và mẹo phát triển hệ thống SaaS vào thứ Hai hằng tuần.
               </p>
             </div>
@@ -432,7 +432,7 @@ export async function fetchRelatedPosts(category: string): Promise<Post[]> {
                 placeholder="Nhập email của bạn..."
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
-                className="bg-white dark:bg-zinc-900/90 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-xs !rounded-lg h-9"
+                className="bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 !text-xs !rounded-lg h-9"
               />
               <Button
                 onClick={handleSubscribeNewsletter}

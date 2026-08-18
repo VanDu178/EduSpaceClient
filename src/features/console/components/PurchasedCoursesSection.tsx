@@ -17,15 +17,15 @@ interface PurchasedCoursesSectionProps {
 
 export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProps) {
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <AcademicCapIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <AcademicCapIcon className="w-6 h-6 text-blue-600" />
             Khóa học đã mua ({courses.length})
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Theo dõi tiến độ học tập và tiếp tục các bài học bài bản về Trading & Quantitative Finance.
           </p>
         </div>
@@ -33,7 +33,7 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
           <Button
             type="default"
             icon={<ArrowRightIcon className="w-4 h-4" />}
-            className="!rounded-lg text-xs font-semibold h-9 flex items-center border border-slate-200 dark:border-white/10"
+            className="!rounded-lg text-xs font-semibold h-9 flex items-center border border-slate-200"
           >
             Khám phá thêm khóa học
           </Button>
@@ -42,12 +42,12 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
 
       {/* Courses List */}
       {courses.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
-          <AcademicCapIcon className="w-10 h-10 mx-auto text-slate-300 dark:text-zinc-600 mb-2" />
-          <p className="text-sm font-medium text-slate-600 dark:text-zinc-400">
+        <div className="text-center py-12 border border-dashed border-slate-200 rounded-xl">
+          <AcademicCapIcon className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+          <p className="text-sm font-medium text-slate-600">
             Bạn chưa đăng ký khóa học nào
           </p>
-          <p className="text-xs text-slate-400 dark:text-zinc-500 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             Đăng ký các khóa học thực chiến để nâng cao kiến thức tài chính & thuật toán.
           </p>
           <Link href="/courses" className="inline-block mt-4">
@@ -61,7 +61,7 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
           {courses.map((course) => (
             <div
               key={course.id}
-              className="bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden hover:border-slate-300 dark:hover:border-white/20 transition-all flex flex-col justify-between"
+              className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-all flex flex-col justify-between"
             >
               <div>
                 {/* Course Header Banner */}
@@ -84,9 +84,9 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
                 {/* Course Details & Progress */}
                 <div className="p-5">
                   <div className="mb-4">
-                    <div className="flex items-center justify-between text-xs font-medium text-slate-600 dark:text-zinc-400 mb-1.5">
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-600 mb-1.5">
                       <span>Tiến độ học tập</span>
-                      <span className="text-blue-600 dark:text-blue-400 font-bold">
+                      <span className="text-blue-600 font-bold">
                         {course.completedLessons}/{course.totalLessons} bài ({course.progress}%)
                       </span>
                     </div>
@@ -98,18 +98,18 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
                     />
                   </div>
 
-                  <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 p-3 rounded-lg text-xs space-y-1.5">
-                    <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
+                  <div className="bg-white border border-slate-200 p-3 rounded-lg text-xs space-y-1.5">
+                    <div className="flex items-center justify-between text-slate-500">
                       <span className="flex items-center gap-1.5">
                         <BookOpenIcon className="w-4 h-4 text-blue-500" />
                         Bài học tiếp theo:
                       </span>
-                      <span className="flex items-center gap-1 text-slate-400 dark:text-zinc-500">
+                      <span className="flex items-center gap-1 text-slate-400">
                         <ClockIcon className="w-3.5 h-3.5" />
                         {course.lastAccessed}
                       </span>
                     </div>
-                    <p className="font-semibold text-slate-900 dark:text-white line-clamp-1 pl-5">
+                    <p className="font-semibold text-slate-900 line-clamp-1 pl-5">
                       {course.nextLessonTitle}
                     </p>
                   </div>
@@ -118,7 +118,7 @@ export function PurchasedCoursesSection({ courses }: PurchasedCoursesSectionProp
 
               {/* Card Footer Actions */}
               <div className="p-5 pt-0 flex items-center justify-between gap-3">
-                <span className="text-xs text-slate-400 dark:text-zinc-500">
+                <span className="text-xs text-slate-400">
                   Đã mua: {course.purchasedDate}
                 </span>
                 <Link href={`/courses/${course.slug}`}>

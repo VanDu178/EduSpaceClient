@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { geistSans, geistMono } from "@/config/fonts";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { ThemeProvider } from "@/contexts";
-import { AntdWrapper } from "@/components/layout";
+import { AppThemeProvider } from "@/components/providers";
+import { Wrapper } from "@/components/layout";
 import "@/styles/globals.css";
+
+export const metadata: Metadata = {
+  title: "EduSpace - Nền tảng Học tập & Chia sẻ Tri thức",
+  description: "Nền tảng edtech hiện đại cho lập trình viên và người học.",
+};
 
 export default function RootLayout({
   children,
@@ -11,12 +16,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`} data-theme="dark">
+    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <body>
         <AntdRegistry>
-          <ThemeProvider>
-            <AntdWrapper>{children}</AntdWrapper>
-          </ThemeProvider>
+          <AppThemeProvider>
+            <Wrapper>{children}</Wrapper>
+          </AppThemeProvider>
         </AntdRegistry>
       </body>
     </html>

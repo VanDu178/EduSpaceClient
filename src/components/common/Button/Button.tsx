@@ -22,15 +22,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 active:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-500 dark:border-blue-600",
+    "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 active:bg-blue-800",
   secondary:
-    "bg-slate-100 text-slate-900 border-slate-200 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-100 dark:border-white/10 dark:hover:bg-zinc-700",
+    "bg-slate-100 text-slate-900 border-slate-200 hover:bg-slate-200",
   outline:
-    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-500 dark:hover:bg-blue-950/40",
+    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-50",
   ghost:
-    "bg-transparent text-slate-700 border-transparent hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-white/10",
+    "bg-transparent text-slate-700 border-transparent hover:bg-slate-100",
   danger:
-    "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800 dark:bg-red-600 dark:hover:bg-red-500 dark:border-red-600",
+    "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800",
   gradient:
     "bg-gradient-to-r from-blue-600 to-purple-600 text-white border-transparent hover:opacity-95 active:opacity-90",
 };

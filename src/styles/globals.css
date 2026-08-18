@@ -1,44 +1,20 @@
+/* IMPORT TAILWIND CSS VÀ THƯ VIỆN */
 @import "tailwindcss";
-
-@import "./variables.css";
 @import "./antd-custom.css";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
-
-@theme {
-  --color-primary: var(--primary-color);
-  --color-primary-hover: var(--primary-hover);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
-}
-
+/* ĐỊNH DẠNG CHUẨN LIGHT MODE CHO THẺ BODY */
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: #f8fafc;
+  color: #0f172a;
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom UI Utilities */
+/* GRADIENT TEXT UTILITY */
 .gradient-text {
   background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.glass-card {
-  background: rgba(24, 24, 27, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-dark);
-}
-
-[data-theme="light"] .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .btn-gradient {
@@ -52,5 +28,3 @@ body {
   opacity: 0.95;
   transform: translateY(-1px);
 }
-
-

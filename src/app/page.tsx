@@ -242,17 +242,17 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Heading & CTAs */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 text-xs sm:text-sm font-medium">
               <SparklesIcon className="w-4 h-4" />
               <span>Nền tảng chia sẻ tri thức Trading & Quant Analysis</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
               Cộng Đồng Chia Sẻ Tri Thức <br className="hidden sm:inline" />
               <span className="gradient-text">Trading & Quantitative Analysis</span>
             </h1>
 
-            <p className="text-base text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-base text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Không gian tổng hợp bài viết kỹ thuật chuyên sâu, phân tích thuật toán giao dịch, hướng dẫn backtesting và chia sẻ góc nhìn thực chiến dành cho Trader & Quant Developer.
             </p>
 
@@ -272,7 +272,7 @@ export default function Home() {
                   variant="outline"
                   size="md"
                   leftIcon={<PlayIcon className="w-5 h-5" />}
-                  className="w-full sm:w-auto border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white"
+                  className="w-full sm:w-auto border-slate-300 text-slate-700 hover:text-slate-900"
                 >
                   Xem video chia sẻ
                 </Button>
@@ -282,15 +282,15 @@ export default function Home() {
 
           {/* Right Column: Stats Card Mockup */}
           <div className="lg:col-span-5">
-            <div className="glass-card p-6 sm:p-8 rounded-3xl relative overflow-hidden border border-slate-200 dark:border-white/10 group hover:border-blue-500/30 transition-all duration-500">
-              <div className="flex items-center justify-between pb-6 border-b border-slate-200 dark:border-white/10">
+            <div className="bg-white p-6 sm:p-8 rounded-3xl relative overflow-hidden border border-slate-200 group hover:border-blue-500/30 transition-all duration-500">
+              <div className="flex items-center justify-between pb-6 border-b border-slate-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-600">
                     <ChartBarIcon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-slate-900 dark:text-white font-bold text-lg m-0">Chỉ số Kho Tri Thức</h3>
-                    <p className="text-xs text-slate-500 dark:text-zinc-400 m-0">Hệ sinh thái tri thức & tài nguyên mở</p>
+                    <h3 className="text-slate-900 font-bold text-lg m-0">Chỉ số Kho Tri Thức</h3>
+                    <p className="text-xs text-slate-500 m-0">Hệ sinh thái tri thức & tài nguyên mở</p>
                   </div>
                 </div>
                 <Tag color="purple" className="rounded-full px-3 py-0.5 text-xs font-semibold">
@@ -300,40 +300,40 @@ export default function Home() {
 
               {/* Grid of Stats */}
               <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="p-4 rounded-2xl bg-slate-100/80 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/5">
-                  <div className="text-xs text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                    <DocumentTextIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
+                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
+                    <DocumentTextIcon className="w-4 h-4 text-blue-600" />
                     <span>Bài viết & Phân tích</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900 dark:text-white">150+</div>
-                  <div className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1">✓ Chuyên sâu & Thực chiến</div>
+                  <div className="text-3xl font-extrabold text-slate-900">150+</div>
+                  <div className="text-[11px] text-emerald-600 mt-1">✓ Chuyên sâu & Thực chiến</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/5">
-                  <div className="text-xs text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                    <CodeBracketIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
+                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
+                    <CodeBracketIcon className="w-4 h-4 text-purple-600" />
                     <span>Code mẫu & Scripts</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900 dark:text-white">50+</div>
-                  <div className="text-[11px] text-blue-600 dark:text-blue-400 mt-1">✓ Python & PineScript</div>
+                  <div className="text-3xl font-extrabold text-slate-900">50+</div>
+                  <div className="text-[11px] text-blue-600 mt-1">✓ Python & PineScript</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/5">
-                  <div className="text-xs text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                    <UserGroupIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
+                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
+                    <UserGroupIcon className="w-4 h-4 text-emerald-600" />
                     <span>Độc giả active</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900 dark:text-white">5,200+</div>
-                  <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-1">Tham gia đọc & thảo luận</div>
+                  <div className="text-3xl font-extrabold text-slate-900">5,200+</div>
+                  <div className="text-[11px] text-slate-500 mt-1">Tham gia đọc & thảo luận</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 dark:bg-zinc-900/60 border border-slate-200 dark:border-white/5">
-                  <div className="text-xs text-slate-500 dark:text-zinc-400 mb-1 flex items-center gap-1.5">
-                    <SparklesIcon className="w-4 h-4 text-amber-500 dark:text-amber-400" />
+                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
+                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
+                    <SparklesIcon className="w-4 h-4 text-amber-500" />
                     <span>Tài nguyên</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900 dark:text-white">100%</div>
-                  <div className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">Chia sẻ mở & Miễn phí</div>
+                  <div className="text-3xl font-extrabold text-slate-900">100%</div>
+                  <div className="text-[11px] text-amber-600 mt-1">Chia sẻ mở & Miễn phí</div>
                 </div>
               </div>
             </div>
@@ -345,15 +345,15 @@ export default function Home() {
       <section id="posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
               <BookOpenIcon className="w-4 h-4" />
               GÓC CHIA SẺ TRI THỨC
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Bài viết & Phân tích mới nhất
             </h2>
           </div>
-          <Link href="/posts" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1">
+          <Link href="/posts" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             Xem tất cả bài viết <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -369,15 +369,15 @@ export default function Home() {
       <section id="videos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+            <div className="text-xs font-bold text-purple-600 uppercase tracking-widest mb-1 flex items-center gap-1">
               <PlayIcon className="w-4 h-4" />
               VIDEO HƯỚNG DẪN & LIVE BACKTEST
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Video chia sẻ & Trực quan hoá dữ liệu
             </h2>
           </div>
-          <Link href="/videos" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1">
+          <Link href="/videos" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             Xem tất cả video <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -392,13 +392,13 @@ export default function Home() {
       {/* 4. Resources & Community Section */}
       <section id="resources" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">
+          <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
             GÓC CỘNG ĐỒNG & CHIA SẺ
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-3">
             Tài nguyên & Kết nối
           </h2>
-          <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base">
+          <p className="text-slate-600 text-sm sm:text-base">
             Khám phá các bộ tài nguyên mở, mã nguồn mẫu và thảo luận chuyên sâu cùng các thành viên có cùng đam mê giao dịch định lượng.
           </p>
         </div>
@@ -414,15 +414,15 @@ export default function Home() {
       <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
               <AcademicCapIcon className="w-4 h-4" />
               LỘ TRÌNH ĐÀO TẠO CHUYÊN SÂU
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Khóa Học Nổi Bật
             </h2>
           </div>
-          <Link href="/courses" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1">
+          <Link href="/courses" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             Xem tất cả khóa học <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
@@ -438,15 +438,15 @@ export default function Home() {
       <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
               <WrenchScrewdriverIcon className="w-4 h-4" />
               DỊCH VỤ CHUYÊN NGHỆP
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
               Giải pháp & Dịch vụ Tư vấn Quant Trading
             </h2>
           </div>
-          <Link href="/services" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1">
+          <Link href="/services" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
             Xem tất cả dịch vụ <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>

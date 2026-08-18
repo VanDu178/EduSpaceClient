@@ -240,14 +240,14 @@ export default function ConsolePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100/60 dark:bg-[#0b0c0e] text-slate-900 dark:text-zinc-100 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-100/60 text-slate-900 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         {/* Page Breadcrumb / Navigation indicator */}
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 mb-6">
-          <Squares2X2Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        <div className="flex items-center gap-2 text-xs text-slate-500 mb-6">
+          <Squares2X2Icon className="w-4 h-4 text-blue-600" />
           <span>EduSpace Hub</span>
           <span>/</span>
-          <span className="font-semibold text-slate-900 dark:text-white">Console Cá Nhân</span>
+          <span className="font-semibold text-slate-900">Console Cá Nhân</span>
         </div>
 
         {/* User Profile Header Card */}
@@ -261,7 +261,7 @@ export default function ConsolePage() {
         />
 
         {/* Main Tabbed Console Section */}
-        <div className="bg-white dark:bg-zinc-900/40 border border-slate-200 dark:border-white/10 rounded-2xl p-4 sm:p-6">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6">
           <Tabs
             defaultActiveKey="saved"
             items={tabItems}

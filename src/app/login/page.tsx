@@ -23,18 +23,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-slate-100 via-slate-200 to-slate-50 dark:from-[#131315] dark:via-[#1a1a24] dark:to-[#0f0f12] transition-colors duration-300">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50 transition-colors duration-300">
       <div className="w-full max-w-md">
         <Card
-          className="glass-card rounded-lg border border-slate-200 dark:border-white/10 backdrop-blur-2xl p-4 sm:p-6"
+          className="bg-white rounded-lg border border-slate-200 p-4 sm:p-6"
           variant="borderless"
         >
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight mb-1">
               Chào mừng trở lại <span className="gradient-text">EduSpace</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+            <p className="text-xs sm:text-sm text-slate-500">
               Đăng nhập tài khoản của bạn để tiếp tục
             </p>
           </div>
@@ -56,9 +56,9 @@ export default function LoginPage() {
               ]}
             >
               <Input
-                prefix={<EnvelopeIcon className="w-5 h-5 text-slate-400 dark:text-zinc-400 mr-2" />}
+                prefix={<EnvelopeIcon className="w-5 h-5 text-slate-400 mr-2" />}
                 placeholder="Địa chỉ Email"
-                className="bg-slate-50 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-md"
+                className="bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-md"
               />
             </Form.Item>
 
@@ -67,19 +67,19 @@ export default function LoginPage() {
               rules={[{ required: true, message: "Vui lòng nhập Mật khẩu!" }]}
             >
               <Input.Password
-                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 dark:text-zinc-400 mr-2" />}
+                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 mr-2" />}
                 placeholder="Mật khẩu"
-                className="bg-slate-50 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-md"
+                className="bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-md"
               />
             </Form.Item>
 
             <div className="flex items-center justify-between mb-5">
               <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox className="text-slate-600 dark:text-zinc-400 text-sm">
+                <Checkbox className="text-slate-600 text-sm">
                   Ghi nhớ đăng nhập
                 </Checkbox>
               </Form.Item>
-              <Link href="/forgot-password" className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300">
+              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -95,7 +95,7 @@ export default function LoginPage() {
           </Form>
 
           {/* Divider */}
-          <Divider className="border-slate-200 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 text-xs my-3">
+          <Divider className="border-slate-200 text-slate-500 text-xs my-3">
             Hoặc
           </Divider>
 
@@ -112,9 +112,9 @@ export default function LoginPage() {
           </Button>
 
           {/* Footer Link */}
-          <div className="mt-6 text-center text-sm text-slate-600 dark:text-zinc-400">
+          <div className="mt-6 text-center text-sm text-slate-600">
             Chưa có tài khoản?{" "}
-            <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">
+            <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
               Đăng ký ngay
             </Link>
           </div>

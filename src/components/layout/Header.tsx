@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, Button, Drawer, Dropdown, Menu, type MenuProps } from "antd";
 import {
-  SunIcon,
-  MoonIcon,
   Bars3Icon,
   XMarkIcon,
   AcademicCapIcon,
@@ -20,11 +18,9 @@ import {
   HomeIcon,
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
-import { useTheme } from "@/contexts";
 
 export const Header = () => {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
@@ -36,6 +32,56 @@ export const Header = () => {
     { name: "Khóa học", href: "/#courses", icon: AcademicCapIcon },
     { name: "Dịch vụ", href: "/#services", icon: WrenchScrewdriverIcon },
   ];
+
+  const [activeKey, setActiveKey] = useState<string>("/#hero");
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      const matched = navLinks.find(
+        (link) => link.href === pathname || link.href.replace("/#", "/") === pathname
+      );
+      if (matched) {
+        setActiveKey(matched.href);
+      } else {
+        setActiveKey("");
+      }
+      return;
+    }
+
+    const hash = window.location.hash;
+    if (hash && navLinks.some((link) => link.href === `/${hash}`)) {
+      setActiveKey(`/${hash}`);
+    } else {
+      setActiveKey("/#hero");
+    }
+
+    const sectionIds = ["hero", "posts", "videos", "resources", "courses", "services"];
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 120;
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+        setActiveKey("/#services");
+        return;
+      }
+
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const id = sectionIds[i];
+        const element = document.getElementById(id);
+        if (element) {
+          const top = element.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveKey(`/#${id}`);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
 
   const slowSmoothScrollTo = (targetPosition: number, duration: number = 1200) => {
     const startPosition = window.pageYOffset;
@@ -63,6 +109,7 @@ export const Header = () => {
   };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    setActiveKey(href);
     if (pathname === "/" && href.startsWith("/#")) {
       e.preventDefault();
       const sectionId = href.replace("/#", "");
@@ -93,7 +140,7 @@ export const Header = () => {
     const Icon = link?.icon;
     return {
       key: link?.href,
-      icon: <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />,
+      icon: <Icon className="w-5 h-5 text-blue-600" />,
       label: (
         <Link
           href={link?.href}
@@ -113,17 +160,12 @@ export const Header = () => {
     {
       key: "console",
       label: <Link href="/console">Console cá nhân</Link>,
-      icon: <Squares2X2Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
+      icon: <Squares2X2Icon className="w-4 h-4" />,
     },
     {
       key: "profile",
       label: <Link href="/profile">Trang cá nhân</Link>,
       icon: <UserIcon className="w-4 h-4" />,
-    },
-    {
-      key: "my-courses",
-      label: <Link href="/my-courses">Khóa học của tôi</Link>,
-      icon: <AcademicCapIcon className="w-4 h-4" />,
     },
     {
       key: "settings",
@@ -144,11 +186,11 @@ export const Header = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/80 dark:bg-[#131315]/80 border-b border-slate-200 dark:border-white/10 transition-colors duration-300">
+      <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/90 border-b border-slate-200 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Left: EduSpace Logo using Antd Avatar */}
+          {/* Left: EduSpace Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-sans">
+            <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
               Edu<span className="gradient-text">Space</span>
             </span>
           </Link>
@@ -157,9 +199,9 @@ export const Header = () => {
           <nav className="hidden md:flex items-center">
             <Menu
               mode="horizontal"
-              selectedKeys={[pathname]}
+              selectedKeys={[activeKey]}
               items={desktopMenuItems}
-              theme={theme === "dark" ? "dark" : "light"}
+              theme="light"
               className="border-none !bg-transparent min-w-[420px] font-medium"
               disabledOverflow
             />
@@ -167,23 +209,6 @@ export const Header = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Dark/Light mode toggle with Antd Tooltip + Button */}
-
-            <Button
-              type="text"
-              shape="circle"
-              onClick={toggleTheme}
-              icon={
-                theme === "dark" ? (
-                  <SunIcon className="w-5 h-5 text-amber-400" />
-                ) : (
-                  <MoonIcon className="w-5 h-5 text-indigo-600" />
-                )
-              }
-              className="flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 border-none"
-            />
-
-
             {/* Sign In Button / User Profile Menu */}
             {!isLoggedIn ? (
               <Link href="/login" className="hidden sm:inline-block">
@@ -198,8 +223,8 @@ export const Header = () => {
               <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
                 <Avatar
                   size={36}
-                  icon={<UserIcon className="w-5 h-5 text-slate-700 dark:text-zinc-200" />}
-                  className="cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 hover:scale-105 transition-transform flex items-center justify-center border-none"
+                  icon={<UserIcon className="w-5 h-5 text-slate-700" />}
+                  className="cursor-pointer bg-slate-100 hover:bg-slate-200 hover:scale-105 transition-transform flex items-center justify-center border-none"
                 />
               </Dropdown>
             )}
@@ -209,8 +234,8 @@ export const Header = () => {
               type="text"
               shape="circle"
               onClick={() => setMobileMenuOpen(true)}
-              icon={<Bars3Icon className="w-6 h-6 text-slate-600 dark:text-zinc-400" />}
-              className="md:!hidden flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/10 border-none"
+              icon={<Bars3Icon className="w-6 h-6 text-slate-600" />}
+              className="md:!hidden flex items-center justify-center hover:bg-slate-100 border-none"
             />
           </div>
         </div>
@@ -220,7 +245,7 @@ export const Header = () => {
       <Drawer
         title={
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-slate-900 dark:text-white">
+            <span className="text-lg font-bold text-slate-900">
               Edu<span className="gradient-text">Space</span>
             </span>
           </div>
@@ -228,15 +253,15 @@ export const Header = () => {
         placement="right"
         onClose={() => setMobileMenuOpen(false)}
         open={mobileMenuOpen}
-        closeIcon={<XMarkIcon className="w-5 h-5 text-slate-500 dark:text-zinc-400" />}
+        closeIcon={<XMarkIcon className="w-5 h-5 text-slate-500" />}
         styles={{
           header: {
-            background: theme === "dark" ? "#131315" : "#ffffff",
-            borderColor: theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
-            color: theme === "dark" ? "#fff" : "#0f172a",
+            background: "#ffffff",
+            borderColor: "rgba(0,0,0,0.06)",
+            color: "#0f172a",
           },
           body: {
-            background: theme === "dark" ? "#131315" : "#ffffff",
+            background: "#ffffff",
             padding: "16px 8px",
           },
         }}
@@ -244,12 +269,12 @@ export const Header = () => {
         <div className="flex flex-col h-full justify-between">
           <Menu
             mode="inline"
-            selectedKeys={[pathname]}
+            selectedKeys={[activeKey]}
             items={mobileMenuItems}
-            theme={theme === "dark" ? "dark" : "light"}
+            theme="light"
             className="border-none bg-transparent"
           />
-          <div className="pt-4 border-t border-slate-200 dark:border-white/10 px-4 mb-4">
+          <div className="pt-4 border-t border-slate-200 px-4 mb-4">
             {!isLoggedIn ? (
               <Link
                 href="/login"

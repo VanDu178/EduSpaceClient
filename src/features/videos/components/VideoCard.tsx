@@ -13,10 +13,10 @@ export const VideoCard = ({ video, onClick, className = "" }: VideoCardProps) =>
   const content = (
     <div
       onClick={() => onClick?.(video)}
-      className={`glass-card rounded-3xl overflow-hidden group border border-slate-200 dark:border-white/10 hover:border-purple-500/40 transition-all duration-300 ${onClick ? "cursor-pointer" : ""
+      className={`bg-white rounded-3xl overflow-hidden group border border-slate-200 hover:border-purple-500/40 transition-all duration-300 ${onClick ? "cursor-pointer" : ""
         } ${className}`}
     >
-      <div className="relative h-64 w-full overflow-hidden bg-slate-900 dark:bg-zinc-900 cursor-pointer">
+      <div className="relative h-64 w-full overflow-hidden bg-slate-900 cursor-pointer">
         <img
           src={video.thumbnail}
           alt={video.title}
@@ -43,8 +43,8 @@ export const VideoCard = ({ video, onClick, className = "" }: VideoCardProps) =>
       </div>
 
       <div className="p-6">
-        <div className="text-xs text-slate-500 dark:text-zinc-400 mb-2">{video.views}</div>
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
+        <div className="text-xs text-slate-500 mb-2">{video.views}</div>
+        <h3 className="text-lg font-bold text-slate-900 group-hover:text-purple-600 transition-colors leading-snug">
           {video.title}
         </h3>
       </div>

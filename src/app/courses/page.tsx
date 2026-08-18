@@ -10,12 +10,10 @@ import {
   StarIcon,
   UserGroupIcon
 } from "@heroicons/react/24/outline";
-import { useTheme } from "@/contexts";
 
 const { Sider, Content } = Layout;
 
 export default function CoursesPage() {
-  const { theme } = useTheme();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulties, setSelectedDifficulties] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 3000000]);
@@ -96,9 +94,9 @@ export default function CoursesPage() {
   const difficulties = ["Cơ bản", "Nâng cao"];
 
   const FilterContent = (
-    <div className="space-y-6 text-slate-700 dark:text-zinc-300">
+    <div className="space-y-6 text-slate-700">
       <div>
-        <h4 className="text-slate-900 dark:text-white font-semibold mb-3 text-sm uppercase tracking-wider">Danh mục (Category)</h4>
+        <h4 className="text-slate-900 font-semibold mb-3 text-sm uppercase tracking-wider">Danh mục (Category)</h4>
         <div className="flex flex-col gap-2.5">
           {categories.map((cat) => (
             <Checkbox
@@ -111,7 +109,7 @@ export default function CoursesPage() {
                   setSelectedCategories(selectedCategories.filter((c) => c !== cat));
                 }
               }}
-              className="text-slate-700 dark:text-zinc-300 text-sm"
+              className="text-slate-700 text-sm"
             >
               {cat}
             </Checkbox>
@@ -119,8 +117,8 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-        <h4 className="text-slate-900 dark:text-white font-semibold mb-3 text-sm uppercase tracking-wider">Độ khó (Difficulty)</h4>
+      <div className="pt-4 border-t border-slate-200">
+        <h4 className="text-slate-900 font-semibold mb-3 text-sm uppercase tracking-wider">Độ khó (Difficulty)</h4>
         <div className="flex flex-col gap-2.5">
           {difficulties.map((diff) => (
             <Checkbox
@@ -133,7 +131,7 @@ export default function CoursesPage() {
                   setSelectedDifficulties(selectedDifficulties.filter((d) => d !== diff));
                 }
               }}
-              className="text-slate-700 dark:text-zinc-300 text-sm"
+              className="text-slate-700 text-sm"
             >
               {diff}
             </Checkbox>
@@ -141,8 +139,8 @@ export default function CoursesPage() {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-        <h4 className="text-slate-900 dark:text-white font-semibold mb-3 text-sm uppercase tracking-wider">Khoảng giá (Price)</h4>
+      <div className="pt-4 border-t border-slate-200">
+        <h4 className="text-slate-900 font-semibold mb-3 text-sm uppercase tracking-wider">Khoảng giá (Price)</h4>
         <Slider
           range
           min={0}
@@ -154,7 +152,7 @@ export default function CoursesPage() {
             formatter: (v) => `${(v || 0).toLocaleString("vi-VN")}₫`,
           }}
         />
-        <div className="flex justify-between text-xs text-slate-500 dark:text-zinc-400 mt-2">
+        <div className="flex justify-between text-xs text-slate-500 mt-2">
           <span>{priceRange[0].toLocaleString("vi-VN")}₫</span>
           <span>{priceRange[1].toLocaleString("vi-VN")}₫</span>
         </div>
@@ -165,12 +163,12 @@ export default function CoursesPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-6 border-b border-slate-200 dark:border-white/10 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-6 border-b border-slate-200 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
             Khóa Học <span className="gradient-text">Kỹ Thuật EduSpace</span>
           </h1>
-          <p className="text-slate-600 dark:text-zinc-400 text-sm">
+          <p className="text-slate-600 text-sm">
             Nâng cao năng lực lập trình với các lộ trình bài bản từ Beginner đến Advanced
           </p>
         </div>
@@ -180,7 +178,7 @@ export default function CoursesPage() {
           <Button
             onClick={() => setFilterDrawerOpen(true)}
             icon={<FunnelIcon className="w-4 h-4" />}
-            className="bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 text-slate-900 dark:text-white border-slate-300 dark:border-zinc-700 rounded-xl"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300 rounded-xl"
           >
             Bộ lọc
           </Button>
@@ -191,11 +189,11 @@ export default function CoursesPage() {
         {/* Ant Design Sider Filter (Desktop) */}
         <Sider
           width={280}
-          className="hidden lg:block glass-card p-6 rounded-2xl border border-slate-200 dark:border-white/10 h-fit"
-          style={{ background: theme === "dark" ? "rgba(24, 24, 27, 0.65)" : "#ffffff" }}
+          className="hidden lg:block bg-white p-6 rounded-2xl border border-slate-200 h-fit"
+          style={{ background: "#ffffff" }}
         >
-          <div className="flex items-center gap-2 mb-6 text-slate-900 dark:text-white font-bold text-base border-b border-slate-200 dark:border-white/10 pb-4">
-            <FunnelIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="flex items-center gap-2 mb-6 text-slate-900 font-bold text-base border-b border-slate-200 pb-4">
+            <FunnelIcon className="w-5 h-5 text-blue-600" />
             <span>Bộ Lọc Khóa Học</span>
           </div>
           {FilterContent}
@@ -209,12 +207,12 @@ export default function CoursesPage() {
           open={filterDrawerOpen}
           styles={{
             header: {
-              background: theme === "dark" ? "#18181b" : "#ffffff",
-              borderColor: theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
-              color: theme === "dark" ? "#fff" : "#0f172a",
+              background: "#ffffff",
+              borderColor: "rgba(0,0,0,0.1)",
+              color: "#0f172a",
             },
             body: {
-              background: theme === "dark" ? "#18181b" : "#ffffff",
+              background: "#ffffff",
               padding: "20px",
             },
           }}
@@ -228,11 +226,11 @@ export default function CoursesPage() {
             {courses.map((course) => (
               <div
                 key={course.id}
-                className="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group border border-slate-200 dark:border-white/10 hover:border-blue-500/40 transition-all duration-300"
+                className="bg-white rounded-3xl overflow-hidden flex flex-col justify-between group border border-slate-200 hover:border-blue-500/40 transition-all duration-300"
               >
                 <div>
                   {/* Banner */}
-                  <div className="relative h-48 w-full overflow-hidden bg-slate-200 dark:bg-zinc-900">
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-200">
                     <img
                       src={course.banner}
                       alt={course.title}
@@ -241,7 +239,7 @@ export default function CoursesPage() {
                     <div className="absolute top-4 left-4 flex gap-2">
                       <span
                         className={`text-xs px-3 py-1 rounded-full font-bold ${course.difficulty === "Cơ bản"
-                            ? "bg-emerald-600 dark:bg-emerald-500/90 text-white"
+                            ? "bg-emerald-600 text-white"
                             : "bg-purple-600/90 text-white"
                           }`}
                       >
@@ -252,35 +250,35 @@ export default function CoursesPage() {
 
                   <div className="p-6 space-y-4">
                     {/* Meta info */}
-                    <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-zinc-400">
+                    <div className="flex items-center gap-4 text-xs text-slate-500">
                       <span className="flex items-center gap-1">
-                        <UserGroupIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <UserGroupIcon className="w-4 h-4 text-blue-600" />
                         {course.students} học viên
                       </span>
                       <span>•</span>
-                      <span className="flex items-center gap-1 text-amber-500 dark:text-amber-400 font-semibold">
+                      <span className="flex items-center gap-1 text-amber-500 font-semibold">
                         <StarIcon className="w-4 h-4 fill-amber-400" />
                         {course.rating}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <ClockIcon className="w-4 h-4 text-slate-400 dark:text-zinc-400" />
+                        <ClockIcon className="w-4 h-4 text-slate-400" />
                         {course.hours}
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
                       {course.title}
                     </h3>
 
                     {/* 3 Bullet points Roadmap */}
-                    <div className="space-y-2 py-2 border-t border-slate-200 dark:border-white/5">
-                      <div className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+                    <div className="space-y-2 py-2 border-t border-slate-200">
+                      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         Lộ trình học nổi bật:
                       </div>
                       {course.roadmap.map((bullet, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 dark:text-zinc-300">
-                          <CheckCircleIcon className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                        <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700">
+                          <CheckCircleIcon className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                           <span>{bullet}</span>
                         </div>
                       ))}
@@ -289,12 +287,12 @@ export default function CoursesPage() {
                 </div>
 
                 {/* Footer / Pricing & Enroll CTA */}
-                <div className="p-6 pt-0 flex items-center justify-between border-t border-slate-200 dark:border-white/10 mt-4">
+                <div className="p-6 pt-0 flex items-center justify-between border-t border-slate-200 mt-4">
                   <div>
-                    <div className="text-xs text-slate-400 dark:text-zinc-500 line-through">
+                    <div className="text-xs text-slate-400 line-through">
                       {course.originalPrice.toLocaleString("vi-VN")}₫
                     </div>
-                    <div className="text-xl font-extrabold text-slate-900 dark:text-white">
+                    <div className="text-xl font-extrabold text-slate-900">
                       {course.discountedPrice.toLocaleString("vi-VN")}₫
                     </div>
                   </div>

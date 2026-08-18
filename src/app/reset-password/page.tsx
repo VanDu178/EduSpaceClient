@@ -25,18 +25,18 @@ function ResetPasswordForm() {
 
   return (
     <Card
-      className="glass-card rounded-lg border border-slate-200 dark:border-white/10 backdrop-blur-2xl p-4 sm:p-6"
+      className="bg-white rounded-lg border border-slate-200 p-4 sm:p-6"
       variant="borderless"
     >
       {completed ? (
         <div className="text-center py-4">
-          <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 mb-4">
-            <CheckCircleIcon className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+          <div className="mx-auto flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 mb-4">
+            <CheckCircleIcon className="w-8 h-8 text-emerald-600" />
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight mb-2">
             Đặt lại Mật khẩu thành công!
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-400 mb-6">
+          <p className="text-xs sm:text-sm text-slate-600 mb-6">
             Mật khẩu của bạn đã được cập nhật thành công. Bạn có thể sử dụng mật khẩu mới để đăng nhập.
           </p>
           <Link href="/login" className="block">
@@ -49,10 +49,10 @@ function ResetPasswordForm() {
         <>
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight mb-1">
               Đặt lại <span className="gradient-text">Mật khẩu</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400">
+            <p className="text-xs sm:text-sm text-slate-500">
               Nhập mật khẩu mới của bạn bên dưới
             </p>
           </div>
@@ -74,9 +74,9 @@ function ResetPasswordForm() {
               hasFeedback
             >
               <Input.Password
-                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 dark:text-zinc-400 mr-2" />}
+                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 mr-2" />}
                 placeholder="Mật khẩu mới"
-                className="bg-slate-50 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-md"
+                className="bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-md"
               />
             </Form.Item>
 
@@ -97,9 +97,9 @@ function ResetPasswordForm() {
               ]}
             >
               <Input.Password
-                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 dark:text-zinc-400 mr-2" />}
+                prefix={<LockClosedIcon className="w-5 h-5 text-slate-400 mr-2" />}
                 placeholder="Xác nhận mật khẩu mới"
-                className="bg-slate-50 dark:bg-zinc-900/80 border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-zinc-500 !text-sm !rounded-md"
+                className="bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400 !text-sm !rounded-md"
               />
             </Form.Item>
 
@@ -118,7 +118,7 @@ function ResetPasswordForm() {
           <div className="mt-6 text-center">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1.5 text-sm text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900 transition-colors"
             >
               <ArrowLeftIcon className="w-4 h-4" />
               Quay lại Đăng nhập
@@ -132,10 +132,10 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-slate-100 via-slate-200 to-slate-50 dark:from-[#131315] dark:via-[#1a1a24] dark:to-[#0f0f12] transition-colors duration-300">
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-slate-50 transition-colors duration-300">
       <div className="w-full max-w-md">
         <Suspense fallback={
-          <div className="p-8 text-center text-slate-500 dark:text-zinc-400">
+          <div className="p-8 text-center text-slate-500">
             Đang tải...
           </div>
         }>

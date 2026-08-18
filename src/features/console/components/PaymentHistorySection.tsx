@@ -7,7 +7,6 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ClockIcon,
-  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 import { PaymentTransaction } from "../types";
 
@@ -29,7 +28,7 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
       dataIndex: "transactionCode",
       key: "transactionCode",
       render: (code: string) => (
-        <span className="font-mono text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-1 rounded border border-blue-200 dark:border-blue-500/30">
+        <span className="font-mono text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded border border-blue-200">
           {code}
         </span>
       ),
@@ -40,8 +39,8 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
       key: "itemName",
       render: (text: string, record: PaymentTransaction) => (
         <div>
-          <p className="text-xs sm:text-sm font-medium text-slate-900 dark:text-white">{text}</p>
-          <span className="text-[11px] text-slate-400 dark:text-zinc-500">Loại: {record.itemType}</span>
+          <p className="text-xs sm:text-sm font-medium text-slate-900">{text}</p>
+          <span className="text-[11px] text-slate-400">Loại: {record.itemType}</span>
         </div>
       ),
     },
@@ -50,7 +49,7 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
       dataIndex: "amount",
       key: "amount",
       render: (amount: number) => (
-        <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+        <span className="text-xs sm:text-sm font-bold text-slate-900">
           {formatCurrency(amount)}
         </span>
       ),
@@ -60,7 +59,7 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
       dataIndex: "paymentMethod",
       key: "paymentMethod",
       render: (method: string) => (
-        <span className="text-xs text-slate-600 dark:text-zinc-400 font-medium">
+        <span className="text-xs text-slate-600 font-medium">
           {method}
         </span>
       ),
@@ -70,7 +69,7 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
       dataIndex: "paymentDate",
       key: "paymentDate",
       render: (date: string) => (
-        <span className="text-xs text-slate-500 dark:text-zinc-400">
+        <span className="text-xs text-slate-500">
           {date}
         </span>
       ),
@@ -104,15 +103,15 @@ export function PaymentHistorySection({ transactions }: PaymentHistorySectionPro
   ];
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-2xl p-6 sm:p-8">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200 dark:border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
             <CreditCardIcon className="w-6 h-6 text-emerald-500" />
             Lịch sử thanh toán ({transactions.length})
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Tra cứu tất cả hóa đơn thanh toán khóa học, dịch vụ tư vấn và đăng ký tài khoản.
           </p>
         </div>
