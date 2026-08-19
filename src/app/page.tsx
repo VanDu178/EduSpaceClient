@@ -233,36 +233,36 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-24 pb-20">
-      {/* 1. Hero Section (Trang chủ) */}
-      <section id="hero" className="relative pt-12 lg:pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden transition-all duration-500 ease-out">
-        {/* Background Ambient Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-tr from-blue-600/20 to-purple-600/20 blur-[120px] rounded-full pointer-events-none -z-10" />
+    <div className="space-y-16 sm:space-y-20 pb-20 bg-white text-zinc-900">
+      {/* 1. Hero Section */}
+      <section id="hero" className="relative pt-10 lg:pt-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        {/* Minimalist Grid Pattern Background */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none -z-10" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Column: Heading & CTAs */}
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 text-xs sm:text-sm font-medium">
-              <SparklesIcon className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-zinc-100 border border-zinc-200 text-zinc-800 text-xs sm:text-sm font-medium">
+              <SparklesIcon className="w-4 h-4 text-zinc-900" />
               <span>Nền tảng chia sẻ tri thức Trading & Quant Analysis</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 leading-[1.2]">
               Cộng Đồng Chia Sẻ Tri Thức <br className="hidden sm:inline" />
-              <span className="gradient-text">Trading & Quantitative Analysis</span>
+              <span className="text-zinc-900 font-extrabold block mt-1">Trading & Quantitative Analysis</span>
             </h1>
 
-            <p className="text-base text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-sm sm:text-base text-zinc-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
               Không gian tổng hợp bài viết kỹ thuật chuyên sâu, phân tích thuật toán giao dịch, hướng dẫn backtesting và chia sẻ góc nhìn thực chiến dành cho Trader & Quant Developer.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
               <Link href="/posts" className="w-full sm:w-auto">
                 <Button
                   variant="primary"
                   size="md"
-                  leftIcon={<BookOpenIcon className="w-5 h-5" />}
-                  className="w-full sm:w-auto"
+                  leftIcon={<BookOpenIcon className="w-4 h-4" />}
+                  className="w-full sm:w-auto bg-zinc-900 text-white hover:bg-zinc-800 border-0 rounded-lg font-medium"
                 >
                   Khám phá bài viết
                 </Button>
@@ -271,8 +271,8 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="md"
-                  leftIcon={<PlayIcon className="w-5 h-5" />}
-                  className="w-full sm:w-auto border-slate-300 text-slate-700 hover:text-slate-900"
+                  leftIcon={<PlayIcon className="w-4 h-4" />}
+                  className="w-full sm:w-auto border-zinc-300 text-zinc-800 hover:bg-zinc-100 hover:text-zinc-900 rounded-lg font-medium"
                 >
                   Xem video chia sẻ
                 </Button>
@@ -280,60 +280,60 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column: Stats Card Mockup */}
+          {/* Right Column: Stats Card Mockup (Minimalist Monochrome) */}
           <div className="lg:col-span-5">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl relative overflow-hidden border border-slate-200 group hover:border-blue-500/30 transition-all duration-500">
-              <div className="flex items-center justify-between pb-6 border-b border-slate-200">
+            <div className="bg-white p-6 sm:p-7 rounded-2xl relative overflow-hidden border border-zinc-200 transition-colors hover:border-zinc-400">
+              <div className="flex items-center justify-between pb-5 border-b border-zinc-200">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-600">
-                    <ChartBarIcon className="w-6 h-6" />
+                  <div className="w-10 h-10 rounded-lg bg-zinc-900 text-white flex items-center justify-center">
+                    <ChartBarIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-slate-900 font-bold text-lg m-0">Chỉ số Kho Tri Thức</h3>
-                    <p className="text-xs text-slate-500 m-0">Hệ sinh thái tri thức & tài nguyên mở</p>
+                    <h3 className="text-zinc-900 font-bold text-base m-0">Chỉ số Kho Tri Thức</h3>
+                    <p className="text-xs text-zinc-500 m-0">Hệ sinh thái tri thức & tài nguyên mở</p>
                   </div>
                 </div>
-                <Tag color="purple" className="rounded-full px-3 py-0.5 text-xs font-semibold">
+                <span className="rounded-md bg-zinc-100 border border-zinc-200 px-2.5 py-1 text-xs font-semibold text-zinc-800 uppercase tracking-wider">
                   CỘNG ĐỒNG
-                </Tag>
+                </span>
               </div>
 
               {/* Grid of Stats */}
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
-                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
-                    <DocumentTextIcon className="w-4 h-4 text-blue-600" />
+              <div className="grid grid-cols-2 gap-3.5 mt-5">
+                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-1.5 font-medium">
+                    <DocumentTextIcon className="w-4 h-4 text-zinc-700" />
                     <span>Bài viết & Phân tích</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900">150+</div>
-                  <div className="text-[11px] text-emerald-600 mt-1">✓ Chuyên sâu & Thực chiến</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-zinc-900">150+</div>
+                  <div className="text-[11px] text-zinc-600 font-medium mt-1">✓ Chuyên sâu & Thực chiến</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
-                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
-                    <CodeBracketIcon className="w-4 h-4 text-purple-600" />
+                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-1.5 font-medium">
+                    <CodeBracketIcon className="w-4 h-4 text-zinc-700" />
                     <span>Code mẫu & Scripts</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900">50+</div>
-                  <div className="text-[11px] text-blue-600 mt-1">✓ Python & PineScript</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-zinc-900">50+</div>
+                  <div className="text-[11px] text-zinc-600 font-medium mt-1">✓ Python & PineScript</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
-                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
-                    <UserGroupIcon className="w-4 h-4 text-emerald-600" />
+                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-1.5 font-medium">
+                    <UserGroupIcon className="w-4 h-4 text-zinc-700" />
                     <span>Độc giả active</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900">5,200+</div>
-                  <div className="text-[11px] text-slate-500 mt-1">Tham gia đọc & thảo luận</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-zinc-900">5,200+</div>
+                  <div className="text-[11px] text-zinc-500 mt-1">Tham gia đọc & thảo luận</div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-slate-100/80 border border-slate-200">
-                  <div className="text-xs text-slate-500 mb-1 flex items-center gap-1.5">
-                    <SparklesIcon className="w-4 h-4 text-amber-500" />
+                <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-1.5 font-medium">
+                    <SparklesIcon className="w-4 h-4 text-zinc-700" />
                     <span>Tài nguyên</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900">100%</div>
-                  <div className="text-[11px] text-amber-600 mt-1">Chia sẻ mở & Miễn phí</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-zinc-900">100%</div>
+                  <div className="text-[11px] text-zinc-600 font-medium mt-1">Chia sẻ mở & Miễn phí</div>
                 </div>
               </div>
             </div>
@@ -341,117 +341,132 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="border-t border-zinc-200/80 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+
       {/* 2. Bài viết Section (Posts) */}
-      <section id="posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+      <section id="posts" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-              <BookOpenIcon className="w-4 h-4" />
+            <div className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <BookOpenIcon className="w-4 h-4 text-zinc-700" />
               GÓC CHIA SẺ TRI THỨC
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
               Bài viết & Phân tích mới nhất
             </h2>
           </div>
-          <Link href="/posts" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <Link href="/posts" className="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 transition-colors underline underline-offset-4 decoration-zinc-300">
             Xem tất cả bài viết <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {articles.map((item) => (
             <PostCard key={item.id} post={item} />
           ))}
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="border-t border-zinc-200/80 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+
       {/* 3. Featured Videos Section */}
-      <section id="videos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+      <section id="videos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="text-xs font-bold text-purple-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-              <PlayIcon className="w-4 h-4" />
+            <div className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <PlayIcon className="w-4 h-4 text-zinc-700" />
               VIDEO HƯỚNG DẪN & LIVE BACKTEST
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
               Video chia sẻ & Trực quan hoá dữ liệu
             </h2>
           </div>
-          <Link href="/videos" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <Link href="/videos" className="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 transition-colors underline underline-offset-4 decoration-zinc-300">
             Xem tất cả video <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {videos.map((video) => (
             <VideoCard key={video.id} video={video} />
           ))}
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="border-t border-zinc-200/80 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+
       {/* 4. Resources & Community Section */}
-      <section id="resources" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1">
+      <section id="resources" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-1.5">
             GÓC CỘNG ĐỒNG & CHIA SẺ
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight mb-3">
+          <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight mb-2.5">
             Tài nguyên & Kết nối
           </h2>
-          <p className="text-slate-600 text-sm sm:text-base">
+          <p className="text-zinc-600 text-sm sm:text-base leading-relaxed">
             Khám phá các bộ tài nguyên mở, mã nguồn mẫu và thảo luận chuyên sâu cùng các thành viên có cùng đam mê giao dịch định lượng.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {resources.map((res, idx) => (
             <ResourceCard key={idx} resource={res} />
           ))}
         </div>
       </section>
 
-      {/* 5. Courses Section (Bổ sung mới) */}
-      <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+      {/* Divider */}
+      <div className="border-t border-zinc-200/80 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+
+      {/* 5. Courses Section */}
+      <section id="courses" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-              <AcademicCapIcon className="w-4 h-4" />
+            <div className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <AcademicCapIcon className="w-4 h-4 text-zinc-700" />
               LỘ TRÌNH ĐÀO TẠO CHUYÊN SÂU
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
               Khóa Học Nổi Bật
             </h2>
           </div>
-          <Link href="/courses" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <Link href="/courses" className="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 transition-colors underline underline-offset-4 decoration-zinc-300">
             Xem tất cả khóa học <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
         </div>
       </section>
 
+      {/* Divider */}
+      <div className="border-t border-zinc-200/80 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" />
+
       {/* 6. Services Section */}
-      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 transition-all duration-500 ease-out">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4">
+      <section id="services" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
-            <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1">
-              <WrenchScrewdriverIcon className="w-4 h-4" />
+            <div className="text-xs font-semibold text-zinc-500 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <WrenchScrewdriverIcon className="w-4 h-4 text-zinc-700" />
               DỊCH VỤ CHUYÊN NGHỆP
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">
               Giải pháp & Dịch vụ Tư vấn Quant Trading
             </h2>
           </div>
-          <Link href="/services" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1">
+          <Link href="/services" className="text-xs sm:text-sm font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 transition-colors underline underline-offset-4 decoration-zinc-300">
             Xem tất cả dịch vụ <ArrowRightIcon className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
           {services.map((svc) => (
             <ServiceCard key={svc.id} service={svc} />
           ))}

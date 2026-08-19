@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { geistSans, geistMono } from "@/config/fonts";
+import { varelaRound } from "@/config/fonts";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { AppThemeProvider } from "@/components/providers";
 import { Wrapper } from "@/components/layout";
@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={varelaRound.variable} suppressHydrationWarning>
       <body>
         <AntdRegistry>
           <AppThemeProvider>
