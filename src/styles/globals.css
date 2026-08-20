@@ -1,7 +1,27 @@
-/* IMPORT TAILWIND CSS VÀ THƯ VIỆN */
 @import "tailwindcss";
+@import "./variables.css";
 @import "./antd-custom.css";
 
+/* TAILWIND CSS V4 THEME CONFIGURATION */
+@theme {
+  --color-primary: var(--primary-color);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-light: var(--primary-light);
+  --color-primary-contrast: var(--primary-contrast);
+  --color-btn-primary: var(--btn-primary-bg);
+  --color-btn-primary-hover: var(--btn-primary-hover);
+  --color-btn-secondary-bg: var(--btn-secondary-bg);
+  --color-btn-secondary-text: var(--btn-secondary-text);
+  --color-btn-secondary-border: var(--btn-secondary-border);
+  --color-brand-accent: var(--bg-accent);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-tertiary: var(--text-tertiary);
+}
+
+
+/* FONT & TYPOGRAPHY */
 @font-face {
   font-family: 'Varela Round';
   src: url('/fonts/varela-round-latin.woff2') format('woff2');
@@ -22,21 +42,27 @@ body {
   min-height: 100vh;
 }
 
-/* GRADIENT TEXT UTILITY */
-.gradient-text {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* CUSTOM ANIMATIONS FOR SIMULATED CHAT & COUNTER */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-.btn-gradient {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-  color: #ffffff !important;
-  border: none !important;
-  transition: all 0.3s ease !important;
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.btn-gradient:hover {
-  opacity: 0.95;
-  transform: translateY(-1px);
+.animate-blink {
+  animation: blink 0.8s infinite;
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

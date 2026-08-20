@@ -10,10 +10,12 @@ export type ButtonVariant =
   | "gradient";
 
 export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonRounded = "md" | "lg" | "xl" | "2xl" | "full";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  rounded?: ButtonRounded;
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -22,23 +24,31 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-blue-600 text-white border-blue-600 hover:bg-blue-700 hover:border-blue-700 active:bg-blue-800",
+    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90",
   secondary:
-    "bg-slate-100 text-slate-900 border-slate-200 hover:bg-slate-200",
+    "bg-white text-primary border border-primary/40 hover:border-primary hover:bg-primary-light/30 active:bg-primary-light/60",
   outline:
-    "bg-transparent text-blue-600 border-blue-600 hover:bg-blue-50",
+    "bg-white text-primary border border-slate-200 hover:border-primary ",
   ghost:
-    "bg-transparent text-slate-700 border-transparent hover:bg-slate-100",
+    "bg-transparent text-slate-700 border-transparent hover:bg-[#ddf3fe]/30",
   danger:
     "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800",
   gradient:
-    "bg-gradient-to-r from-blue-600 to-purple-600 text-white border-transparent hover:opacity-95 active:opacity-90",
+    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-xs gap-1.5 rounded-md",
-  md: "h-10 px-4 text-sm gap-2 rounded-lg",
-  lg: "h-12 px-6 text-base gap-2.5 rounded-lg font-semibold",
+  sm: "h-8 px-3.5 text-xs gap-1.5",
+  md: "h-10 px-5 text-sm gap-2",
+  lg: "h-12 px-7 text-base gap-2.5 font-semibold",
+};
+
+const roundedClasses: Record<ButtonRounded, string> = {
+  md: "rounded-md",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+  "2xl": "rounded-2xl",
+  full: "rounded-full",
 };
 
 const iconSizeClasses: Record<ButtonSize, string> = {
@@ -52,6 +62,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant = "primary",
       size = "md",
+      rounded = "full",
       isLoading = false,
       leftIcon,
       rightIcon,
@@ -67,10 +78,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || isLoading;
 
     const baseClasses =
-      "inline-flex items-center justify-center font-medium border transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer";
+      "inline-flex items-center justify-center font-medium border transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer whitespace-nowrap";
     const widthClass = fullWidth ? "w-full" : "";
+    const roundedClass = roundedClasses[rounded] || "rounded-full";
 
-    const combinedClassName = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${className}`.trim();
+    const combinedClassName = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${roundedClass} ${widthClass} ${className}`.trim();
 
     return (
       <button
@@ -88,7 +100,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {leftIcon}
           </span>
         )}
-        {children && <span>{children}</span>}
+        {children && <span className="inline-flex items-center gap-2 whitespace-nowrap">{children}</span>}
         {!isLoading && rightIcon && (
           <span className={`inline-flex items-center shrink-0 ${iconSizeClasses[size]}`}>
             {rightIcon}

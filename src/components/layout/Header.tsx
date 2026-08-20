@@ -7,16 +7,10 @@ import { Avatar, Button, Drawer, Dropdown, Menu, type MenuProps } from "antd";
 import {
   Bars3Icon,
   XMarkIcon,
-  AcademicCapIcon,
-  BookOpenIcon,
-  VideoCameraIcon,
-  BriefcaseIcon,
-  WrenchScrewdriverIcon,
   ArrowRightStartOnRectangleIcon,
   UserIcon,
-  Cog6ToothIcon,
   HomeIcon,
-  Squares2X2Icon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 
 export const Header = () => {
@@ -25,106 +19,18 @@ export const Header = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const navLinks = [
-    { name: "Trang chủ", href: "/#hero", icon: HomeIcon },
-    { name: "Bài viết", href: "/#posts", icon: BookOpenIcon },
-    { name: "Video", href: "/#videos", icon: VideoCameraIcon },
-    { name: "Tài nguyên", href: "/#resources", icon: BriefcaseIcon },
-    { name: "Khóa học", href: "/#courses", icon: AcademicCapIcon },
-    { name: "Dịch vụ", href: "/#services", icon: WrenchScrewdriverIcon },
+    { name: "Trang chủ", href: "/", icon: HomeIcon },
+    { name: "Bài viết", href: "/blogs", icon: DocumentTextIcon },
   ];
 
-  const [activeKey, setActiveKey] = useState<string>("/#hero");
+  const [activeKey, setActiveKey] = useState<string>("/");
 
   useEffect(() => {
-    if (pathname !== "/") {
-      const matched = navLinks.find(
-        (link) => link.href === pathname || link.href.replace("/#", "/") === pathname
-      );
-      if (matched) {
-        setActiveKey(matched.href);
-      } else {
-        setActiveKey("");
-      }
-      return;
-    }
-
-    const hash = window.location.hash;
-    if (hash && navLinks.some((link) => link.href === `/${hash}`)) {
-      setActiveKey(`/${hash}`);
-    } else {
-      setActiveKey("/#hero");
-    }
-
-    const sectionIds = ["hero", "posts", "videos", "resources", "courses", "services"];
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 120;
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
-        setActiveKey("/#services");
-        return;
-      }
-
-      for (let i = sectionIds.length - 1; i >= 0; i--) {
-        const id = sectionIds[i];
-        const element = document.getElementById(id);
-        if (element) {
-          const top = element.offsetTop;
-          if (scrollPosition >= top) {
-            setActiveKey(`/#${id}`);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
+    setActiveKey(pathname);
   }, [pathname]);
-
-  const slowSmoothScrollTo = (targetPosition: number, duration: number = 1200) => {
-    const startPosition = window.pageYOffset;
-    const distance = targetPosition - startPosition;
-    let startTime: number | null = null;
-
-    const easeInOutCubic = (t: number): number => {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    };
-
-    const step = (currentTime: number) => {
-      if (startTime === null) startTime = currentTime;
-      const timeElapsed = currentTime - startTime;
-      const progress = Math.min(timeElapsed / duration, 1);
-      const easeProgress = easeInOutCubic(progress);
-
-      window.scrollTo(0, startPosition + distance * easeProgress);
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(step);
-      }
-    };
-
-    requestAnimationFrame(step);
-  };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     setActiveKey(href);
-    if (pathname === "/" && href.startsWith("/#")) {
-      e.preventDefault();
-      const sectionId = href.replace("/#", "");
-      if (sectionId === "hero") {
-        slowSmoothScrollTo(0, 1000);
-      } else {
-        const element = document.getElementById(sectionId);
-        if (element) {
-          const headerOffset = 70;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          slowSmoothScrollTo(offsetPosition, 1200);
-        }
-      }
-    }
   };
 
   const desktopMenuItems: MenuProps["items"] = navLinks?.map((link) => ({
@@ -158,24 +64,6 @@ export const Header = () => {
 
   const userMenuItems: MenuProps["items"] = [
     {
-      key: "console",
-      label: <Link href="/console">Console cá nhân</Link>,
-      icon: <Squares2X2Icon className="w-4 h-4" />,
-    },
-    {
-      key: "profile",
-      label: <Link href="/profile">Trang cá nhân</Link>,
-      icon: <UserIcon className="w-4 h-4" />,
-    },
-    {
-      key: "settings",
-      label: <Link href="/settings">Cài đặt tài khoản</Link>,
-      icon: <Cog6ToothIcon className="w-4 h-4" />,
-    },
-    {
-      type: "divider",
-    },
-    {
       key: "logout",
       label: "Đăng xuất",
       icon: <ArrowRightStartOnRectangleIcon className="w-4 h-4" />,
@@ -191,7 +79,7 @@ export const Header = () => {
           {/* Left: EduSpace Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
-              Edu<span className="gradient-text">Space</span>
+              Edu<span className="text-blue-600">Space</span>
             </span>
           </Link>
 
@@ -246,7 +134,7 @@ export const Header = () => {
         title={
           <div className="flex items-center justify-between">
             <span className="text-lg font-bold text-slate-900">
-              Edu<span className="gradient-text">Space</span>
+              Edu<span className="text-blue-600">Space</span>
             </span>
           </div>
         }

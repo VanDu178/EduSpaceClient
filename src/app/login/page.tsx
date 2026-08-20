@@ -32,7 +32,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight mb-1">
-              Chào mừng trở lại <span className="gradient-text">EduSpace</span>
+              Chào mừng trở lại <span className="text-blue-600">EduSpace</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-500">
               Đăng nhập tài khoản của bạn để tiếp tục

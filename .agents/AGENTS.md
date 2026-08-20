@@ -35,7 +35,7 @@ Keep the structure organized and place files under the correct directories insid
 ## 3. Coding Style & Conventions
 - **Component Files:** Use PascalCase for component file names (e.g., `PrimaryButton.tsx`) and named exports.
 - **Component Typing:** Do NOT use `React.FC` (or `React.FunctionComponent`). Type props directly in the component function parameters instead (e.g., `export const MyComponent = ({ prop }: Props) => ...` or `export function MyComponent({ prop }: Props)`).
-- **UI Design & Styling:** Không sử dụng hiệu ứng đổ bóng (`box-shadow`, shadow classes, v.v.) khi thiết kế giao diện UI. Thay vào đó, ưu tiên sử dụng đường viền (border), màu nền tương phản (background contrast) hoặc khoảng cách (spacing) để phân tách và phân cấp các thành phần.
+- **UI Design & Styling:** Không sử dụng hiệu ứng đổ bóng (`box-shadow`, shadow classes, v.v.) khi thiết kế giao diện UI. Cho phép bo tròn góc (`rounded-full`, `rounded-xl`, `rounded-2xl`, v.v.) đối với các nút bấm (Button). Thay vào đó, ưu tiên sử dụng đường viền (border), màu nền tương phản (background contrast) hoặc khoảng cách (spacing) để phân tách và phân cấp các thành phần.
 - **Client vs. Server Components:** 
   - Leverage Server Components by default for better performance and SEO.
   - Use `'use client'` only when utilizing state (`useState`, `useEffect`), contexts, or browser-only APIs.

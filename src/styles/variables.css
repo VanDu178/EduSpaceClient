@@ -1,8 +1,28 @@
 :root {
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --accent-purple: #8b5cf6;
-  --bg-color: #f8fafc;
+  --primary-color: #06B6D4;
+  /* Màu chính mặc định (Cyan) */
+  --primary-hover: #0891b2;
+  /* Trạng thái Rê chuột (Hover) */
+  --primary-active: #0e7490;
+  /* Trạng thái Nhấn (Active/Pressed) */
+  --primary-light: #ddf3fe;
+  /* Màu nền nhạt (Badge, Sub-container) */
+  --primary-contrast: #ffffff;
+  /* Màu chữ/Icon hiển thị trên nền primary */
+
+  /* BUTTON COLOR TOKENS */
+  --btn-primary-bg: #06B6D4;
+  --btn-primary-hover: #05c5e7;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-text: #05c5e7;
+  --btn-secondary-border: #05c5e7;
+
+  /* SYSTEM COLOR TOKENS */
+  --bg-color: #ffffff;
+  --bg-secondary: #ddf3fe;
+  --bg-accent: #ddf3fe;
   --text-color: #0f172a;
   --text-muted: #64748b;
+  --text-tertiary: #05c5e7;
+  --border-color: rgba(226, 232, 240, 0.9);
 }

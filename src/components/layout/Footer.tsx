@@ -2,76 +2,191 @@ import Link from "next/link";
 
 export const Footer = () => {
   return (
-    <footer className="w-full bg-slate-100 border-t border-slate-200 text-slate-600 pt-12 px-4 sm:px-6 lg:px-8 mt-auto transition-colors duration-300">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12 pb-10 border-b border-slate-200">
-        {/* Column 1: Branding & Mission */}
-        <div className="flex flex-col gap-4">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
-              Edu<span className="gradient-text">Space</span>
-            </span>
-          </Link>
-          <p className="text-sm leading-relaxed text-slate-600 max-w-sm">
-            Nền tảng chia sẻ tri thức, bài viết phân tích, video bài giảng và khóa học chuyên sâu về Trading, Quantitative Finance & Algorithmic Trading dành cho cộng đồng nhà đầu tư và nhà phát triển Việt Nam.
-          </p>
-        </div>
-
-        {/* Column 2: Quick Links */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-slate-900 font-semibold text-base mb-1.5">Chuyên mục chính</h4>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <Link href="/posts" className="hover:text-slate-900 transition-colors">
-                Bài viết Trading & Quant
-              </Link>
-            </li>
-            <li>
-              <Link href="/#videos" className="hover:text-slate-900 transition-colors">
-                Video bài giảng & Phân tích
-              </Link>
-            </li>
-            <li>
-              <Link href="/courses" className="hover:text-slate-900 transition-colors">
-                Khóa học Trade
-              </Link>
-            </li>
-            <li>
-              <Link href="/#services" className="hover:text-slate-900 transition-colors">
-                Dịch vụ tư vấn và hỗ trợ
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="hover:text-slate-900 transition-colors">
-                Chính sách bảo mật
-              </Link>
-            </li>
-            <li>
-              <Link href="/terms" className="hover:text-slate-900 transition-colors">
-                Điều khoản sử dụng
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Column 3: Risk Disclaimer */}
-        <div className="flex flex-col gap-3">
-          <h4 className="text-slate-900 font-semibold text-base mb-1.5">Cảnh báo rủi ro</h4>
-          <p className="text-xs leading-relaxed text-slate-500">
-            Tất cả nội dung bài viết, video và khóa học tại EduSpace được cung cấp chỉ nhằm mục đích giáo dục, nghiên cứu và chia sẻ thông tin. EduSpace không đưa ra bất kỳ lời khuyên đầu tư tài chính nào.
-          </p>
-          <p className="text-xs leading-relaxed text-slate-500">
-            Giao dịch tài chính & Quantitative Trading luôn ẩn chứa rủi ro thua lỗ vốn. Hãy tìm hiểu kĩ và chịu trách nhiệm 100% cho mọi quyết định giao dịch của bạn.
-          </p>
-        </div>
+    <footer className="w-full relative mt-auto transition-colors duration-300">
+      {/* 1. Organic Ocean Wave SVG Transition */}
+      <div className="w-full overflow-hidden leading-none bg-white">
+        <svg
+          className="relative block w-full h-12 sm:h-20 lg:h-24 text-[#ddf3fe]"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+          fill="currentColor"
+        >
+          <path
+            d="M0,0 C150,90 350,-30 500,50 C650,120 900,10 1200,50 L1200,120 L0,120 Z"
+            className="fill-sky-100/70"
+          />
+          <path
+            d="M0,25 C200,95 450,15 700,75 C950,135 1100,35 1200,65 L1200,120 L0,120 Z"
+            className="fill-[#ddf3fe]"
+          />
+        </svg>
       </div>
 
-      {/* Bottom Bar: Social & Copyright */}
-      <div className="max-w-7xl mx-auto py-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-xs text-slate-500">
-        <div>
-          © {new Date().getFullYear()} EduSpace. Tất cả các quyền được bảo lưu.
+      {/* 2. Main Footer Body with #ddf3fe background */}
+      <div className="w-full bg-[#ddf3fe] text-slate-700 pt-4 pb-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          {/* 4-Column Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 pb-10 border-b border-sky-200/80">
+            {/* Column 1: DỊCH VỤ */}
+            <div className="space-y-3">
+              <h4 className="text-slate-900 font-extrabold text-sm sm:text-base tracking-wider uppercase">
+                Dịch Vụ
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-slate-600">
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Phân tích kỹ thuật
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Giao dịch Forex & Crypto
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Quantitative Bot & Signal
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Phân tích On-Chain
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 2: KHO TÀI LIỆU */}
+            <div className="space-y-3">
+              <h4 className="text-slate-900 font-extrabold text-sm sm:text-base tracking-wider uppercase">
+                Kho Tài Liệu
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-slate-600">
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Blog kiến thức
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Giao dịch trading
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Chiến lược chuyên sâu
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Ebook & Thuật toán
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: VỀ CHÚNG TÔI */}
+            <div className="space-y-3">
+              <h4 className="text-slate-900 font-extrabold text-sm sm:text-base tracking-wider uppercase">
+                Về Chúng Tôi
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-slate-600">
+                <li>
+                  <Link href="/" className="hover:text-slate-900 transition-colors">
+                    Giới thiệu EduSpace
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-slate-900 transition-colors">
+                    Tầm nhìn & Sứ mệnh
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/" className="hover:text-slate-900 transition-colors">
+                    Điều khoản dịch vụ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Học liệu miễn phí
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 4: LIÊN HỆ */}
+            <div className="space-y-3">
+              <h4 className="text-slate-900 font-extrabold text-sm sm:text-base tracking-wider uppercase">
+                Liên Hệ
+              </h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-slate-600">
+                <li>
+                  <Link href="/" className="hover:text-slate-900 transition-colors">
+                    Tuyển dụng & Hợp tác
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="hover:text-slate-900 transition-colors">
+                    Trading học viên
+                  </Link>
+                </li>
+                <li>
+                  <a href="https://t.me" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 transition-colors">
+                    Kênh Telegram
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:contact@eduspace.vn" className="hover:text-slate-900 transition-colors">
+                    Contact liên hệ
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar: Copyright & Contact & Social */}
+          <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600">
+            <div>
+              © {new Date().getFullYear()} EDUSPACE VIETNAM. Tất cả quyền lợi được bảo lưu.
+            </div>
+
+            <div className="flex items-center gap-4">
+              <span>Contact info: +84 930 455 789</span>
+
+              {/* Social Circles */}
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-7 h-7 rounded-full bg-[#0088cc] text-white flex items-center justify-center font-bold text-[11px] hover:opacity-90 transition-opacity"
+                  title="Facebook"
+                >
+                  f
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-7 h-7 rounded-full bg-[#0088cc] text-white flex items-center justify-center font-bold text-[11px] hover:opacity-90 transition-opacity"
+                  title="LinkedIn"
+                >
+                  in
+                </a>
+                <a
+                  href="https://t.me"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-7 h-7 rounded-full bg-[#0088cc] text-white flex items-center justify-center font-bold text-[11px] hover:opacity-90 transition-opacity"
+                  title="Telegram"
+                >
+                  ✈
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
 };
-

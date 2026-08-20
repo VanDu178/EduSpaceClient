@@ -1,7 +1,16 @@
-/* Thêm các CSS rules tùy biến thủ công cho components Ant Design */
+/* Custom styles for Ant Design buttons */
 .ant-btn {
   border-radius: 8px;
-  /* Tùy biến nút bấm của Ant Design */
+}
+
+.ant-btn-primary {
+  background-color: var(--btn-primary-bg) !important;
+  border-color: var(--btn-primary-bg) !important;
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--btn-primary-hover) !important;
+  border-color: var(--btn-primary-hover) !important;
 }
 
 /* Đồng bộ line-height và border giữa light/dark mode để tránh giật/nhích menu */
@@ -17,32 +26,32 @@
   top: 0 !important;
 }
 
-/* Đồng bộ kiểu dáng active tab giữa Dark mode và Light mode (background trong suốt, gạch chân bottom line) */
+/* Đồng bộ kiểu dáng active tab (background trong suốt, gạch chân bottom line) */
 .ant-menu-horizontal .ant-menu-item {
   background-color: transparent !important;
 }
 
 .ant-menu-horizontal .ant-menu-item-selected {
   background-color: transparent !important;
-  color: #3b82f6 !important;
+  color: #06B6D4 !important;
 }
 
 .ant-menu-horizontal .ant-menu-item-selected a {
-  color: #3b82f6 !important;
+  color: #06B6D4 !important;
 }
 
 .ant-menu-horizontal .ant-menu-item-selected::after {
-  border-bottom: 2px solid #3b82f6 !important;
-  border-bottom-color: #3b82f6 !important;
+  border-bottom: 2px solid #06B6D4 !important;
+  border-bottom-color: #06B6D4 !important;
 }
 
 /* Inline mode trên mobile drawer */
 .ant-menu-inline .ant-menu-item-selected {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-  color: #3b82f6 !important;
-  border-right: 2px solid #3b82f6 !important;
+  background-color: rgba(6, 182, 212, 0.1) !important;
+  color: #06B6D4 !important;
+  border-right: 2px solid #06B6D4 !important;
 }
 
 .ant-menu-inline .ant-menu-item-selected a {
-  color: #3b82f6 !important;
+  color: #06B6D4 !important;
 }

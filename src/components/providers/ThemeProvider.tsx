@@ -11,9 +11,10 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
   return (
     <ConfigProvider
       theme={{
+        cssVar: { key: "app" },
         algorithm: antdTheme.defaultAlgorithm,
         token: {
-          colorPrimary: "#2563eb",
+          colorPrimary: "var(--primary-color)",
           borderRadius: 12,
           fontFamily: "var(--font-sans)",
           fontSize: 14,
