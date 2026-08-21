@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Avatar, Button, Drawer, Dropdown, Menu, type MenuProps } from "antd";
+import { Avatar, Button, Drawer, Dropdown, Menu, Spin, type MenuProps } from "antd";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -12,11 +12,14 @@ import {
   HomeIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
+import { useAuthStore } from "@/features/auth";
 
 export const Header = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  const { user, isInitialized, logout } = useAuthStore();
+  const isLoggedIn = Boolean(user);
 
   const navLinks = [
     { name: "Trang chủ", href: "/", icon: HomeIcon },
@@ -64,11 +67,26 @@ export const Header = () => {
 
   const userMenuItems: MenuProps["items"] = [
     {
+      key: "user-info",
+      label: (
+        <div className="px-1 py-1">
+          <p className="text-xs text-slate-500 font-normal">Tài khoản</p>
+          <p className="text-sm font-semibold text-slate-800 truncate max-w-[180px]">
+            {user?.name || user?.email || "Người dùng"}
+          </p>
+        </div>
+      ),
+      disabled: true,
+    },
+    {
+      type: "divider",
+    },
+    {
       key: "logout",
       label: "Đăng xuất",
       icon: <ArrowRightStartOnRectangleIcon className="w-4 h-4" />,
       danger: true,
-      onClick: () => setIsLoggedIn(false),
+      onClick: () => logout(),
     },
   ];
 
@@ -76,10 +94,11 @@ export const Header = () => {
     <>
       <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/90 border-b border-slate-200 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Left: EduSpace Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          {/* Left: TradeVerse Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <img src="/images/logo.png" alt="EduSpace Logo" className="h-8 sm:h-9 w-auto object-contain" />
             <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
-              Edu<span className="text-blue-600">Space</span>
+              Trade<span className="text-sky-500">Verse</span>
             </span>
           </Link>
 
@@ -98,8 +117,12 @@ export const Header = () => {
           {/* Right: Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Sign In Button / User Profile Menu */}
-            {!isLoggedIn ? (
-              <Link href="/login" className="hidden sm:inline-block">
+            {!isInitialized ? (
+              <div className="h-10 px-4 flex items-center justify-center">
+                <Spin size="small" />
+              </div>
+            ) : !isLoggedIn ? (
+              <Link href="/login">
                 <Button
                   type="primary"
                   className="font-medium !rounded-lg h-10 px-5 flex items-center gap-1.5 border-none"
@@ -133,9 +156,12 @@ export const Header = () => {
       <Drawer
         title={
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-slate-900">
-              Edu<span className="text-blue-600">Space</span>
-            </span>
+            <div className="flex items-center gap-2">
+              <img src="/images/logo.png" alt="EduSpace Logo" className="h-7 w-auto object-contain" />
+              <span className="text-lg font-bold text-slate-900">
+                Trade<span className="text-sky-500">Verse</span>
+              </span>
+            </div>
           </div>
         }
         placement="right"
@@ -163,7 +189,11 @@ export const Header = () => {
             className="border-none bg-transparent"
           />
           <div className="pt-4 border-t border-slate-200 px-4 mb-4">
-            {!isLoggedIn ? (
+            {!isInitialized ? (
+              <div className="h-12 flex items-center justify-center">
+                <Spin />
+              </div>
+            ) : !isLoggedIn ? (
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
@@ -180,20 +210,37 @@ export const Header = () => {
                 </Button>
               </Link>
             ) : (
-              <Button
-                type="default"
-                danger
-                block
-                size="large"
-                icon={<ArrowRightStartOnRectangleIcon className="w-5 h-5" />}
-                onClick={() => {
-                  setIsLoggedIn(false);
-                  setMobileMenuOpen(false);
-                }}
-                className="rounded-xl font-medium flex items-center justify-center gap-2 h-12 text-base"
-              >
-                Đăng xuất
-              </Button>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 border border-slate-200">
+                  <Avatar
+                    size={36}
+                    icon={<UserIcon className="w-5 h-5 text-slate-700" />}
+                    className="bg-slate-200 flex items-center justify-center flex-shrink-0"
+                  />
+                  <div className="overflow-hidden">
+                    <p className="text-sm font-semibold text-slate-900 truncate">
+                      {user?.name || user?.email || "Người dùng"}
+                    </p>
+                    {user?.name && user?.email && (
+                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  type="default"
+                  danger
+                  block
+                  size="large"
+                  icon={<ArrowRightStartOnRectangleIcon className="w-5 h-5" />}
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="rounded-xl font-medium flex items-center justify-center gap-2 h-12 text-base border-red-200 hover:border-red-300"
+                >
+                  Đăng xuất
+                </Button>
+              </div>
             )}
           </div>
         </div>

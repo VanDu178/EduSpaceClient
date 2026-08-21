@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ConfigProvider, theme as antdTheme } from "antd";
+import { Toaster } from "react-hot-toast";
 
 interface AppThemeProviderProps {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export function AppThemeProvider({ children }: AppThemeProviderProps) {
         },
       }}
     >
+      <Toaster position="top-right" reverseOrder={false} />
       {children}
     </ConfigProvider>
   );

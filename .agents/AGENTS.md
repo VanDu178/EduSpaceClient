@@ -12,12 +12,11 @@ Always follow these guidelines when writing code or adding features to this work
 - **Framework:** Next.js (App Router, Version 15+).
 - **Language:** TypeScript (strict mode enabled).
 - **Styling:** Tailwind CSS by default for UI components and layouts. Vanilla CSS / CSS Modules may be used for complex custom animations or isolated styles if needed.
-- **API Client:** Use the preconfigured axios client at `@/services/api` for API requests. Do not initialize new axios or fetch instances for backend interaction.
+- **API Client:** Use the preconfigured axios client at `@/core/services/api` for API requests. Do not initialize new axios or fetch instances for backend interaction.
 
 ## 2. Directory Architecture
 Keep the structure organized and place files under the correct directories inside `src/`:
 - `src/app/`: App Router page components, routes, and layouts.
-- `src/config/`: App configuration files (metadata, fonts, etc.).
 - `src/components/common/`: Reusable stateless/presentational UI components (Buttons, Inputs, Dialogs, Cards).
 - `src/components/layout/`: Page layouts (Header, Sidebar, Navigation).
 - `src/features/`: Feature modules. Each sub-folder (e.g., `posts`, `auth`) contains its own:
@@ -26,11 +25,15 @@ Keep the structure organized and place files under the correct directories insid
   - `services/`: API services specific to the feature.
   - `types.ts` / `types/`: TypeScript type definitions specific to the feature.
   - `index.ts`: Public API export file for the feature.
-- `src/hooks/`: Global custom React hooks (e.g., `useDebounce`, `useLocalStorage`).
-- `src/services/`: Global API configs (e.g., Axios client `api.ts`).
-- `src/contexts/`: Global state management contexts (Auth Context, Theme Context, etc.).
-- `src/types/`: Global TypeScript type definitions and interfaces.
-- `src/utils/`: Pure global helper functions.
+- `src/core/`: Core infrastructure & shared resources:
+  - `config/`: App configuration files (metadata, fonts, etc.).
+  - `contexts/`: Global state management contexts (Auth Context, Theme Context, etc.).
+  - `hooks/`: Global custom React hooks (e.g., `useDebounce`, `useLocalStorage`).
+  - `icons/`: Global custom SVG & icon components.
+  - `services/`: Global API configs (e.g., Axios client `api.ts`).
+  - `styles/`: Global CSS styles & design tokens (`globals.css`, `variables.css`).
+  - `types/`: Global TypeScript type definitions and interfaces.
+  - `utils/`: Pure global helper functions.
 
 ## 3. Coding Style & Conventions
 - **Component Files:** Use PascalCase for component file names (e.g., `PrimaryButton.tsx`) and named exports.
@@ -110,5 +113,17 @@ Keep the structure organized and place files under the correct directories insid
      - Nút nhỏ (`sm`): `text-xs` (12px), `h-8`.
      - Nút chuẩn (`md` - Mặc định): `text-sm` (14px), `font-medium` / `font-semibold`, `h-10`.
      - Nút lớn (`lg`): `text-sm` (14px) hoặc `text-base` (16px), `font-semibold`, `h-12`.
+## 14. Quy chuẩn sinh ảnh Mascot Linh Vật (Mascot Generation Rules)
+- Khi thiết kế hoặc tạo mới ảnh linh vật (Mascot) cho dự án, Agent PHẢI tuân thủ nghiêm ngặt các quy tắc sau:
+  1. **Bắt buộc tách/Xóa nền (Remove Background / Transparent PNG):** Khi tạo mới hoặc sinh ảnh linh vật (Mascot) cho giao diện, Agent PHẢI luôn thực hiện xóa/tách phông nền tuyệt đối (nền trong suốt PNG - Transparent background), không để lại bất kỳ màu nền solid (trắng, đen, xám) hay phông cảnh rườm rà nào che mất các thành phần UI.
+  2. **Không chứa chữ / tên thương hiệu (No Brand Text):** Linh vật tuyệt đối không mang bất kỳ chữ, từ ngữ, hay logo tên thương hiệu nào trên kính che mặt (visor), ngực, hay bất kỳ bộ phận nào của robot.
+  3. **Đồng bộ thiết kế linh vật gốc (Consistent Mascot Base):** Sử dụng linh vật robot 3D mẫu (robot trắng phối viền/chi tiết xanh cyan, mặt màn hình hiển thị mắt & miệng cười phát sáng xanh cyan).
+  4. **Biến đổi tư thế linh động (Dynamic Pose Variation):** Tùy thuộc vào bối cảnh UI/trang web, Agent có thể linh hoạt tạo linh vật ở nhiều tư thế khác nhau (ví dụ: đang lơ lửng, đang đứng, đang ngồi trên tên lửa, tương tác với biểu đồ HUD, v.v.).
 
-
+## 15. Quy chuẩn vô hiệu hóa tương tác khi đang xử lý (Action Processing & Interactive Elements Locking)
+- Khi có một hành động hoặc tác vụ bất đồng bộ đang trong quá trình xử lý (trạng thái `isLoading`, `isPending`, hoặc tương tự):
+  1. **Khóa toàn bộ các thành phần tương tác:** Agent PHẢI vô hiệu hóa tất cả các nút bấm (`button`), liên kết (`Link`/`a`), input và các yếu tố có thể bấm được trên giao diện/form/modal bối cảnh đó nhằm tránh người dùng bấm trùng lặp (double submit / spam click) hoặc chuyển trang đột ngột khi đang gửi dữ liệu.
+  2. **Cách thức thực thi:**
+     - Đăng ký thuộc tính `disabled={isLoading}` cho toàn bộ nút bấm liên quan.
+     - Với thẻ liên kết (`Link` / `a`) hoặc thẻ tương tác custom không có attribute `disabled`: Thêm class Tailwind `pointer-events-none opacity-50` và chặn sự kiện click (`onClick={(e) => { if (isLoading) e.preventDefault(); ... }}`).
+  3. **Hiển thị phản hồi trực quan (Visual Feedback):** Kết hợp hiển thị icon xoay (Loading Spinner), trạng thái mờ (opacity/disabled) và hiệu ứng con trỏ chuột `cursor-not-allowed` để người dùng nhận biết hệ thống đang phản hồi.

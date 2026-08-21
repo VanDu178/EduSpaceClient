@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/common";
-
 export function HeroSection() {
   return (
     <section id="hero" className="relative pt-8 sm:pt-12 lg:pt-16 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
@@ -12,7 +11,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none -z-10" />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-        {/* Left Column: Mascot Image */}
+        {/* Left Column: Quant AI Robot Mascot */}
         <div className="lg:col-span-5 flex justify-center items-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -22,10 +21,10 @@ export function HeroSection() {
             className="w-full flex justify-center"
           >
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-sky-400 to-blue-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition duration-500 pointer-events-none" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-sky-400 to-sky-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-30 transition duration-500 pointer-events-none" />
               <Image
-                src="/images/mascot .svg"
-                alt="EduSpace Mascot"
+                src={"/images/mascot-quant-robot.png"}
+                alt="TradeVerse Quant AI Robot Mascot"
                 width={380}
                 height={380}
                 className="relative w-full max-w-xs sm:max-w-sm h-auto object-contain transition-transform duration-300 group-hover:scale-105"
@@ -92,4 +91,6 @@ export function HeroSection() {
     </section>
   );
 }
+
+
 

@@ -173,7 +173,7 @@ export function CommunicationSection() {
                   </div>
                   <div>
                     <h4 className="font-bold text-sm flex items-center gap-1.5 leading-tight text-white">
-                      <span>EduSpace Community Chat</span>
+                      <span>TradeVerse Community Chat</span>
                       <span className="w-4 h-4 rounded-full bg-white/25 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
                     </h4>
                     <p className="text-[11px] text-sky-100 flex items-center gap-2 mt-0.5">

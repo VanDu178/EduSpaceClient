@@ -1,4 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
+import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 
 interface FailedRequestItem {
   resolve: (token: string | null) => void;
@@ -31,14 +32,27 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Request Interceptor: Tự động đính kèm Access Token vào Header của mỗi yêu cầu
+// Request Interceptor: Tự động đính kèm Access Token từ Zustand Store & kích hoạt Lazy Check bị động
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // Kiểm tra xem có đang chạy ở môi trường Client (trình duyệt) hay không
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
+      const token = useAuthStore.getState().accessToken;
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      // Kích hoạt Bị động (Lazy Check) dữ liệu user từ xa nếu không phải các API auth cơ bản
+      const isAuthRoute =
+        config.url?.includes('/auth/login') ||
+        config.url?.includes('/auth/refresh') ||
+        config.url?.includes('/auth/me');
+
+      if (token && !isAuthRoute) {
+        // Tự động kiểm tra bị động trong background không làm block request chính
+        useAuthStore.getState().fetchMeLazy().catch(() => {
+          // Bỏ qua lỗi background check
+        });
       }
     }
     return config;
@@ -50,7 +64,13 @@ api.interceptors.request.use(
 
 // Response Interceptor: Tự động bắt lỗi 401 để refresh token và gọi lại request cũ
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Reset trạng thái lỗi mạng nếu request thành công
+    if (typeof window !== 'undefined' && useAuthStore.getState().isNetworkError) {
+      useAuthStore.getState().setNetworkError(false);
+    }
+    return response;
+  },
   async (error) => {
     // Nếu request bị hủy
     if (axios.isCancel(error)) {
@@ -58,6 +78,14 @@ api.interceptors.response.use(
     }
 
     const originalRequest = error.config;
+
+    // Nếu là lỗi mạng / rớt kết nối / 5xx (không phải lỗi 401)
+    if (!error.response || error.code === 'ERR_NETWORK' || error.response.status >= 500) {
+      if (typeof window !== 'undefined') {
+        useAuthStore.getState().setNetworkError(true);
+      }
+      return Promise.reject(error);
+    }
 
     // Nếu không có originalRequest hoặc lỗi không phải 401 Unauthorized
     // Hoặc đây là request login/refresh thì trả về lỗi luôn
@@ -94,17 +122,20 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // Gọi API refresh token
+      // Gọi API refresh token (HttpOnly Cookie được gửi kèm tự động)
       const response = await axios.post(
         `${api.defaults.baseURL}/auth/refresh`,
         {},
         { withCredentials: true }
       );
 
-      const { accessToken } = response.data.data;
+      const { accessToken, user } = response.data.data;
 
-      // Lưu token mới vào localStorage
-      localStorage.setItem('accessToken', accessToken);
+      // Cập nhật Access Token & User mới vào Zustand RAM store
+      useAuthStore.getState().setAccessToken(accessToken);
+      if (user) {
+        useAuthStore.getState().setUser(user);
+      }
 
       // Cập nhật Authorization header mặc định của api instance
       api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
@@ -115,14 +146,19 @@ api.interceptors.response.use(
       // Thực thi lại request ban đầu với token mới
       originalRequest.headers.Authorization = `Bearer ${accessToken}`;
       return api(originalRequest);
-    } catch (refreshError) {
-      // Nếu refresh token thất bại (ví dụ: refresh token hết hạn hoặc bị thu hồi)
+    } catch (refreshError: any) {
       processQueue(refreshError, null);
 
-      // Xóa thông tin đăng nhập và chuyển hướng về trang login
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Chỉ đăng xuất nếu Refresh Token thực sự bị từ chối (Lỗi 401: hết hạn / bị thu hồi / tài khoản bị khóa)
+      if (refreshError?.response?.status === 401) {
+        useAuthStore.getState().logout();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      } else {
+        // Nếu refresh lỗi do rớt mạng hay server 5xx: GIỮ NGUYÊN SESSION, chỉ bật flag lỗi mạng
+        useAuthStore.getState().setNetworkError(true);
+      }
 
       return Promise.reject(refreshError);
     } finally {

@@ -3,11 +3,11 @@ import { TelegramMessage } from "../types";
 export const TELEGRAM_MESSAGES: TelegramMessage[] = [
   {
     id: 1,
-    author: "EduSpace Admin",
+    author: "TradeVerse Admin",
     role: "MOD",
-    avatar: "E",
+    avatar: "T",
     bg: "bg-sky-600",
-    text: "Chào mừng mọi người gia nhập kênh thảo luận EduSpace Telegram! 🚀",
+    text: "Chào mừng mọi người gia nhập kênh thảo luận TradeVerse Telegram! 🚀",
     time: "14:20",
   },
   {
@@ -30,9 +30,9 @@ export const TELEGRAM_MESSAGES: TelegramMessage[] = [
   },
   {
     id: 4,
-    author: "EduSpace Admin",
+    author: "TradeVerse Admin",
     role: "MOD",
-    avatar: "E",
+    avatar: "T",
     bg: "bg-sky-600",
     text: "Báo cáo Market Bias & kịch bản sóng 24/7 vừa cập nhật nhé cả nhà 📊",
     time: "14:23",

@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { BlogsFeature } from '@/features/blogs';
 
 export const metadata: Metadata = {
-  title: 'Tất Cả Bài Viết - EduSpace Blog',
+  title: 'Tất Cả Bài Viết - TradeVerse Blog',
   description:
-    'Khám phá các bài viết, hướng dẫn và chia sẻ kinh nghiệm mới nhất về AI, Lập trình, Cấu trúc dữ liệu và Phát triển phần mềm.',
+    'Khám phá các bài viết, hướng dẫn và chia sẻ kinh nghiệm mới nhất về Trading, Quantitative Trading, Phân tích kỹ thuật và Quản lý vốn.',
 };
 
 export default function BlogsPage() {

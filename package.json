@@ -1,5 +1,5 @@
 {
-  "name": "eduspace-fe-client",
+  "name": "tradeverse-fe-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -21,7 +21,9 @@
     "postcss": "^8.5.20",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "tailwindcss": "^4.3.3"
+    "react-hot-toast": "^2.6.0",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@types/node": "^20",

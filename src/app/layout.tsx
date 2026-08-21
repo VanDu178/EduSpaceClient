@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
-import { varelaRound } from "@/config/fonts";
+import { varelaRound } from "@/core/config/fonts";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { AppThemeProvider } from "@/components/providers";
+import { AppThemeProvider, AuthProvider } from "@/components/providers";
 import { Wrapper } from "@/components/layout";
-import "@/styles/globals.css";
+import { siteConfig } from "@/core/config/site";
+import "@/core/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "EduSpace - Nền tảng Học tập & Chia sẻ Tri thức",
-  description: "Nền tảng edtech hiện đại cho lập trình viên và người học.",
+  title: siteConfig.name,
+  description: siteConfig.description,
+  icons: {
+    icon: [
+      { url: "/images/logo.png" },
+      { url: "/images/favicon.ico" },
+    ],
+    shortcut: "/images/logo.png",
+    apple: "/images/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +29,9 @@ export default function RootLayout({
       <body>
         <AntdRegistry>
           <AppThemeProvider>
-            <Wrapper>{children}</Wrapper>
+            <AuthProvider>
+              <Wrapper>{children}</Wrapper>
+            </AuthProvider>
           </AppThemeProvider>
         </AntdRegistry>
       </body>
