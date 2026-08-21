@@ -1,5 +1,5 @@
 import api from '@/core/services/api';
-import { RegisterDTO, LoginDTO, AuthResponse, User } from '../types';
+import { RegisterDTO, LoginDTO, GoogleLoginDTO, AuthResponse, User } from '../types';
 
 export const registerApi = async (data: RegisterDTO): Promise<AuthResponse> => {
   const response = await api.post('/auth/register', data);
@@ -10,6 +10,12 @@ export const loginApi = async (data: LoginDTO): Promise<AuthResponse> => {
   const response = await api.post('/auth/login', data);
   return response.data.data;
 };
+
+export const googleLoginApi = async (data: GoogleLoginDTO): Promise<AuthResponse> => {
+  const response = await api.post('/auth/google', data);
+  return response.data.data;
+};
+
 
 export const getMeApi = async (): Promise<User> => {
   const response = await api.get('/auth/me');

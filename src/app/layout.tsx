@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { varelaRound } from "@/core/config/fonts";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { AppThemeProvider, AuthProvider } from "@/components/providers";
+import { GoogleAuthProvider } from "@/core/contexts";
 import { Wrapper } from "@/components/layout";
 import { siteConfig } from "@/core/config/site";
 import "@/core/styles/globals.css";
@@ -29,12 +30,15 @@ export default function RootLayout({
       <body>
         <AntdRegistry>
           <AppThemeProvider>
-            <AuthProvider>
-              <Wrapper>{children}</Wrapper>
-            </AuthProvider>
+            <GoogleAuthProvider>
+              <AuthProvider>
+                <Wrapper>{children}</Wrapper>
+              </AuthProvider>
+            </GoogleAuthProvider>
           </AppThemeProvider>
         </AntdRegistry>
       </body>
     </html>
   );
 }
+

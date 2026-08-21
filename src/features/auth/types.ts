@@ -4,6 +4,9 @@ export interface User {
   name?: string | null;
   role: 'admin' | 'client';
   status: 'active' | 'locked';
+  avatarUrl?: string | null;
+  googleId?: string | null;
+  provider?: 'credentials' | 'google' | string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -19,7 +22,14 @@ export interface LoginDTO {
   password: string;
 }
 
+export interface GoogleLoginDTO {
+  idToken?: string;
+  accessToken?: string;
+}
+
+
 export interface AuthResponse {
   user: User;
   accessToken?: string;
 }
+

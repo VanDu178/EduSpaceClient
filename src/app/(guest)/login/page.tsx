@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Checkbox, Divider, Form, Input } from "antd";
 import { toast } from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 import {
   EnvelopeIcon,
   LockClosedIcon,
@@ -15,7 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
-import { loginApi, useAuthStore } from "@/features/auth";
+import { loginApi, googleLoginApi, useAuthStore } from "@/features/auth";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -43,10 +44,43 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSuccess = async (tokenResponse: any) => {
+    setLoading(true);
+    try {
+      const res = await googleLoginApi({
+        accessToken: tokenResponse?.access_token,
+      });
+      useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
+      toast.success("Đăng nhập bằng Google thành công!");
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        "Đăng nhập bằng Google thất bại. Vui lòng thử lại sau!";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => {
+      toast.error("Đăng nhập bằng Google bị hủy hoặc gặp lỗi!");
+    },
+  });
+
   const handleGoogleLogin = () => {
     if (loading) return;
-    toast("Chức năng đăng nhập bằng Google đang được xử lý...", { icon: "ℹ️" });
+    if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      toast.error("Chưa cấu hình NEXT_PUBLIC_GOOGLE_CLIENT_ID trong môi trường!");
+      return;
+    }
+    loginWithGoogle();
   };
+
 
   return (
     <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 lg:p-10 relative overflow-hidden bg-slate-50 dark:bg-[#070d19] transition-colors duration-300">
@@ -217,6 +251,7 @@ export default function LoginPage() {
               size="md"
               rounded="xl"
               fullWidth
+              isLoading={loading}
               disabled={loading}
               leftIcon={<GoogleIcon />}
               onClick={handleGoogleLogin}
