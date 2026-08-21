@@ -9,6 +9,7 @@ import {
   XMarkIcon,
   ArrowRightStartOnRectangleIcon,
   UserIcon,
+  KeyIcon,
   HomeIcon,
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
@@ -77,6 +78,14 @@ export const Header = () => {
         </div>
       ),
       disabled: true,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "change-password",
+      label: <Link href="/change-password">Đổi mật khẩu</Link>,
+      icon: <KeyIcon className="w-4 h-4 text-slate-600" />,
     },
     {
       type: "divider",
@@ -226,6 +235,21 @@ export const Header = () => {
                     )}
                   </div>
                 </div>
+                <Link
+                  href="/change-password"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full block"
+                >
+                  <Button
+                    type="default"
+                    block
+                    size="large"
+                    icon={<KeyIcon className="w-5 h-5 text-slate-600" />}
+                    className="rounded-xl font-medium flex items-center justify-center gap-2 h-12 text-base border-slate-200 text-slate-700 hover:text-sky-600"
+                  >
+                    Đổi mật khẩu
+                  </Button>
+                </Link>
                 <Button
                   type="default"
                   danger

@@ -1,5 +1,14 @@
 import api from '@/core/services/api';
-import { RegisterDTO, LoginDTO, GoogleLoginDTO, AuthResponse, User } from '../types';
+import {
+  RegisterDTO,
+  LoginDTO,
+  GoogleLoginDTO,
+  AuthResponse,
+  User,
+  ForgotPasswordDTO,
+  ResetPasswordDTO,
+  ChangePasswordDTO
+} from '../types';
 
 export const registerApi = async (data: RegisterDTO): Promise<AuthResponse> => {
   const response = await api.post('/auth/register', data);
@@ -16,6 +25,20 @@ export const googleLoginApi = async (data: GoogleLoginDTO): Promise<AuthResponse
   return response.data.data;
 };
 
+export const forgotPasswordApi = async (data: ForgotPasswordDTO): Promise<{ message: string; email: string; devOtp?: string }> => {
+  const response = await api.post('/auth/forgot-password', data);
+  return response.data.data;
+};
+
+export const resetPasswordApi = async (data: ResetPasswordDTO): Promise<{ message: string }> => {
+  const response = await api.post('/auth/reset-password', data);
+  return response.data;
+};
+
+export const changePasswordApi = async (data: ChangePasswordDTO): Promise<{ message: string }> => {
+  const response = await api.post('/auth/change-password', data);
+  return response.data;
+};
 
 export const getMeApi = async (): Promise<User> => {
   const response = await api.get('/auth/me');
@@ -34,3 +57,4 @@ export const logoutApi = async (): Promise<void> => {
     // Suppress logout errors
   }
 };
+
