@@ -38,7 +38,7 @@ export function BlogPagination({
             onClick={() => onPageChange(page)}
             className={`w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg flex items-center justify-center text-xs font-medium transition-colors cursor-pointer ${
               isActive
-                ? 'border-2 border-[#3B82F6] text-[#3B82F6] bg-blue-50/50 font-bold'
+                ? 'border-2 border-primary text-primary bg-primary-light/50 font-bold'
                 : 'border border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
             }`}
           >

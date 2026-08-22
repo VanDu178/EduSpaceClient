@@ -1,60 +1,113 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { BlogCategoryName } from './types';
-import { MOCK_BLOGS } from './mockData';
+import { useState, useEffect } from 'react';
+import { Blog, BlogCategoryOption } from './types';
+import { getBlogTypesApi, getBlogsApi } from './services/blogService';
 import { BlogHeader } from './components/BlogHeader';
 import { BlogSearch } from './components/BlogSearch';
 import { BlogGrid } from './components/BlogGrid';
 import { BlogPagination } from './components/BlogPagination';
 
 const ITEMS_PER_PAGE = 6;
+const DEFAULT_CATEGORY: BlogCategoryOption = { code: 'ALL', name: 'Tất cả' };
 
 export function BlogsFeature() {
-  const [selectedCategory, setSelectedCategory] = useState<BlogCategoryName>('Tất cả');
+  const [categories, setCategories] = useState<BlogCategoryOption[]>([DEFAULT_CATEGORY]);
+  const [selectedCategoryCode, setSelectedCategoryCode] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter blogs based on category and search query
-  const filteredBlogs = useMemo(() => {
-    return MOCK_BLOGS.filter((blog) => {
-      const matchesCategory =
-        selectedCategory === 'Tất cả' || blog.category === selectedCategory;
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setCurrentPage(1);
+    }, 350);
 
-      const query = searchQuery.trim().toLowerCase();
-      const matchesSearch =
-        query === '' ||
-        blog.title.toLowerCase().includes(query) ||
-        blog.description.toLowerCase().includes(query) ||
-        blog.tags.some((tag) => tag.toLowerCase().includes(query)) ||
-        blog.author.name.toLowerCase().includes(query);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-      return matchesCategory && matchesSearch;
-    });
-  }, [selectedCategory, searchQuery]);
+  // Fetch blog types from API on mount
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCategories = async () => {
+      try {
+        const types = await getBlogTypesApi();
+        if (isMounted) {
+          const apiCategories: BlogCategoryOption[] = types.map((t) => ({
+            code: t.code,
+            name: t.name,
+          }));
+          setCategories([DEFAULT_CATEGORY, ...apiCategories]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch blog types:', error);
+      }
+    };
 
-  const handleCategoryChange = (category: BlogCategoryName) => {
-    setSelectedCategory(category);
+    fetchCategories();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Fetch blogs list from API when page, category or search query changes
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBlogs = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getBlogsApi({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          keyword: debouncedSearch.trim() || undefined,
+          blogType: selectedCategoryCode === 'ALL' ? undefined : selectedCategoryCode,
+        });
+
+        if (isMounted) {
+          setBlogs(data.blogs);
+          setTotalPages(data.pagination.totalPages || 1);
+        }
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+        if (isMounted) {
+          setBlogs([]);
+          setTotalPages(1);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchBlogs();
+    return () => {
+      isMounted = false;
+    };
+  }, [currentPage, selectedCategoryCode, debouncedSearch]);
+
+  const handleCategoryChange = (categoryCode: string) => {
+    setSelectedCategoryCode(categoryCode);
     setCurrentPage(1);
   };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    setCurrentPage(1);
   };
-
-  const totalPages = Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE) || 1;
-  const paginatedBlogs = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredBlogs, currentPage]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
       {/* 1. Header (Title + Category Filter Pills) */}
       <BlogHeader
-        selectedCategory={selectedCategory}
+        categories={categories}
+        selectedCategoryCode={selectedCategoryCode}
         onSelectCategory={handleCategoryChange}
+        isLoading={isLoading}
       />
 
       {/* 2. Search Bar */}
@@ -64,7 +117,7 @@ export function BlogsFeature() {
       />
 
       {/* 3. Article Cards Grid */}
-      <BlogGrid blogs={paginatedBlogs} />
+      <BlogGrid blogs={blogs} isLoading={isLoading} />
 
       {/* 4. Pagination */}
       <BlogPagination
@@ -77,3 +130,4 @@ export function BlogsFeature() {
 }
 
 export * from './types';
+export * from './services/blogService';

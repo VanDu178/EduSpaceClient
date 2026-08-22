@@ -1,9 +1,3 @@
-export type BlogCategoryName =
-  | 'Tất cả'
-  | 'Tư duy'
-  | 'Phương pháp'
-  | 'Quant';
-
 export type BlogIllustrationType =
   | 'tuduy'
   | 'phuongphap'
@@ -12,6 +6,11 @@ export type BlogIllustrationType =
 export interface BlogAuthor {
   name: string;
   avatar: string;
+}
+
+export interface BlogCategoryOption {
+  code: string;
+  name: string;
 }
 
 export interface BlogType {
@@ -46,11 +45,30 @@ export interface Blog {
   } | null;
 }
 
+export interface GetBlogsParams {
+  page?: number;
+  limit?: number;
+  keyword?: string;
+  blogType?: string;
+  status?: string;
+  isPremium?: string;
+}
+
+export interface GetBlogsResponse {
+  blogs: Blog[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export interface BlogPost {
   id: string;
   title: string;
   description: string;
-  category: BlogCategoryName;
+  category: string;
   tags: string[];
   coverColor: string;
   illustrationType: BlogIllustrationType;
@@ -59,4 +77,3 @@ export interface BlogPost {
   readTime: string;
   slug: string;
 }
-

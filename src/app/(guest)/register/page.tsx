@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Checkbox, Divider, Form, Input } from "antd";
 import { toast } from "react-hot-toast";
+import { useGoogleLogin } from "@react-oauth/google";
 import {
   UserIcon,
   EnvelopeIcon,
@@ -17,38 +18,81 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
-import { registerApi } from "@/features/auth";
+import {
+  useRegisterMutation,
+  useGoogleLoginMutation,
+  useAuthStore,
+  PasswordStrengthIndicator,
+} from "@/features/auth";
 
 export default function RegisterPage() {
-  const [loading, setLoading] = useState(false);
+  const [password, setPassword] = useState("");
   const router = useRouter();
+  const { mutate: register, isPending: isRegisterPending } = useRegisterMutation();
+  const { mutate: googleLogin, isPending: isGooglePending } = useGoogleLoginMutation();
+  const isPending = isRegisterPending || isGooglePending;
 
-  const onFinish = async (values: any) => {
-    setLoading(true);
-    try {
-      console.log("bat dau");
-      await registerApi({
+  const onFinish = (values: any) => {
+    register(
+      {
         email: values?.email,
         password: values?.password,
         name: values?.name,
-      });
-      toast.success("Đăng ký tài khoản thành công! Đang chuyển hướng đăng nhập...");
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Đăng ký thất bại. Email có thể đã được sử dụng hoặc có lỗi xảy ra!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: () => {
+          toast.success("Đăng ký tài khoản thành công!");
+          setTimeout(() => {
+            router.push("/login");
+          }, 1500);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đăng ký thất bại. Email có thể đã được sử dụng hoặc có lỗi xảy ra!";
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
+  const handleGoogleSuccess = (tokenResponse: any) => {
+    googleLogin(
+      {
+        accessToken: tokenResponse?.access_token,
+      },
+      {
+        onSuccess: (res) => {
+          useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
+          toast.success("Đăng ký thành công qua Google!");
+          setTimeout(() => {
+            router.push("/");
+          }, 1000);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đăng ký bằng Google thất bại. Vui lòng thử lại sau!";
+          toast.error(errorMessage);
+        },
+      }
+    );
+  };
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => {
+      toast.error("Đăng ký bằng Google bị hủy hoặc gặp lỗi!");
+    },
+  });
+
   const handleGoogleLogin = () => {
-    if (loading) return;
-    toast("Chức năng đăng ký bằng Google đang được xử lý...", { icon: "ℹ️" });
+    if (isPending) return;
+    if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      toast.error("Chưa cấu hình môi trường!");
+      return;
+    }
+    loginWithGoogle();
   };
 
   return (
@@ -145,7 +189,7 @@ export default function RegisterPage() {
               onFinish={onFinish}
               autoComplete="off"
               size="large"
-              disabled={loading}
+              disabled={isPending}
             >
               {/* Full Name */}
               <Form.Item
@@ -155,7 +199,7 @@ export default function RegisterPage() {
                 <Input
                   prefix={<UserIcon className="w-5 h-5 text-sky-500/80 dark:text-cyan-400/80 mr-2" />}
                   placeholder="Họ và tên"
-                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!border-sky-500 dark:focus:!border-cyan-400 !rounded-xl !py-2.5 !px-4 !text-sm"
+                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!shadow-none focus-within:!shadow-none focus:!border-slate-200 dark:focus:!border-slate-800 focus-within:!border-slate-200 dark:focus-within:!border-slate-800 !rounded-xl !py-2.5 !px-4 !text-sm"
                 />
               </Form.Item>
 
@@ -170,7 +214,7 @@ export default function RegisterPage() {
                 <Input
                   prefix={<EnvelopeIcon className="w-5 h-5 text-sky-500/80 dark:text-cyan-400/80 mr-2" />}
                   placeholder="Địa chỉ Email"
-                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!border-sky-500 dark:focus:!border-cyan-400 !rounded-xl !py-2.5 !px-4 !text-sm"
+                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!shadow-none focus-within:!shadow-none focus:!border-slate-200 dark:focus:!border-slate-800 focus-within:!border-slate-200 dark:focus-within:!border-slate-800 !rounded-xl !py-2.5 !px-4 !text-sm"
                 />
               </Form.Item>
 
@@ -185,9 +229,12 @@ export default function RegisterPage() {
                 <Input.Password
                   prefix={<LockClosedIcon className="w-5 h-5 text-sky-500/80 dark:text-cyan-400/80 mr-2" />}
                   placeholder="Mật khẩu"
-                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!border-sky-500 dark:focus:!border-cyan-400 !rounded-xl !py-2.5 !px-4 !text-sm"
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!shadow-none focus-within:!shadow-none focus:!border-slate-200 dark:focus:!border-slate-800 focus-within:!border-slate-200 dark:focus-within:!border-slate-800 !rounded-xl !py-2.5 !px-4 !text-sm"
                 />
               </Form.Item>
+
+              <PasswordStrengthIndicator password={password} />
 
               {/* Confirm Password */}
               <Form.Item
@@ -208,7 +255,7 @@ export default function RegisterPage() {
                 <Input.Password
                   prefix={<ShieldCheckIcon className="w-5 h-5 text-sky-500/80 dark:text-cyan-400/80 mr-2" />}
                   placeholder="Xác nhận mật khẩu"
-                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!border-sky-500 dark:focus:!border-cyan-400 !rounded-xl !py-2.5 !px-4 !text-sm"
+                  className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!shadow-none focus-within:!shadow-none focus:!border-slate-200 dark:focus:!border-slate-800 focus-within:!border-slate-200 dark:focus-within:!border-slate-800 !rounded-xl !py-2.5 !px-4 !text-sm"
                 />
               </Form.Item>
 
@@ -233,9 +280,9 @@ export default function RegisterPage() {
                   <Link
                     href="#"
                     onClick={(e) => {
-                      if (loading) e.preventDefault();
+                      if (isPending) e.preventDefault();
                     }}
-                    className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:hover:text-cyan-300 underline ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                    className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:hover:text-cyan-300 underline ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                       }`}
                   >
                     Điều khoản dịch vụ
@@ -244,9 +291,9 @@ export default function RegisterPage() {
                   <Link
                     href="#"
                     onClick={(e) => {
-                      if (loading) e.preventDefault();
+                      if (isPending) e.preventDefault();
                     }}
-                    className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:hover:text-cyan-300 underline ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                    className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:hover:text-cyan-300 underline ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                       }`}
                   >
                     Chính sách bảo mật
@@ -261,8 +308,8 @@ export default function RegisterPage() {
                 size="md"
                 rounded="xl"
                 fullWidth
-                isLoading={loading}
-                disabled={loading}
+                isLoading={isPending}
+                disabled={isPending}
                 className="!bg-sky-500 hover:!bg-sky-600 !border-sky-500 text-white dark:!bg-cyan-500 dark:hover:!bg-cyan-400 dark:!border-cyan-400 dark:text-slate-950 font-semibold"
               >
                 Đăng ký
@@ -281,7 +328,7 @@ export default function RegisterPage() {
               size="md"
               rounded="xl"
               fullWidth
-              disabled={loading}
+              disabled={isPending}
               leftIcon={<GoogleIcon />}
               onClick={handleGoogleLogin}
               className="!bg-slate-50 dark:!bg-slate-950/80 !border-slate-200 dark:!border-slate-800 !text-slate-700 dark:!text-slate-200 hover:!bg-slate-100 dark:hover:!bg-slate-800/80 hover:!border-slate-300 dark:hover:!border-cyan-500/40"
@@ -295,9 +342,9 @@ export default function RegisterPage() {
               <Link
                 href="/login"
                 onClick={(e) => {
-                  if (loading) e.preventDefault();
+                  if (isPending) e.preventDefault();
                 }}
-                className={`text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-semibold transition-colors ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                className={`text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-semibold transition-colors ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                   }`}
               >
                 Đăng nhập ngay

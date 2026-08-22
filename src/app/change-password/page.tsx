@@ -11,14 +11,12 @@ import {
   KeyIcon,
   ShieldCheckIcon,
   ArrowLeftIcon,
-  CheckCircleIcon,
-  XCircleIcon,
   ChartBarIcon,
   BoltIcon,
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
-import { AuthGuard, changePasswordApi } from "@/features/auth";
+import { AuthGuard, changePasswordApi, PasswordStrengthIndicator } from "@/features/auth";
 
 export default function ChangePasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -26,30 +24,7 @@ export default function ChangePasswordPage() {
   const router = useRouter();
   const [form] = Form.useForm();
 
-  // Đánh giá độ mạnh của mật khẩu mới
-  const hasMinLength = newPassword.length >= 8;
-  const hasNumber = /\d/.test(newPassword);
-  const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
-  const hasUpper = /[A-Z]/.test(newPassword);
 
-  const getStrengthScore = () => {
-    let score = 0;
-    if (hasMinLength) score += 25;
-    if (hasNumber) score += 25;
-    if (hasUpper) score += 25;
-    if (hasSpecial) score += 25;
-    return score;
-  };
-
-  const strengthScore = getStrengthScore();
-
-  const getStrengthLabel = () => {
-    if (strengthScore <= 25) return { text: "Yếu", color: "text-rose-500", bg: "bg-rose-500" };
-    if (strengthScore <= 75) return { text: "Trung bình", color: "text-amber-500", bg: "bg-amber-500" };
-    return { text: "Rất mạnh", color: "text-emerald-500", bg: "bg-emerald-500" };
-  };
-
-  const strength = getStrengthLabel();
 
   const handleChangePassword = async (values: {
     oldPassword: string;
@@ -167,9 +142,8 @@ export default function ChangePasswordPage() {
                   onClick={(e) => {
                     if (loading) e.preventDefault();
                   }}
-                  className={`inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 transition-colors ${
-                    loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 transition-colors ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   <ArrowLeftIcon className="w-4 h-4 mr-1" /> Trở về trang chủ
                 </Link>
@@ -179,9 +153,6 @@ export default function ChangePasswordPage() {
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight mb-1">
                   Đổi mật khẩu
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Vui lòng nhập mật khẩu hiện tại và mật khẩu mới của bạn
-                </p>
               </div>
 
               <Form
@@ -221,55 +192,7 @@ export default function ChangePasswordPage() {
                   />
                 </Form.Item>
 
-                {/* Password Strength Indicator */}
-                {newPassword.length > 0 && (
-                  <div className="mb-4 p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-medium">
-                      <span className="text-slate-600 dark:text-slate-400">Độ mạnh mật khẩu:</span>
-                      <span className={strength.color}>{strength.text}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${strength.bg}`}
-                        style={{ width: `${strengthScore}%` }}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-1 text-[11px] pt-1 text-slate-500 dark:text-slate-400">
-                      <div className="flex items-center gap-1">
-                        {hasMinLength ? (
-                          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <XCircleIcon className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span>Tối thiểu 8 ký tự</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {hasNumber ? (
-                          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <XCircleIcon className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span>Chứa chữ số (0-9)</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {hasUpper ? (
-                          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <XCircleIcon className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span>Chữ in hoa (A-Z)</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {hasSpecial ? (
-                          <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <XCircleIcon className="w-3.5 h-3.5 text-slate-400" />
-                        )}
-                        <span>Ký tự đặc biệt (!@#$)</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                <PasswordStrengthIndicator password={newPassword} />
 
                 <Form.Item
                   name="confirmPassword"

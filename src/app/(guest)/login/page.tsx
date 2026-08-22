@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -16,53 +15,59 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
-import { loginApi, googleLoginApi, useAuthStore } from "@/features/auth";
+import { useLoginMutation, useGoogleLoginMutation, useAuthStore } from "@/features/auth";
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { mutate: login, isPending: isLoginPending } = useLoginMutation();
+  const { mutate: googleLogin, isPending: isGooglePending } = useGoogleLoginMutation();
+  const isPending = isLoginPending || isGooglePending;
 
-  const onFinish = async (values: any) => {
-    setLoading(true);
-    try {
-      const res = await loginApi({
+  const onFinish = (values: any) => {
+    login(
+      {
         email: values?.email,
         password: values?.password,
-      });
-      useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
-      toast.success("Đăng nhập thành công! Chào mừng đến với TradeVerse.");
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: (res) => {
+          useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
+          toast.success("Đăng nhập thành công! Chào mừng đến với TradeVerse.");
+          setTimeout(() => {
+            router.push("/");
+          }, 1000);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu!";
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
-  const handleGoogleSuccess = async (tokenResponse: any) => {
-    setLoading(true);
-    try {
-      const res = await googleLoginApi({
+  const handleGoogleSuccess = (tokenResponse: any) => {
+    googleLogin(
+      {
         accessToken: tokenResponse?.access_token,
-      });
-      useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
-      toast.success("Đăng nhập bằng Google thành công!");
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Đăng nhập bằng Google thất bại. Vui lòng thử lại sau!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: (res) => {
+          useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
+          toast.success("Đăng nhập bằng Google thành công!");
+          setTimeout(() => {
+            router.push("/");
+          }, 1000);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đăng nhập bằng Google thất bại. Vui lòng thử lại sau!";
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   const loginWithGoogle = useGoogleLogin({
@@ -73,7 +78,7 @@ export default function LoginPage() {
   });
 
   const handleGoogleLogin = () => {
-    if (loading) return;
+    if (isPending) return;
     if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
       toast.error("Chưa cấu hình NEXT_PUBLIC_GOOGLE_CLIENT_ID trong môi trường!");
       return;
@@ -177,7 +182,7 @@ export default function LoginPage() {
               onFinish={onFinish}
               autoComplete="off"
               size="large"
-              disabled={loading}
+              disabled={isPending}
             >
               <Form.Item
                 name="email"
@@ -216,9 +221,9 @@ export default function LoginPage() {
                 <Link
                   href="/forgot-password"
                   onClick={(e) => {
-                    if (loading) e.preventDefault();
+                    if (isPending) e.preventDefault();
                   }}
-                  className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:!hover:text-cyan-300 !transition-colors ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                  className={`!text-sky-600 hover:!text-sky-700 dark:!text-cyan-400 dark:!hover:text-cyan-300 !transition-colors ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                     }`}
                 >
                   Quên mật khẩu
@@ -231,8 +236,8 @@ export default function LoginPage() {
                 size="md"
                 rounded="xl"
                 fullWidth
-                isLoading={loading}
-                disabled={loading}
+                isLoading={isPending}
+                disabled={isPending}
                 className="!bg-sky-500 hover:!bg-sky-600 !border-sky-500 text-white dark:!bg-cyan-500 dark:hover:!bg-cyan-400 dark:!border-cyan-400 dark:text-slate-950 font-semibold"
               >
                 Đăng nhập
@@ -251,8 +256,8 @@ export default function LoginPage() {
               size="md"
               rounded="xl"
               fullWidth
-              isLoading={loading}
-              disabled={loading}
+              isLoading={isPending}
+              disabled={isPending}
               leftIcon={<GoogleIcon />}
               onClick={handleGoogleLogin}
               className="!bg-slate-50 dark:!bg-slate-950/80 !border-slate-200 dark:!border-slate-800 !text-slate-700 dark:!text-slate-200 hover:!bg-slate-100 dark:hover:!bg-slate-800/80 hover:!border-slate-300 dark:hover:!border-cyan-500/40"
@@ -265,9 +270,9 @@ export default function LoginPage() {
               <Link
                 href="/register"
                 onClick={(e) => {
-                  if (loading) e.preventDefault();
+                  if (isPending) e.preventDefault();
                 }}
-                className={`text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-semibold transition-colors ${loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                className={`text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-semibold transition-colors ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                   }`}
               >
                 Đăng ký ngay

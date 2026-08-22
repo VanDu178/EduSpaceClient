@@ -120,6 +120,7 @@ Keep the structure organized and place files under the correct directories insid
   3. **Đồng bộ thiết kế linh vật gốc (Consistent Mascot Base):** Sử dụng linh vật robot 3D mẫu (robot trắng phối viền/chi tiết xanh cyan, mặt màn hình hiển thị mắt & miệng cười phát sáng xanh cyan).
   4. **Biến đổi tư thế linh động (Dynamic Pose Variation):** Tùy thuộc vào bối cảnh UI/trang web, Agent có thể linh hoạt tạo linh vật ở nhiều tư thế khác nhau (ví dụ: đang lơ lửng, đang đứng, đang ngồi trên tên lửa, tương tác với biểu đồ HUD, v.v.).
 
+
 ## 15. Quy chuẩn vô hiệu hóa tương tác khi đang xử lý (Action Processing & Interactive Elements Locking)
 - Khi có một hành động hoặc tác vụ bất đồng bộ đang trong quá trình xử lý (trạng thái `isLoading`, `isPending`, hoặc tương tự):
   1. **Khóa toàn bộ các thành phần tương tác:** Agent PHẢI vô hiệu hóa tất cả các nút bấm (`button`), liên kết (`Link`/`a`), input và các yếu tố có thể bấm được trên giao diện/form/modal bối cảnh đó nhằm tránh người dùng bấm trùng lặp (double submit / spam click) hoặc chuyển trang đột ngột khi đang gửi dữ liệu.
@@ -127,3 +128,8 @@ Keep the structure organized and place files under the correct directories insid
      - Đăng ký thuộc tính `disabled={isLoading}` cho toàn bộ nút bấm liên quan.
      - Với thẻ liên kết (`Link` / `a`) hoặc thẻ tương tác custom không có attribute `disabled`: Thêm class Tailwind `pointer-events-none opacity-50` và chặn sự kiện click (`onClick={(e) => { if (isLoading) e.preventDefault(); ... }}`).
   3. **Hiển thị phản hồi trực quan (Visual Feedback):** Kết hợp hiển thị icon xoay (Loading Spinner), trạng thái mờ (opacity/disabled) và hiệu ứng con trỏ chuột `cursor-not-allowed` để người dùng nhận biết hệ thống đang phản hồi.
+
+## 16. Quy chuẩn Tên Thương hiệu Hệ thống (System Branding Rule)
+- Tên hệ thống / sản phẩm chính thức hiện tại của dự án là **TradeVerse** (TUYỆT ĐỐI KHÔNG sử dụng tên EduSpace trong các mẫu email, giao diện UI, thông báo, tiêu đề trang web, v.v.).
+
+

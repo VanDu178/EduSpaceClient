@@ -19,7 +19,7 @@ export function BlogSearch({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search articles..."
-        className="w-full pl-9 pr-9 py-2.5 bg-white text-gray-900 text-xs sm:text-sm placeholder-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+        className="w-full pl-9 pr-9 py-2.5 bg-white text-gray-900 text-xs sm:text-sm placeholder-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
       />
       {searchQuery && (
         <button

@@ -142,7 +142,7 @@ export function CommunicationSection() {
                   Khóa học chuyên sâu
                 </Button>
               </Link>
-              <Link href="/login">
+              <Link href="/blogs">
                 <Button variant="outline" size="md" leftIcon={<DocumentTextIcon className="w-4 h-4" />}>
                   Kho bài viết
                 </Button>

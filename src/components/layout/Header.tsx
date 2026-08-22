@@ -27,23 +27,18 @@ export const Header = () => {
     { name: "Bài viết", href: "/blogs", icon: DocumentTextIcon },
   ];
 
-  const [activeKey, setActiveKey] = useState<string>("/");
-
-  useEffect(() => {
-    setActiveKey(pathname);
-  }, [pathname]);
-
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    setActiveKey(href);
+  // Xác định active key dựa trên đường dẫn hiện tại (ví dụ: /blogs/abc vẫn active tab /blogs)
+  const getActiveKey = (path: string) => {
+    if (path === "/") return "/";
+    const matched = navLinks.find((link) => link.href !== "/" && path.startsWith(link.href));
+    return matched ? matched.href : path;
   };
+
+  const activeKey = getActiveKey(pathname);
 
   const desktopMenuItems: MenuProps["items"] = navLinks?.map((link) => ({
     key: link?.href,
-    label: (
-      <Link href={link?.href} onClick={(e) => handleNavClick(e, link?.href)}>
-        {link?.name}
-      </Link>
-    ),
+    label: <Link href={link?.href}>{link?.name}</Link>,
   }));
 
   const mobileMenuItems: MenuProps["items"] = navLinks?.map((link) => {
@@ -54,10 +49,7 @@ export const Header = () => {
       label: (
         <Link
           href={link?.href}
-          onClick={(e) => {
-            setMobileMenuOpen(false);
-            handleNavClick(e, link?.href);
-          }}
+          onClick={() => setMobileMenuOpen(false)}
           className="text-sm font-medium"
         >
           {link?.name}

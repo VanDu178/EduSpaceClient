@@ -1,14 +1,17 @@
-import { BlogCategoryName } from '../types';
-import { BLOG_CATEGORIES } from '../mockData';
+import { BlogCategoryOption } from '../types';
 
 interface BlogHeaderProps {
-  selectedCategory: BlogCategoryName;
-  onSelectCategory: (category: BlogCategoryName) => void;
+  categories: BlogCategoryOption[];
+  selectedCategoryCode: string;
+  onSelectCategory: (code: string) => void;
+  isLoading?: boolean;
 }
 
 export function BlogHeader({
-  selectedCategory,
+  categories,
+  selectedCategoryCode,
   onSelectCategory,
+  isLoading = false,
 }: BlogHeaderProps) {
   return (
     <div className="space-y-4">
@@ -20,20 +23,23 @@ export function BlogHeader({
       {/* Category Filter Pills (Scrollable) */}
       <div className="relative">
         <div className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none]">
-          {BLOG_CATEGORIES.map((category) => {
-            const isActive = selectedCategory === category;
+          {categories.map((category) => {
+            const isActive = selectedCategoryCode === category.code;
             return (
               <button
-                key={category}
+                key={category.code}
                 type="button"
-                onClick={() => onSelectCategory(category)}
+                disabled={isLoading}
+                onClick={() => onSelectCategory(category.code)}
                 className={`whitespace-nowrap px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-full transition-all duration-200 cursor-pointer ${
+                  isLoading ? 'opacity-60 cursor-not-allowed' : ''
+                } ${
                   isActive
-                    ? 'bg-[#3B82F6] text-white border border-[#3B82F6]'
+                    ? 'bg-primary text-white border border-primary hover:bg-primary-hover'
                     : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
-                {category}
+                {category.name}
               </button>
             );
           })}

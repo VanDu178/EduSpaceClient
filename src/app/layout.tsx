@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { varelaRound } from "@/core/config/fonts";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { AppThemeProvider, AuthProvider } from "@/components/providers";
+import { AppThemeProvider, AuthProvider, ReactQueryProvider } from "@/components/providers";
 import { GoogleAuthProvider } from "@/core/contexts";
 import { Wrapper } from "@/components/layout";
 import { siteConfig } from "@/core/config/site";
@@ -29,13 +29,15 @@ export default function RootLayout({
     <html lang="vi" className={varelaRound.variable} suppressHydrationWarning>
       <body>
         <AntdRegistry>
-          <AppThemeProvider>
-            <GoogleAuthProvider>
-              <AuthProvider>
-                <Wrapper>{children}</Wrapper>
-              </AuthProvider>
-            </GoogleAuthProvider>
-          </AppThemeProvider>
+          <ReactQueryProvider>
+            <AppThemeProvider>
+              <GoogleAuthProvider>
+                <AuthProvider>
+                  <Wrapper>{children}</Wrapper>
+                </AuthProvider>
+              </GoogleAuthProvider>
+            </AppThemeProvider>
+          </ReactQueryProvider>
         </AntdRegistry>
       </body>
     </html>

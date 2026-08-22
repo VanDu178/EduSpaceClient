@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,13 +17,13 @@ import {
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
-import { resetPasswordApi } from "@/features/auth";
+import { useResetPasswordMutation } from "@/features/auth";
 
 function ResetPasswordForm() {
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [form] = Form.useForm();
+  const { mutate: resetPassword, isPending } = useResetPasswordMutation();
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
@@ -36,7 +36,7 @@ function ResetPasswordForm() {
     }
   }, [searchParams, form]);
 
-  const handleResetPassword = async (values: {
+  const handleResetPassword = (values: {
     email: string;
     otp: string;
     newPassword: string;
@@ -47,27 +47,29 @@ function ResetPasswordForm() {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await resetPasswordApi({
+    resetPassword(
+      {
         email: values.email,
         otp: values.otp,
         newPassword: values.newPassword,
-      });
-      toast.success(
-        res?.message || "Đặt lại mật khẩu thành công! Đang chuyển đến Đăng nhập..."
-      );
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Đặt lại mật khẩu thất bại. Vui lòng kiểm tra lại thông tin mã OTP!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: (res) => {
+          toast.success(
+            res?.message || "Đặt lại mật khẩu thành công! Đang chuyển đến Đăng nhập..."
+          );
+          setTimeout(() => {
+            router.push("/login");
+          }, 1500);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đặt lại mật khẩu thất bại. Vui lòng kiểm tra lại thông tin mã OTP!";
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   return (
@@ -150,10 +152,10 @@ function ResetPasswordForm() {
               <Link
                 href="/login"
                 onClick={(e) => {
-                  if (loading) e.preventDefault();
+                  if (isPending) e.preventDefault();
                 }}
                 className={`inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 transition-colors ${
-                  loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                  isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
                 }`}
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-1" /> Quay lại Đăng nhập
@@ -176,7 +178,7 @@ function ResetPasswordForm() {
               onFinish={handleResetPassword}
               autoComplete="off"
               size="large"
-              disabled={loading}
+              disabled={isPending}
             >
               <Form.Item
                 name="email"
@@ -251,8 +253,8 @@ function ResetPasswordForm() {
                 size="md"
                 rounded="xl"
                 fullWidth
-                isLoading={loading}
-                disabled={loading}
+                isLoading={isPending}
+                disabled={isPending}
                 className="!bg-sky-500 hover:!bg-sky-600 !border-sky-500 text-white dark:!bg-cyan-500 dark:hover:!bg-cyan-400 dark:!border-cyan-400 dark:text-slate-950 font-semibold mt-2"
               >
                 Đổi mật khẩu ngay

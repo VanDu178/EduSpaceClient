@@ -18,17 +18,25 @@ import {
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
-import { forgotPasswordApi, resetPasswordApi } from "@/features/auth";
+import {
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  PasswordStrengthIndicator,
+} from "@/features/auth";
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<1 | 2>(1);
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [countdown, setCountdown] = useState(0);
   const [devOtpHint, setDevOtpHint] = useState<string | null>(null);
   const router = useRouter();
   const [formStep1] = Form.useForm();
   const [formStep2] = Form.useForm();
+
+  const { mutate: forgotPassword, isPending: isForgotPasswordPending } = useForgotPasswordMutation();
+  const { mutate: resetPassword, isPending: isResetPasswordPending } = useResetPasswordMutation();
+  const isPending = isForgotPasswordPending || isResetPasswordPending;
 
   // Xử lý đếm ngược gửi lại mã OTP (60 giây)
   useEffect(() => {
@@ -42,52 +50,56 @@ export default function ForgotPasswordPage() {
   }, [countdown]);
 
   // Bước 1: Yêu cầu gửi mã OTP về Email
-  const handleRequestOtp = async (values: { email: string }) => {
-    setLoading(true);
-    try {
-      const res = await forgotPasswordApi({ email: values.email });
-      setEmail(values.email);
-      if (res?.devOtp) {
-        setDevOtpHint(res.devOtp);
+  const handleRequestOtp = (values: { email: string }) => {
+    forgotPassword(
+      { email: values.email },
+      {
+        onSuccess: (res) => {
+          setEmail(values.email);
+          if (res?.devOtp) {
+            setDevOtpHint(res.devOtp);
+          }
+          toast.success(
+            res?.message || "Mã OTP khôi phục đã được gửi về email của bạn!"
+          );
+          setStep(2);
+          setCountdown(60);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Gửi yêu cầu thất bại. Vui lòng kiểm tra lại địa chỉ email!";
+          toast.error(errorMessage);
+        },
       }
-      toast.success(
-        res?.message || "Mã OTP khôi phục đã được gửi về email của bạn!"
-      );
-      setStep(2);
-      setCountdown(60);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Gửi yêu cầu thất bại. Vui lòng kiểm tra lại địa chỉ email!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   // Gửi lại OTP ở bước 2
-  const handleResendOtp = async () => {
-    if (countdown > 0 || loading || !email) return;
-    setLoading(true);
-    try {
-      const res = await forgotPasswordApi({ email });
-      if (res?.devOtp) {
-        setDevOtpHint(res.devOtp);
+  const handleResendOtp = () => {
+    if (countdown > 0 || isPending || !email) return;
+    forgotPassword(
+      { email },
+      {
+        onSuccess: (res) => {
+          if (res?.devOtp) {
+            setDevOtpHint(res.devOtp);
+          }
+          toast.success("Đã gửi lại mã OTP mới về email của bạn!");
+          setCountdown(60);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Không thể gửi lại mã OTP. Vui lòng thử lại sau!";
+          toast.error(errorMessage);
+        },
       }
-      toast.success("Đã gửi lại mã OTP mới về email của bạn!");
-      setCountdown(60);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Không thể gửi lại mã OTP. Vui lòng thử lại sau!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   // Bước 2: Đặt lại mật khẩu với mã OTP
-  const handleResetPassword = async (values: {
+  const handleResetPassword = (values: {
     otp: string;
     newPassword: string;
     confirmPassword: string;
@@ -97,27 +109,29 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await resetPasswordApi({
+    resetPassword(
+      {
         email,
         otp: values.otp,
         newPassword: values.newPassword,
-      });
-      toast.success(
-        res?.message || "Đặt lại mật khẩu thành công! Đang chuyển đến Đăng nhập..."
-      );
-      setTimeout(() => {
-        router.push("/login");
-      }, 1500);
-    } catch (error: any) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Đặt lại mật khẩu thất bại. Vui lòng kiểm tra lại mã OTP!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: (res) => {
+          toast.success(
+            res?.message || "Đặt lại mật khẩu thành công! Đang chuyển đến Đăng nhập..."
+          );
+          setTimeout(() => {
+            router.push("/login");
+          }, 1500);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message ||
+            "Đặt lại mật khẩu thất bại. Vui lòng kiểm tra lại mã OTP!";
+          toast.error(errorMessage);
+        },
+      }
+    );
   };
 
   return (
@@ -203,11 +217,10 @@ export default function ForgotPasswordPage() {
               <Link
                 href="/login"
                 onClick={(e) => {
-                  if (loading) e.preventDefault();
+                  if (isPending) e.preventDefault();
                 }}
-                className={`inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 transition-colors ${
-                  loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`inline-flex items-center text-xs text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 transition-colors ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                  }`}
               >
                 <ArrowLeftIcon className="w-4 h-4 mr-1" /> Quay lại Đăng nhập
               </Link>
@@ -224,14 +237,6 @@ export default function ForgotPasswordPage() {
                   : `Mã OTP đã được gửi tới ${email}`}
               </p>
             </div>
-
-            {/* Developer OTP Hint Alert (cho môi trường dev) */}
-            {devOtpHint && (
-              <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs text-center font-medium">
-                💡 Mã OTP thử nghiệm (Dev): <strong className="tracking-widest text-sm">{devOtpHint}</strong>
-              </div>
-            )}
-
             {/* BƯỚC 1: NHẬP EMAIL */}
             {step === 1 && (
               <Form
@@ -241,7 +246,7 @@ export default function ForgotPasswordPage() {
                 onFinish={handleRequestOtp}
                 autoComplete="off"
                 size="large"
-                disabled={loading}
+                disabled={isPending}
               >
                 <Form.Item
                   name="email"
@@ -263,8 +268,8 @@ export default function ForgotPasswordPage() {
                   size="md"
                   rounded="xl"
                   fullWidth
-                  isLoading={loading}
-                  disabled={loading}
+                  isLoading={isPending}
+                  disabled={isPending}
                   className="!bg-sky-500 hover:!bg-sky-600 !border-sky-500 text-white dark:!bg-cyan-500 dark:hover:!bg-cyan-400 dark:!border-cyan-400 dark:text-slate-950 font-semibold mt-2"
                 >
                   Gửi mã xác nhận OTP
@@ -281,7 +286,7 @@ export default function ForgotPasswordPage() {
                 onFinish={handleResetPassword}
                 autoComplete="off"
                 size="large"
-                disabled={loading}
+                disabled={isPending}
               >
                 <Form.Item
                   name="otp"
@@ -308,9 +313,12 @@ export default function ForgotPasswordPage() {
                   <Input.Password
                     prefix={<LockClosedIcon className="w-5 h-5 text-sky-500/80 dark:text-cyan-400/80 mr-2" />}
                     placeholder="Mật khẩu mới (Tối thiểu 8 ký tự)"
+                    onChange={(e) => setNewPassword(e.target.value)}
                     className="!bg-slate-50 dark:!bg-slate-950/90 !border-slate-200 dark:!border-slate-800 !text-slate-900 dark:!text-slate-100 placeholder:!text-slate-400 dark:placeholder:!text-slate-500 hover:!border-sky-500 dark:hover:!border-cyan-500/60 focus:!shadow-none focus-within:!shadow-none focus:!border-slate-200 dark:focus:!border-slate-800 focus-within:!border-slate-200 dark:focus-within:!border-slate-800 !rounded-xl !py-2.5 !px-4 !text-sm"
                   />
                 </Form.Item>
+
+                <PasswordStrengthIndicator password={newPassword} />
 
                 <Form.Item
                   name="confirmPassword"
@@ -340,10 +348,9 @@ export default function ForgotPasswordPage() {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    disabled={loading}
-                    className={`text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 ${
-                      loading ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    disabled={isPending}
+                    className={`text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-cyan-400 ${isPending ? "pointer-events-none opacity-50 cursor-not-allowed" : ""
+                      }`}
                   >
                     Thay đổi Email
                   </button>
@@ -351,14 +358,13 @@ export default function ForgotPasswordPage() {
                   <button
                     type="button"
                     onClick={handleResendOtp}
-                    disabled={countdown > 0 || loading}
-                    className={`font-medium flex items-center gap-1 ${
-                      countdown > 0 || loading
-                        ? "text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60"
-                        : "text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300"
-                    }`}
+                    disabled={countdown > 0 || isPending}
+                    className={`font-medium flex items-center gap-1 ${countdown > 0 || isPending
+                      ? "text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60"
+                      : "text-sky-600 hover:text-sky-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+                      }`}
                   >
-                    <ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                    <ArrowPathIcon className={`w-3.5 h-3.5 ${isPending ? "animate-spin" : ""}`} />
                     {countdown > 0 ? `Gửi lại mã (${countdown}s)` : "Gửi lại OTP"}
                   </button>
                 </div>
@@ -369,8 +375,8 @@ export default function ForgotPasswordPage() {
                   size="md"
                   rounded="xl"
                   fullWidth
-                  isLoading={loading}
-                  disabled={loading}
+                  isLoading={isPending}
+                  disabled={isPending}
                   className="!bg-sky-500 hover:!bg-sky-600 !border-sky-500 text-white dark:!bg-cyan-500 dark:hover:!bg-cyan-400 dark:!border-cyan-400 dark:text-slate-950 font-semibold"
                 >
                   Xác nhận & Đặt lại mật khẩu
