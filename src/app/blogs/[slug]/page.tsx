@@ -11,8 +11,12 @@ import {
   ClockIcon,
   TagIcon,
   ExclamationCircleIcon,
+  LockClosedIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
-import { Blog, getBlogBySlugApi } from '@/features/blogs';
+import { Blog, getBlogBySlugApi, getBlogsApi } from '@/features/blogs';
+import { BlogCard } from '@/features/blogs/components/BlogCard';
+import { PremiumAccessModal } from '@/features/membership';
 import { Button } from '@/components/common';
 
 function formatDate(dateStr?: string | null) {
@@ -42,6 +46,12 @@ export default function BlogDetailPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  // State quản lý danh sách bài viết liên quan
+  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
+  const [isRelatedLoading, setIsRelatedLoading] = useState<boolean>(true);
+  const [selectedRelatedBlog, setSelectedRelatedBlog] = useState<Blog | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -70,6 +80,10 @@ export default function BlogDetailPage() {
         const data = await getBlogBySlugApi(slug);
         if (isMounted) {
           setBlog(data);
+          // If post is premium, auto open access modal on first visit for demonstration
+          if (data?.isPremium) {
+            setIsModalOpen(true);
+          }
         }
       } catch (error) {
         console.error('Failed to fetch blog detail:', error);
@@ -89,6 +103,62 @@ export default function BlogDetailPage() {
       isMounted = false;
     };
   }, [slug]);
+
+  // Fetch bài viết liên quan (Related Blogs) dựa trên thể loại & fallback bài mới nhất
+  useEffect(() => {
+    if (!blog) return;
+
+    let isMounted = true;
+    const fetchRelatedBlogs = async () => {
+      setIsRelatedLoading(true);
+      try {
+        // Bước 1: Lấy các bài cùng thể loại (blogType)
+        let sameCategoryBlogs: Blog[] = [];
+        if (blog.blogType?.code) {
+          const res = await getBlogsApi({
+            limit: 6,
+            blogType: blog.blogType.code,
+          });
+          sameCategoryBlogs = (res.blogs || []).filter((b) => b.id !== blog.id);
+        }
+
+        let finalRelated = sameCategoryBlogs.slice(0, 3);
+
+        // Bước 2: Bù đắp bằng các bài mới nhất nếu chưa đủ 3 bài
+        if (finalRelated.length < 3) {
+          const fallbackRes = await getBlogsApi({ limit: 6 });
+          const existingIds = new Set([blog.id, ...finalRelated.map((b) => b.id)]);
+          const fallbackBlogs = (fallbackRes.blogs || []).filter(
+            (b) => !existingIds.has(b.id)
+          );
+          finalRelated = [...finalRelated, ...fallbackBlogs].slice(0, 3);
+        }
+
+        if (isMounted) {
+          setRelatedBlogs(finalRelated);
+        }
+      } catch (error) {
+        console.error('Failed to fetch related blogs:', error);
+        if (isMounted) {
+          setRelatedBlogs([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsRelatedLoading(false);
+        }
+      }
+    };
+
+    fetchRelatedBlogs();
+    return () => {
+      isMounted = false;
+    };
+  }, [blog]);
+
+  const handleRelatedPremiumClick = (relatedBlog: Blog) => {
+    setSelectedRelatedBlog(relatedBlog);
+    setIsModalOpen(true);
+  };
 
   // Loading Skeleton State
   if (isLoading) {
@@ -178,14 +248,14 @@ export default function BlogDetailPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
           <div className="flex items-center gap-2">
             {blog.blogType?.name && (
-              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-primary bg-primary-light/60 rounded-md">
+              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-primary bg-primary-light/60 rounded-md">
                 <TagIcon className="w-3.5 h-3.5" />
                 {blog.blogType.name}
               </span>
             )}
             {blog.isPremium && (
-              <span className="px-3 py-1 text-xs font-semibold text-amber-700 bg-amber-50 rounded-md">
-                ★ Premium
+              <span className="px-3 py-1 text-xs font-medium text-amber-700 bg-amber-50 rounded-md">
+                ★ Trả phí
               </span>
             )}
           </div>
@@ -194,30 +264,29 @@ export default function BlogDetailPage() {
           <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <span className="text-gray-400 flex items-center gap-2">
-                Tác giả: {" "}
-                <span className="text-gray-800"> {authorName}</span>
+                Tác giả: <span className="text-gray-800"> {authorName}</span>
               </span>
             </div>
 
             <div className="flex items-center gap-1.5">
               <CalendarIcon className="w-4 h-4 text-gray-400" />
-              <span>Ngày đăng:
-                <span className="text-gray-800"> {formattedDate}</span></span>
+              <span>
+                Ngày đăng: <span className="text-gray-800"> {formattedDate}</span>
+              </span>
             </div>
 
             {hasUpdatedDate && (
               <div className="flex items-center gap-1.5">
                 <ArrowPathIcon className="w-4 h-4 text-gray-400" />
-                <span>Ngày cập nhật:
-                  <span className="text-gray-800"> {formattedUpdatedDate}</span></span>
+                <span>
+                  Ngày cập nhật: <span className="text-gray-800"> {formattedUpdatedDate}</span>
+                </span>
               </div>
             )}
 
             <div className="flex items-center gap-1.5">
               <ClockIcon className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-800">
-                {readTime}
-              </span>
+              <span className="text-gray-800">{readTime}</span>
             </div>
           </div>
         </div>
@@ -236,25 +305,54 @@ export default function BlogDetailPage() {
       </header>
 
       {/* 3. Cover Banner (Only if coverImage exists!) */}
-      {
-        coverImage && (
-          <div className="w-full rounded-2xl overflow-hidden aspect-[16/9] max-h-[400px] relative flex items-center justify-center p-2 sm:p-4 bg-gray-50 border border-gray-100">
-            <img
-              src={coverImage}
-              alt={blog.title}
-              className="w-full h-full object-cover rounded-xl"
-            />
-          </div>
-        )
-      }
+      {coverImage && (
+        <div className="w-full rounded-2xl overflow-hidden aspect-[16/9] max-h-[400px] relative flex items-center justify-center p-2 sm:p-4 bg-gray-50 border border-gray-100">
+          <img
+            src={coverImage}
+            alt={blog.title}
+            className="w-full h-full object-cover rounded-xl"
+          />
+        </div>
+      )}
 
       {/* 4. Article Body Content */}
-      <main className="pt-2">
+      <main className="pt-2 relative">
         {blog.content ? (
-          <div
-            className="blog-content-body text-gray-800 text-sm sm:text-base leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
-          />
+          <div className="relative">
+            <div
+              className={`blog-content-body text-gray-800 text-sm sm:text-base leading-relaxed ${blog.isPremium ? 'max-h-72 overflow-hidden select-none' : ''
+                }`}
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+            />
+
+            {/* Premium Blur Lock Gradient & Callout Container */}
+            {blog.isPremium && (
+              <div className="relative z-10 pt-16 -mt-36 bg-gradient-to-t from-white via-white/95 to-transparent flex flex-col items-center justify-center text-center p-6 sm:p-8 space-y-4 border border-amber-200/80 rounded-2xl bg-amber-50/40">
+                <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
+                  <LockClosedIcon className="w-6 h-6 stroke-[2]" />
+                </div>
+                <div className="space-y-1 max-w-lg">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center justify-center gap-1.5">
+                    <SparklesIcon className="w-5 h-5 text-amber-600" />
+                    Bài viết này dành riêng cho Gói Hội Viên Premium
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                    Bạn đang xem nội dung bản xem trước. Vui lòng nâng cấp gói hội viên để mở khóa toàn bộ bài viết và các phân tích chuyên sâu.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  rounded="full"
+                  onClick={() => setIsModalOpen(true)}
+                  className="cursor-pointer font-semibold"
+                >
+                  Nâng cấp gói hội viên ngay
+                </Button>
+              </div>
+            )}
+          </div>
         ) : (
           <p className="text-gray-500 italic text-sm">
             Nội dung bài viết đang được cập nhật...
@@ -262,7 +360,55 @@ export default function BlogDetailPage() {
         )}
       </main>
 
-      {/* 5. Footer Navigation */}
+      {/* 5. Related Posts Section */}
+      <section className="pt-10 pb-4 border-t border-gray-200 space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+            Bài viết liên quan
+          </h2>
+          <Link
+            href="/blogs"
+            className="text-xs sm:text-sm font-medium text-primary hover:underline"
+          >
+            Xem tất cả
+          </Link>
+        </div>
+
+        {isRelatedLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse h-72 flex flex-col justify-between p-4 space-y-3"
+              >
+                <div className="w-full aspect-[16/9] bg-gray-100 rounded-md" />
+                <div className="space-y-2 flex-1 pt-2">
+                  <div className="h-4 bg-gray-200 rounded w-1/3" />
+                  <div className="h-5 bg-gray-200 rounded w-5/6" />
+                  <div className="h-3 bg-gray-100 rounded w-full" />
+                </div>
+                <div className="h-4 bg-gray-100 rounded w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : relatedBlogs.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {relatedBlogs.map((relatedBlog) => (
+              <BlogCard
+                key={relatedBlog.id}
+                blog={relatedBlog}
+                onPremiumClick={handleRelatedPremiumClick}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs sm:text-sm text-gray-500 italic">
+            Chưa có bài viết liên quan nào khác.
+          </p>
+        )}
+      </section>
+
+      {/* 6. Footer Navigation */}
       <footer className="pt-8 border-t border-gray-200 flex items-center justify-between">
         <Link
           href="/blogs"
@@ -273,7 +419,7 @@ export default function BlogDetailPage() {
         </Link>
       </footer>
 
-      {/* 6. Back to Top Anchor */}
+      {/* 7. Back to Top Anchor */}
       {showScrollTop && (
         <Button
           type="button"
@@ -287,7 +433,16 @@ export default function BlogDetailPage() {
           <ArrowUpIcon className="w-5 h-5 text-white" />
         </Button>
       )}
-    </article >
+
+      {/* Restricted Access Modal */}
+      <PremiumAccessModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedRelatedBlog(null);
+        }}
+        postTitle={selectedRelatedBlog?.title || blog.title}
+      />
+    </article>
   );
 }
-

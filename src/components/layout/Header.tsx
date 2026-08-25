@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, Button, Drawer, Dropdown, Menu, Spin, type MenuProps } from "antd";
@@ -12,6 +12,7 @@ import {
   KeyIcon,
   HomeIcon,
   DocumentTextIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "@/features/auth";
 
@@ -21,6 +22,15 @@ export const Header = () => {
 
   const { user, isInitialized, logout } = useAuthStore();
   const isLoggedIn = Boolean(user);
+
+  const isPaidUser = Boolean(user?.isPremium || (user?.plan && user.plan.toUpperCase() !== "FREE"));
+  const userPlanName =
+    user?.planName ||
+    (isPaidUser
+      ? user?.plan === "VIP_PREMIUM"
+        ? "VIP Premium"
+        : "Pro Trader"
+      : "Gói Free");
 
   const navLinks = [
     { name: "Trang chủ", href: "/", icon: HomeIcon },
@@ -45,7 +55,7 @@ export const Header = () => {
     const Icon = link?.icon;
     return {
       key: link?.href,
-      icon: <Icon className="w-5 h-5 text-blue-600" />,
+      icon: <Icon className="w-5 h-5 text-sky-600" />,
       label: (
         <Link
           href={link?.href}
@@ -62,11 +72,31 @@ export const Header = () => {
     {
       key: "user-info",
       label: (
-        <div className="px-1 py-1">
+        <div className="px-1 py-1.5">
           <p className="text-xs text-slate-500 font-normal">Tài khoản</p>
-          <p className="text-sm font-semibold text-slate-800 truncate max-w-[180px]">
+          <p className="text-sm font-semibold text-slate-900 truncate max-w-[200px]">
             {user?.name || user?.email || "Người dùng"}
           </p>
+          <div className="mt-2 flex items-center gap-2">
+            <span
+              className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                isPaidUser
+                  ? "bg-sky-50 text-sky-700 border-sky-200 font-semibold flex items-center gap-1"
+                  : "bg-slate-100 text-slate-600 border-slate-200"
+              }`}
+            >
+              {isPaidUser && <SparklesIcon className="w-3 h-3 text-sky-600" />}
+              {userPlanName}
+            </span>
+            {!isPaidUser && (
+              <Link
+                href="/pricing"
+                className="text-[11px] font-semibold text-sky-600 hover:text-sky-700 underline"
+              >
+                Nâng cấp ngay
+              </Link>
+            )}
+          </div>
         </div>
       ),
       disabled: true,
@@ -97,7 +127,7 @@ export const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left: TradeVerse Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <img src="/images/logo.png" alt="EduSpace Logo" className="h-8 sm:h-9 w-auto object-contain" />
+            <img src="/images/logo.png" alt="TradeVerse Logo" className="h-8 sm:h-9 w-auto object-contain" />
             <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
               Trade<span className="text-sky-500">Verse</span>
             </span>
@@ -126,19 +156,45 @@ export const Header = () => {
               <Link href="/login">
                 <Button
                   type="primary"
-                  className="font-medium !rounded-lg h-10 px-5 flex items-center gap-1.5 border-none"
+                  className="font-medium !rounded-lg h-10 px-5 flex items-center gap-1.5 border-none bg-sky-600 hover:!bg-sky-500"
                 >
                   <span>Đăng nhập</span>
                 </Button>
               </Link>
             ) : (
-              <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
-                <Avatar
-                  size={36}
-                  icon={<UserIcon className="w-5 h-5 text-slate-700" />}
-                  className="cursor-pointer bg-slate-100 hover:bg-slate-200 hover:scale-105 transition-transform flex items-center justify-center border-none"
-                />
-              </Dropdown>
+              <div className="flex items-center gap-2.5">
+                {/* Gói sử dụng hiện tại */}
+                {!isPaidUser ? (
+                  <div className="hidden sm:flex items-center gap-2">
+                    <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                      Gói Free
+                    </span>
+                    <Link href="/pricing">
+                      <Button
+                        type="primary"
+                        size="small"
+                        className="!rounded-full font-medium h-8 px-3 text-xs flex items-center gap-1.5 border-none bg-sky-600 hover:!bg-sky-500"
+                        icon={<SparklesIcon className="w-3.5 h-3.5 text-amber-300" />}
+                      >
+                        Nâng cấp
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200 rounded-full">
+                    <SparklesIcon className="w-3.5 h-3.5 text-sky-600" />
+                    {userPlanName}
+                  </span>
+                )}
+
+                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
+                  <Avatar
+                    size={36}
+                    icon={<UserIcon className="w-5 h-5 text-sky-600" />}
+                    className="cursor-pointer bg-sky-50 hover:bg-sky-100 border border-sky-200 hover:border-sky-300 hover:scale-105 transition-all flex items-center justify-center"
+                  />
+                </Dropdown>
+              </div>
             )}
 
             {/* Hamburger menu button for Mobile using Antd Button */}
@@ -158,7 +214,7 @@ export const Header = () => {
         title={
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src="/images/logo.png" alt="EduSpace Logo" className="h-7 w-auto object-contain" />
+              <img src="/images/logo.png" alt="TradeVerse Logo" className="h-7 w-auto object-contain" />
               <span className="text-lg font-bold text-slate-900">
                 Trade<span className="text-sky-500">Verse</span>
               </span>
@@ -205,28 +261,53 @@ export const Header = () => {
                   block
                   size="large"
                   icon={<ArrowRightStartOnRectangleIcon className="w-5 h-5" />}
-                  className="!rounded-lg font-medium flex items-center justify-center gap-2 border-none h-12 text-base"
+                  className="!rounded-lg font-medium flex items-center justify-center gap-2 border-none h-12 text-base bg-sky-600 hover:!bg-sky-500"
                 >
                   Đăng nhập
                 </Button>
               </Link>
             ) : (
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-50 border border-slate-200">
-                  <Avatar
-                    size={36}
-                    icon={<UserIcon className="w-5 h-5 text-slate-700" />}
-                    className="bg-slate-200 flex items-center justify-center flex-shrink-0"
-                  />
-                  <div className="overflow-hidden">
-                    <p className="text-sm font-semibold text-slate-900 truncate">
-                      {user?.name || user?.email || "Người dùng"}
-                    </p>
-                    {user?.name && user?.email && (
-                      <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                    )}
+                <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-sky-50/60 border border-sky-100">
+                  <div className="flex items-center gap-2.5 overflow-hidden">
+                    <Avatar
+                      size={36}
+                      icon={<UserIcon className="w-5 h-5 text-sky-600" />}
+                      className="bg-sky-100 border border-sky-200 flex items-center justify-center flex-shrink-0"
+                    />
+                    <div className="overflow-hidden">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {user?.name || user?.email || "Người dùng"}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className={`text-[11px] font-medium px-2 py-0.5 rounded-full border ${
+                            isPaidUser
+                              ? "bg-sky-100 text-sky-700 border-sky-200 font-semibold flex items-center gap-1"
+                              : "bg-white text-slate-600 border-slate-200"
+                          }`}
+                        >
+                          {isPaidUser && <SparklesIcon className="w-3 h-3 text-sky-600" />}
+                          {userPlanName}
+                        </span>
+                      </div>
+                    </div>
                   </div>
+
+                  {!isPaidUser && (
+                    <Link href="/pricing" onClick={() => setMobileMenuOpen(false)}>
+                      <Button
+                        type="primary"
+                        size="small"
+                        className="!rounded-full font-medium h-8 px-3 text-xs flex items-center gap-1 border-none bg-sky-600 hover:!bg-sky-500 flex-shrink-0"
+                        icon={<SparklesIcon className="w-3.5 h-3.5 text-amber-300" />}
+                      >
+                        Nâng cấp
+                      </Button>
+                    </Link>
+                  )}
                 </div>
+
                 <Link
                   href="/change-password"
                   onClick={() => setMobileMenuOpen(false)}
@@ -264,3 +345,4 @@ export const Header = () => {
     </>
   );
 };
+

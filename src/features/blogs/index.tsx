@@ -7,6 +7,7 @@ import { BlogHeader } from './components/BlogHeader';
 import { BlogSearch } from './components/BlogSearch';
 import { BlogGrid } from './components/BlogGrid';
 import { BlogPagination } from './components/BlogPagination';
+import { PremiumAccessModal } from '@/features/membership';
 
 const ITEMS_PER_PAGE = 6;
 const DEFAULT_CATEGORY: BlogCategoryOption = { code: 'ALL', name: 'Tất cả' };
@@ -20,6 +21,10 @@ export function BlogsFeature() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Premium Modal State
+  const [selectedPremiumBlog, setSelectedPremiumBlog] = useState<Blog | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search query
   useEffect(() => {
@@ -100,6 +105,11 @@ export function BlogsFeature() {
     setSearchQuery(query);
   };
 
+  const handlePremiumClick = (blog: Blog) => {
+    setSelectedPremiumBlog(blog);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5">
       {/* 1. Header (Title + Category Filter Pills) */}
@@ -117,7 +127,11 @@ export function BlogsFeature() {
       />
 
       {/* 3. Article Cards Grid */}
-      <BlogGrid blogs={blogs} isLoading={isLoading} />
+      <BlogGrid
+        blogs={blogs}
+        isLoading={isLoading}
+        onPremiumClick={handlePremiumClick}
+      />
 
       {/* 4. Pagination */}
       <BlogPagination
@@ -125,9 +139,17 @@ export function BlogsFeature() {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
       />
+
+      {/* 5. Restricted Access Modal for Premium Blog Posts */}
+      <PremiumAccessModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        postTitle={selectedPremiumBlog?.title}
+      />
     </div>
   );
 }
 
 export * from './types';
 export * from './services/blogService';
+

@@ -24,17 +24,17 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90",
+    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90 disabled:hover:bg-btn-primary disabled:hover:border-btn-primary",
   secondary:
-    "bg-white text-primary border border-primary/40 hover:border-primary hover:bg-primary-light/30 active:bg-primary-light/60",
+    "bg-white text-primary border border-primary/40 hover:border-primary hover:bg-primary-light/30 active:bg-primary-light/60 disabled:hover:border-primary/40 disabled:hover:bg-white",
   outline:
-    "bg-white text-primary border border-slate-200 hover:border-primary ",
+    "bg-white text-primary border border-slate-200 hover:border-primary disabled:hover:border-slate-200 disabled:hover:bg-white",
   ghost:
-    "bg-transparent text-slate-700 border-transparent hover:bg-[#ddf3fe]/30",
+    "bg-transparent text-slate-700 border-transparent hover:bg-[#ddf3fe]/30 disabled:hover:bg-transparent",
   danger:
-    "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800",
+    "bg-red-600 text-white border-red-600 hover:bg-red-700 hover:border-red-700 active:bg-red-800 disabled:hover:bg-red-600 disabled:hover:border-red-600",
   gradient:
-    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90",
+    "bg-btn-primary text-white border-btn-primary hover:bg-btn-primary-hover hover:border-btn-primary-hover active:opacity-90 disabled:hover:bg-btn-primary disabled:hover:border-btn-primary",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

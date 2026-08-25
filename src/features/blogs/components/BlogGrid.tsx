@@ -5,9 +5,10 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
 interface BlogGridProps {
   blogs: Blog[];
   isLoading?: boolean;
+  onPremiumClick?: (blog: Blog) => void;
 }
 
-export function BlogGrid({ blogs, isLoading = false }: BlogGridProps) {
+export function BlogGrid({ blogs, isLoading = false, onPremiumClick }: BlogGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -52,8 +53,9 @@ export function BlogGrid({ blogs, isLoading = false }: BlogGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {blogs.map((blog) => (
-        <BlogCard key={blog.id} blog={blog} />
+        <BlogCard key={blog.id} blog={blog} onPremiumClick={onPremiumClick} />
       ))}
     </div>
   );
 }
+

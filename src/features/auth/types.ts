@@ -9,6 +9,9 @@ export interface User {
   provider?: 'credentials' | 'google' | string;
   createdAt?: string;
   updatedAt?: string;
+  plan?: string | null;
+  planName?: string | null;
+  isPremium?: boolean;
 }
 
 export interface RegisterDTO {
