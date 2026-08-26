@@ -25,9 +25,9 @@ export const getBlogsApi = async (
 };
 
 /**
- * Lấy chi tiết bài blog theo ID hoặc Slug (Public)
+ * Lấy chi tiết bài blog theo Slug (Public)
  */
 export const getBlogBySlugApi = async (slug: string): Promise<Blog> => {
-  const response = await api.get(`/blogs/${slug}`);
+  const response = await api.get(`/blogs/slug/${slug}`);
   return response.data.data.blog;
 };

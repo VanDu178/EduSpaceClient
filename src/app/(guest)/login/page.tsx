@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Checkbox, Divider, Form, Input } from "antd";
 import { toast } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -17,11 +18,25 @@ import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
 import { useLoginMutation, useGoogleLoginMutation, useAuthStore } from "@/features/auth";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
+
   const { mutate: login, isPending: isLoginPending } = useLoginMutation();
   const { mutate: googleLogin, isPending: isGooglePending } = useGoogleLoginMutation();
   const isPending = isLoginPending || isGooglePending;
+
+  const getDestination = () => {
+    if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+      return redirectUrl;
+    }
+    return "/";
+  };
+
+  const registerHref = redirectUrl
+    ? `/register?redirect=${encodeURIComponent(redirectUrl)}`
+    : "/register";
 
   const onFinish = (values: any) => {
     login(
@@ -34,7 +49,7 @@ export default function LoginPage() {
           useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
           toast.success("Đăng nhập thành công! Chào mừng đến với TradeVerse.");
           setTimeout(() => {
-            router.push("/");
+            router.push(getDestination());
           }, 1000);
         },
         onError: (error: any) => {
@@ -57,7 +72,7 @@ export default function LoginPage() {
           useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
           toast.success("Đăng nhập bằng Google thành công!");
           setTimeout(() => {
-            router.push("/");
+            router.push(getDestination());
           }, 1000);
         },
         onError: (error: any) => {
@@ -85,7 +100,6 @@ export default function LoginPage() {
     }
     loginWithGoogle();
   };
-
 
   return (
     <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 lg:p-10 relative overflow-hidden bg-slate-50 dark:bg-[#070d19] transition-colors duration-300">
@@ -264,11 +278,12 @@ export default function LoginPage() {
             >
               Tiếp tục với Google
             </Button>
+
             {/* Footer Link */}
             <div className="mt-5 text-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 pt-4">
               Chưa có tài khoản?{" "}
               <Link
-                href="/register"
+                href={registerHref}
                 onClick={(e) => {
                   if (isPending) e.preventDefault();
                 }}
@@ -284,3 +299,16 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[90vh] flex items-center justify-center bg-slate-50 dark:bg-[#070d19]">
+        <div className="text-slate-500 dark:text-slate-400 text-sm">Đang tải...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
+  );
+}
+

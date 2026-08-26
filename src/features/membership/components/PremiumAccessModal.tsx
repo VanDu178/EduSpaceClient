@@ -14,6 +14,8 @@ export function PremiumAccessModal({
   onClose,
   postTitle,
   recommendedPlanCode = 'PRO_TRADER',
+  isUpgradeTier = false,
+  currentPlanName,
 }: PremiumAccessModalProps) {
   const router = useRouter();
   const [selectedPlanCode, setSelectedPlanCode] = useState<string>(recommendedPlanCode);
@@ -91,17 +93,21 @@ export function PremiumAccessModal({
           <div className="space-y-2 text-left">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">
               {postTitle
-                ? `Mở khóa bài viết: "${postTitle}"`
+                ? `${isUpgradeTier ? 'Nâng cấp mở khóa bài viết' : 'Mở khóa bài viết'}: "${postTitle}"`
+                : isUpgradeTier
+                ? 'Nâng cấp hạng gói để truy cập bài viết chuyên sâu'
                 : 'Mở khóa toàn bộ bài viết & phân tích chuyên sâu'}
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
-              Luyện tập và nâng cao kỹ năng giao dịch mỗi ngày cùng các chuyên gia hàng đầu TradeVerse — chỉ có trên các gói hội viên nâng cấp. Giống như câu nói kinh điển: Luyện tập tạo nên sự thành thục (và lợi nhuận).
+              {isUpgradeTier
+                ? `Gói ${currentPlanName || 'hội viên hiện tại'} của bạn chưa bao gồm đặc quyền truy cập bài viết này. Hãy nâng cấp lên gói đề xuất bên dưới để trải nghiệm toàn bộ kiến thức chuyên sâu từ TradeVerse.`
+                : 'Luyện tập và nâng cao kỹ năng giao dịch mỗi ngày cùng các chuyên gia hàng đầu TradeVerse — chỉ có trên các gói hội viên nâng cấp.'}
             </p>
           </div>
 
           {/* Current Plan vs Recommended Plan Selector Cards Box */}
           <div className="grid grid-cols-2 gap-3 pt-1">
-            {/* Left Card: Current Plan (Basic) */}
+            {/* Left Card: Current Plan */}
             <div
               className={`p-3.5 rounded-xl border transition-all ${
                 selectedPlanCode === 'STANDARD'
@@ -117,8 +123,8 @@ export function PremiumAccessModal({
                   <XMarkIcon className="w-3.5 h-3.5 stroke-[2.5]" />
                 </div>
               </div>
-              <h3 className="text-sm font-bold text-gray-700 mt-1">
-                Cơ bản (Miễn phí)
+              <h3 className="text-sm font-bold text-gray-700 mt-1 truncate">
+                {currentPlanName || 'Cơ bản (Miễn phí)'}
               </h3>
             </div>
 

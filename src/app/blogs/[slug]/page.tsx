@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   ArrowLeftIcon,
@@ -13,11 +13,13 @@ import {
   ExclamationCircleIcon,
   LockClosedIcon,
   SparklesIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { Blog, getBlogBySlugApi, getBlogsApi } from '@/features/blogs';
 import { BlogCard } from '@/features/blogs/components/BlogCard';
 import { PremiumAccessModal } from '@/features/membership';
 import { Button } from '@/components/common';
+import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 
 function formatDate(dateStr?: string | null) {
   if (!dateStr) return 'Mới đăng';
@@ -40,7 +42,11 @@ function getReadTime(content?: string | null, summary?: string | null) {
 
 export default function BlogDetailPage() {
   const params = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const slug = params?.slug as string;
+
+  const { user } = useAuthStore();
 
   const [blog, setBlog] = useState<Blog | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -80,10 +86,6 @@ export default function BlogDetailPage() {
         const data = await getBlogBySlugApi(slug);
         if (isMounted) {
           setBlog(data);
-          // If post is premium, auto open access modal on first visit for demonstration
-          if (data?.isPremium) {
-            setIsModalOpen(true);
-          }
         }
       } catch (error) {
         console.error('Failed to fetch blog detail:', error);
@@ -216,6 +218,11 @@ export default function BlogDetailPage() {
     formattedUpdatedDate !== formattedDate;
   const readTime = getReadTime(blog.content, blog.summary);
 
+  const isGuest = !user;
+  const isAdmin = user?.role === 'admin';
+  const isClientHasNoPaidPlan = user?.role === 'client' && (!user?.isPremium || user?.plan === 'STANDARD');
+  const isClientPaidInadequateTier = user?.role === 'client' && user?.isPremium && blog.hasFullAccess === false;
+
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 relative">
       {/* 1. Navigation / Back Link */}
@@ -246,7 +253,7 @@ export default function BlogDetailPage() {
       <header className="space-y-4">
         {/* Badges & Meta Info */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {blog.blogType?.name && (
               <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-primary bg-primary-light/60 rounded-md">
                 <TagIcon className="w-3.5 h-3.5" />
@@ -256,6 +263,21 @@ export default function BlogDetailPage() {
             {blog.isPremium && (
               <span className="px-3 py-1 text-xs font-medium text-amber-700 bg-amber-50 rounded-md">
                 ★ Trả phí
+              </span>
+            )}
+
+            {/* Role / Access Level Badges */}
+            {isAdmin && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-purple-700 bg-purple-50 rounded-md border border-purple-200">
+                <ShieldCheckIcon className="w-3.5 h-3.5" />
+                Chế độ xem Quản trị viên
+              </span>
+            )}
+
+            {blog.isPremium && blog.hasFullAccess && user?.role === 'client' && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-md border border-emerald-200">
+                <SparklesIcon className="w-3.5 h-3.5" />
+                Đặc quyền Hội viên Premium
               </span>
             )}
           </div>
@@ -320,36 +342,74 @@ export default function BlogDetailPage() {
         {blog.content ? (
           <div className="relative">
             <div
-              className={`blog-content-body text-gray-800 text-sm sm:text-base leading-relaxed ${blog.isPremium ? 'max-h-72 overflow-hidden select-none' : ''
+              className={`blog-content-body text-gray-800 text-sm sm:text-base leading-relaxed ${blog.hasFullAccess === false
+                ? '[mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)]'
+                : ''
                 }`}
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
 
-            {/* Premium Blur Lock Gradient & Callout Container */}
-            {blog.isPremium && (
-              <div className="relative z-10 pt-16 -mt-36 bg-gradient-to-t from-white via-white/95 to-transparent flex flex-col items-center justify-center text-center p-6 sm:p-8 space-y-4 border border-amber-200/80 rounded-2xl bg-amber-50/40">
+            {/* Premium Access Callout Container */}
+            {blog.hasFullAccess === false && (
+              <div className="relative z-10 -mt-20 pt-12 flex flex-col items-center justify-center text-center p-6 sm:p-8 space-y-4 border border-amber-200/80 rounded-2xl bg-gradient-to-b from-amber-50/60 via-amber-50/90 to-amber-50 backdrop-blur-sm">
                 <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
                   <LockClosedIcon className="w-6 h-6 stroke-[2]" />
                 </div>
                 <div className="space-y-1 max-w-lg">
                   <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center justify-center gap-1.5">
                     <SparklesIcon className="w-5 h-5 text-amber-600" />
-                    Bài viết này dành riêng cho Gói Hội Viên Premium
+                    {isGuest
+                      ? 'Bài viết này dành riêng cho Gói Hội Viên Premium'
+                      : isClientPaidInadequateTier
+                        ? 'Gói hội viên hiện tại chưa bao gồm bài viết này'
+                        : 'Bài viết dành riêng cho Gói Hội Viên Premium'}
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                    Bạn đang xem nội dung bản xem trước. Vui lòng nâng cấp gói hội viên để mở khóa toàn bộ bài viết và các phân tích chuyên sâu.
+                    {isGuest
+                      ? 'Bạn đang xem nội dung xem trước. Vui lòng đăng nhập hoặc tạo tài khoản để trải nghiệm các phân tích chuyên sâu.'
+                      : isClientPaidInadequateTier
+                        ? `Gói ${user?.planName || 'hội viên hiện tại'} của bạn chưa bao gồm đặc quyền xem bài viết phân tích nâng cao này. Hãy nâng cấp lên gói Pro Trader để mở khóa.`
+                        : 'Bạn đang xem bản xem trước. Vui lòng nâng cấp gói hội viên để mở khóa toàn bộ nội dung bài viết.'}
                   </p>
                 </div>
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="lg"
-                  rounded="full"
-                  onClick={() => setIsModalOpen(true)}
-                  className="cursor-pointer font-semibold"
-                >
-                  Nâng cấp gói hội viên ngay
-                </Button>
+
+                {isGuest ? (
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      rounded="full"
+                      onClick={() => router.push(`/login?redirect=${encodeURIComponent(pathname)}`)}
+                      className="cursor-pointer font-semibold"
+                    >
+                      Đăng nhập ngay để tiếp tục
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      rounded="full"
+                      onClick={() => router.push(`/register?redirect=${encodeURIComponent(pathname)}`)}
+                      className="cursor-pointer font-semibold"
+                    >
+                      Đăng ký tài khoản
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="lg"
+                    rounded="full"
+                    onClick={() => setIsModalOpen(true)}
+                    className="cursor-pointer font-semibold"
+                  >
+                    {isClientPaidInadequateTier
+                      ? 'Nâng cấp hạng gói để mở khóa'
+                      : 'Nâng cấp gói hội viên ngay'}
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -442,6 +502,8 @@ export default function BlogDetailPage() {
           setSelectedRelatedBlog(null);
         }}
         postTitle={selectedRelatedBlog?.title || blog.title}
+        isUpgradeTier={isClientPaidInadequateTier}
+        currentPlanName={user?.planName || undefined}
       />
     </article>
   );

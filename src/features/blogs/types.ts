@@ -43,6 +43,7 @@ export interface Blog {
     name?: string | null;
     email: string;
   } | null;
+  hasFullAccess?: boolean;
 }
 
 export interface GetBlogsParams {

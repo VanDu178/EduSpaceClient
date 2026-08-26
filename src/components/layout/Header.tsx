@@ -23,6 +23,11 @@ export const Header = () => {
   const { user, isInitialized, logout } = useAuthStore();
   const isLoggedIn = Boolean(user);
 
+  const loginHref =
+    pathname && pathname !== "/" && pathname !== "/login" && pathname !== "/register"
+      ? `/login?redirect=${encodeURIComponent(pathname)}`
+      : "/login";
+
   const isPaidUser = Boolean(user?.isPremium || (user?.plan && user.plan.toUpperCase() !== "FREE"));
   const userPlanName =
     user?.planName ||
@@ -153,7 +158,7 @@ export const Header = () => {
                 <Spin size="small" />
               </div>
             ) : !isLoggedIn ? (
-              <Link href="/login">
+              <Link href={loginHref}>
                 <Button
                   type="primary"
                   className="font-medium !rounded-lg h-10 px-5 flex items-center gap-1.5 border-none bg-sky-600 hover:!bg-sky-500"
@@ -252,7 +257,7 @@ export const Header = () => {
               </div>
             ) : !isLoggedIn ? (
               <Link
-                href="/login"
+                href={loginHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full flex items-center justify-center"
               >

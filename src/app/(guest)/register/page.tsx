@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Checkbox, Divider, Form, Input } from "antd";
 import { toast } from "react-hot-toast";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -25,12 +25,26 @@ import {
   PasswordStrengthIndicator,
 } from "@/features/auth";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect");
+
   const { mutate: register, isPending: isRegisterPending } = useRegisterMutation();
   const { mutate: googleLogin, isPending: isGooglePending } = useGoogleLoginMutation();
   const isPending = isRegisterPending || isGooglePending;
+
+  const getDestination = () => {
+    if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
+      return redirectUrl;
+    }
+    return "/";
+  };
+
+  const loginHref = redirectUrl
+    ? `/login?redirect=${encodeURIComponent(redirectUrl)}`
+    : "/login";
 
   const onFinish = (values: any) => {
     register(
@@ -43,7 +57,7 @@ export default function RegisterPage() {
         onSuccess: () => {
           toast.success("Đăng ký tài khoản thành công!");
           setTimeout(() => {
-            router.push("/login");
+            router.push(loginHref);
           }, 1500);
         },
         onError: (error: any) => {
@@ -66,7 +80,7 @@ export default function RegisterPage() {
           useAuthStore.getState().setAuth(res?.user, res?.accessToken || null);
           toast.success("Đăng ký thành công qua Google!");
           setTimeout(() => {
-            router.push("/");
+            router.push(getDestination());
           }, 1000);
         },
         onError: (error: any) => {
@@ -340,7 +354,7 @@ export default function RegisterPage() {
             <div className="mt-5 text-center text-xs sm:text-sm text-slate-600 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/80 pt-4">
               Đã có tài khoản?{" "}
               <Link
-                href="/login"
+                href={loginHref}
                 onClick={(e) => {
                   if (isPending) e.preventDefault();
                 }}
@@ -356,3 +370,16 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[90vh] flex items-center justify-center bg-slate-50 dark:bg-[#070d19]">
+        <div className="text-slate-500 dark:text-slate-400 text-sm">Đang tải...</div>
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
+  );
+}
+

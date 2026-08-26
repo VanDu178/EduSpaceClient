@@ -34,4 +34,6 @@ export interface PremiumAccessModalProps {
   onClose: () => void;
   postTitle?: string;
   recommendedPlanCode?: string;
+  isUpgradeTier?: boolean;
+  currentPlanName?: string;
 }

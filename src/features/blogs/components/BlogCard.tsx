@@ -53,7 +53,7 @@ function extractPlainText(input?: string | null): string {
     .trim();
 }
 
-export function BlogCard({ blog, onPremiumClick }: BlogCardProps) {
+export function BlogCard({ blog }: BlogCardProps) {
   const { coverColor, illustrationType } = getCoverConfig(blog.blogType?.code);
   const coverImage = blog.thumbnailUrl || blog.bannerUrl;
   const authorName = blog.creator?.name || blog.creator?.email || 'TradeVerse Team';
@@ -67,16 +67,9 @@ export function BlogCard({ blog, onPremiumClick }: BlogCardProps) {
   const displaySummary =
     cleanSummary || (cleanContent ? cleanContent.slice(0, 130) + '...' : '');
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (blog.isPremium && onPremiumClick) {
-      e.preventDefault();
-      onPremiumClick(blog);
-    }
-  };
-
   return (
     <article className="group bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-all duration-200 h-full">
-      <Link href={`/blogs/${blog.slug}`} onClick={handleClick} className="flex-1 flex flex-col cursor-pointer">
+      <Link href={`/blogs/${blog.slug}`} className="flex-1 flex flex-col cursor-pointer">
         {/* Top Thumbnail (~16:9 aspect ratio) */}
         <div
           className="w-full aspect-[16/9] relative overflow-hidden flex items-center justify-center p-3 transition-transform duration-300 group-hover:scale-[1.01] flex-shrink-0"
