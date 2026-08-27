@@ -46,7 +46,7 @@ export default function BlogDetailPage() {
   const pathname = usePathname();
   const slug = params?.slug as string;
 
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
 
   const [blog, setBlog] = useState<Blog | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,7 +76,9 @@ export default function BlogDetailPage() {
   };
 
   useEffect(() => {
-    if (!slug) return;
+    // Chỉ fetch chi tiết bài viết khi đã khởi tạo xong session Auth (isInitialized === true)
+    // Tránh gửi request thiếu Authorization Token khi F5 reload trang
+    if (!slug || !isInitialized) return;
 
     let isMounted = true;
     const fetchBlogDetail = async () => {
@@ -104,7 +106,7 @@ export default function BlogDetailPage() {
     return () => {
       isMounted = false;
     };
-  }, [slug]);
+  }, [slug, isInitialized]);
 
   // Fetch bài viết liên quan (Related Blogs) dựa trên thể loại & fallback bài mới nhất
   useEffect(() => {
@@ -502,6 +504,7 @@ export default function BlogDetailPage() {
           setSelectedRelatedBlog(null);
         }}
         postTitle={selectedRelatedBlog?.title || blog.title}
+        requiredFeatureCode={selectedRelatedBlog?.requiredFeatureCode || blog?.requiredFeatureCode}
         isUpgradeTier={isClientPaidInadequateTier}
         currentPlanName={user?.planName || undefined}
       />

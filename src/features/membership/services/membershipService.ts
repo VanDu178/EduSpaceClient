@@ -25,6 +25,7 @@ export async function getMembershipPlansApi(): Promise<MembershipPlan[]> {
       const includedFeatures: PlanFeature[] = planFeatures
         .filter((pf: any) => pf.isAvailable)
         .map((pf: any) => ({
+          code: pf.feature?.code,
           text: pf.feature?.name || 'Tính năng',
           isIncluded: true,
         }));
@@ -33,13 +34,13 @@ export async function getMembershipPlansApi(): Promise<MembershipPlan[]> {
       const unavailableFeatures: PlanFeature[] = planFeatures
         .filter((pf: any) => !pf.isAvailable)
         .map((pf: any) => ({
+          code: pf.feature?.code,
           text: pf.feature?.name || 'Tính năng',
           isIncluded: false,
         }));
 
       // Tự động xác định kiểu nút bấm (buttonVariant)
       const buttonVariant: MembershipPlan['buttonVariant'] = isFree ? 'outline' : 'primary';
-
 
       return {
         id: String(plan.id),
@@ -50,7 +51,8 @@ export async function getMembershipPlansApi(): Promise<MembershipPlan[]> {
         yearlyPrice: Number(plan.yearlyPrice) || 0,
         yearlyDiscountPercent: Number(plan.yearlyDiscountPercent) || 0,
         popularBadge: plan.popularBadge || undefined,
-        isCurrentPlan: plan.code === 'STANDARD',
+        tierLevel: Number(plan.tierLevel) || 1,
+        isCurrentPlan: false,
         features: [...includedFeatures, ...unavailableFeatures],
         buttonText: plan.buttonText || (isFree ? 'Gói hiện tại' : `Nâng cấp ${plan.name}`),
         buttonVariant,
@@ -75,4 +77,31 @@ export async function subscribeMembershipPlanApi(
     message: `Đã đăng ký thành công gói ${planCode} với chu kỳ ${cycle === 'yearly' ? 'Hàng năm' : 'Hàng tháng'}!`,
   };
 }
+
+export interface ActivePaymentAccount {
+  id: number;
+  bankName: string;
+  bankCode: string;
+  accountNo: string;
+  accountHolder: string;
+  qrCodeUrl?: string | null;
+  note?: string | null;
+}
+
+/**
+ * Lấy tài khoản thanh toán thụ hưởng mặc định từ Backend API
+ */
+export async function getDefaultPaymentAccountApi(): Promise<ActivePaymentAccount | null> {
+  try {
+    const response = await api.get('/payment-accounts/default');
+    if (response?.data?.success && response.data.data?.paymentAccount) {
+      return response.data.data.paymentAccount;
+    }
+    return null;
+  } catch (error) {
+    console.error('Lỗi khi lấy tài khoản thanh toán mặc định:', error);
+    return null;
+  }
+}
+
 

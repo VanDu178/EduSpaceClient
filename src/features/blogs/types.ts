@@ -44,6 +44,7 @@ export interface Blog {
     email: string;
   } | null;
   hasFullAccess?: boolean;
+  requiredFeatureCode?: string;
 }
 
 export interface GetBlogsParams {

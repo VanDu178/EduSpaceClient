@@ -1,6 +1,7 @@
 export type BillingCycle = 'monthly' | 'yearly';
 
 export interface PlanFeature {
+  code?: string;
   text: string;
   isIncluded: boolean;
   isHighlighted?: boolean;
@@ -15,6 +16,7 @@ export interface MembershipPlan {
   yearlyPrice: number; // in VND per year
   yearlyDiscountPercent?: number; // % discount when billed yearly
   popularBadge?: string; // e.g. "Phổ biến nhất", "Khuyên dùng"
+  tierLevel?: number;
   isCurrentPlan?: boolean;
   features: PlanFeature[];
   buttonText: string;
@@ -34,6 +36,14 @@ export interface PremiumAccessModalProps {
   onClose: () => void;
   postTitle?: string;
   recommendedPlanCode?: string;
+  requiredFeatureCode?: string;
   isUpgradeTier?: boolean;
   currentPlanName?: string;
 }
+
+export type PaymentMethod = 'vietqr' | 'qr_banking' | 'credit_card' | 'e_wallet' | (string & {});
+
+
+
+
+
