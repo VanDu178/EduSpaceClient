@@ -5,6 +5,7 @@ import {
   googleLoginApi,
   forgotPasswordApi,
   resetPasswordApi,
+  changePasswordApi,
 } from "../services/authService";
 import {
   RegisterDTO,
@@ -12,7 +13,9 @@ import {
   GoogleLoginDTO,
   ForgotPasswordDTO,
   ResetPasswordDTO,
+  ChangePasswordDTO,
 } from "../types";
+import { message } from 'antd';
 
 export const useRegisterMutation = () => {
   return useMutation({
@@ -41,5 +44,18 @@ export const useForgotPasswordMutation = () => {
 export const useResetPasswordMutation = () => {
   return useMutation({
     mutationFn: (data: ResetPasswordDTO) => resetPasswordApi(data),
+  });
+};
+
+export const useChangePasswordMutation = () => {
+  return useMutation({
+    mutationFn: (data: ChangePasswordDTO) => changePasswordApi(data),
+    onSuccess: (res) => {
+      message.success(res?.message || 'Đổi mật khẩu thành công!');
+    },
+    onError: (error: any) => {
+      const errorMsg = error?.response?.data?.message || error?.message || 'Đổi mật khẩu thất bại!';
+      message.error(errorMsg);
+    },
   });
 };

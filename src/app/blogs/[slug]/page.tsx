@@ -20,19 +20,9 @@ import { BlogCard } from '@/features/blogs/components/BlogCard';
 import { PremiumAccessModal } from '@/features/membership';
 import { Button } from '@/components/common';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { formatDate } from '@/core/utils';
 
-function formatDate(dateStr?: string | null) {
-  if (!dateStr) return 'Mới đăng';
-  try {
-    return new Date(dateStr).toLocaleDateString('vi-VN', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  } catch (e) {
-    return dateStr;
-  }
-}
+
 
 function getReadTime(content?: string | null, summary?: string | null) {
   const textLength = (content?.length || 0) + (summary?.length || 0);

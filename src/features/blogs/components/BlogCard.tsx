@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Blog } from '../types';
 import { CoddyMascotIllustration } from './CoddyMascotIllustrations';
+import { formatDate } from '@/core/utils';
 
 interface BlogCardProps {
   blog: Blog;
@@ -20,18 +21,7 @@ function getCoverConfig(code?: string) {
   }
 }
 
-function formatDate(dateStr?: string | null) {
-  if (!dateStr) return 'Mới đăng';
-  try {
-    return new Date(dateStr).toLocaleDateString('vi-VN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  } catch (e) {
-    return dateStr;
-  }
-}
+
 
 function getReadTime(content?: string | null, summary?: string | null) {
   const textLength = (content?.length || 0) + (summary?.length || 0);

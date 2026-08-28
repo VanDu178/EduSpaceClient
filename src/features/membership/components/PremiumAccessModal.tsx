@@ -8,6 +8,7 @@ import { MascotBannerGraphic } from './MascotBannerGraphic';
 import { Button } from '@/components/common';
 import { getMembershipPlansApi } from '../services/membershipService';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { formatCurrency } from '@/core/utils';
 
 export function PremiumAccessModal({
   isOpen,
@@ -209,7 +210,7 @@ export function PremiumAccessModal({
                 <p className="text-[11px] text-gray-500 font-normal mt-0.5">
                   {userCurrentPlan?.monthlyPrice === 0 || !userCurrentPlan
                     ? 'Miễn phí'
-                    : `${userCurrentPlan.monthlyPrice.toLocaleString('vi-VN')}đ/tháng`}
+                    : `${formatCurrency(userCurrentPlan.monthlyPrice)}/tháng`}
                 </p>
               </div>
             </div>
@@ -250,7 +251,7 @@ export function PremiumAccessModal({
                   <div className="mt-0.5 space-y-0.5">
                     <p className="text-[11px] font-bold text-primary">
                       {recMonthlyPrice > 0
-                        ? `${recMonthlyPrice.toLocaleString('vi-VN')}đ/tháng`
+                        ? `${formatCurrency(recMonthlyPrice)}/tháng`
                         : 'Miễn phí'}
                     </p>
                   </div>

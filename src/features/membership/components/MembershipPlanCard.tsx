@@ -3,6 +3,7 @@
 import { CheckIcon, XMarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { BillingCycle, MembershipPlan } from '../types';
 import { Button } from '@/components/common';
+import { formatCurrency } from '@/core/utils';
 
 interface MembershipPlanCardProps {
   plan: MembershipPlan;
@@ -38,10 +39,10 @@ export function MembershipPlanCard({
 
   const formattedPrice = isFree
     ? 'Miễn phí'
-    : `${displayPrice.toLocaleString('vi-VN')}đ`;
+    : formatCurrency(displayPrice);
 
   const formattedMonthlyEq = monthlyEquivalent
-    ? `${monthlyEquivalent.toLocaleString('vi-VN')}đ/tháng`
+    ? `${formatCurrency(monthlyEquivalent)}/tháng`
     : null;
 
   return (

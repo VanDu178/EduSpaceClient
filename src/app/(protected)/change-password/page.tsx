@@ -15,8 +15,8 @@ import {
   BoltIcon,
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "@/components/common/Button";
-import { AuthGuard, changePasswordApi, PasswordStrengthIndicator } from "@/features/auth";
+import { Button } from "@/components/common";
+import { changePasswordApi, PasswordStrengthIndicator } from "@/features/auth";
 
 export default function ChangePasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -59,8 +59,7 @@ export default function ChangePasswordPage() {
   };
 
   return (
-    <AuthGuard>
-      <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 lg:p-10 relative overflow-hidden bg-slate-50 dark:bg-[#070d19] transition-colors duration-300">
+    <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 lg:p-10 relative overflow-hidden bg-slate-50 dark:bg-[#070d19] transition-colors duration-300">
         {/* Background Ambient Glow FX */}
         <div className="absolute top-1/4 left-1/10 w-96 h-96 bg-sky-200/50 dark:bg-cyan-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/10 w-96 h-96 bg-indigo-200/50 dark:bg-indigo-600/15 rounded-full blur-3xl pointer-events-none" />
@@ -235,6 +234,5 @@ export default function ChangePasswordPage() {
           </div>
         </div>
       </div>
-    </AuthGuard>
   );
 }

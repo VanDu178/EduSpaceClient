@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { BillingCycle, MembershipPlan } from '../types';
-import { getMembershipPlansApi, subscribeMembershipPlanApi } from '../services/membershipService';
+import { getMembershipPlansApi } from '../services/membershipService';
 import { MembershipPlanCard } from './MembershipPlanCard';
 import { CheckIcon, XMarkIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 
 export function MembershipPlanList() {
+  const router = useRouter();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly');
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [processingPlanCode, setProcessingPlanCode] = useState<string | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,19 +37,11 @@ export function MembershipPlanList() {
     };
   }, []);
 
-
-  const handleSubscribe = async (planCode: string) => {
-    setProcessingPlanCode(planCode);
-    setNotification(null);
-    try {
-      const res = await subscribeMembershipPlanApi(planCode, billingCycle);
-      setNotification(res.message);
-    } catch (error) {
-      console.error('Subscription error:', error);
-      setNotification('Đã có lỗi xảy ra. Vui lòng thử lại!');
-    } finally {
-      setProcessingPlanCode(null);
-    }
+  const handleSubscribe = (planCode: string) => {
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/pricing';
+    router.push(
+      `/checkout?plan=${encodeURIComponent(planCode)}&billing=${billingCycle}&redirect=${encodeURIComponent(currentPath)}`
+    );
   };
 
   return (
@@ -65,13 +57,6 @@ export function MembershipPlanList() {
         <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-normal">
           Mở khóa toàn bộ bài viết trả phí, phân tích chuyên sâu, tín hiệu thị trường và bộ công cụ Quant hàng đầu.
         </p>
-
-        {/* Notification Alert */}
-        {notification && (
-          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-medium animate-slide-up-fade">
-            {notification}
-          </div>
-        )}
       </div>
 
       {/* 2. Billing Cycle Toggle Switch */}
@@ -126,7 +111,6 @@ export function MembershipPlanList() {
               key={plan.id}
               plan={plan}
               billingCycle={billingCycle}
-              isLoading={processingPlanCode === plan.code}
               onSubscribe={handleSubscribe}
             />
           ))}

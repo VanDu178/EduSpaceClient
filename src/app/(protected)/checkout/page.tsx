@@ -23,6 +23,7 @@ import {
 } from '@/features/paymentMethods';
 import { Button } from '@/components/common';
 import toast from 'react-hot-toast';
+import { formatCurrency, formatDate } from '@/core/utils';
 
 
 
@@ -116,8 +117,7 @@ function CheckoutContent() {
 
   // Date Calculation Helper
   const now = new Date();
-  const formatDate = (date: Date) =>
-    date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
 
   const startDateStr = formatDate(now);
   const expiryDate = new Date(now);
@@ -222,7 +222,7 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <p className="text-lg font-bold text-gray-900">
-                      {monthlyPrice > 0 ? `${monthlyPrice.toLocaleString('vi-VN')}đ` : 'Miễn phí'}
+                      {monthlyPrice > 0 ? formatCurrency(monthlyPrice) : 'Miễn phí'}
                       <span className="text-xs font-normal text-gray-500"> / tháng</span>
                     </p>
                     <p className="text-[11px] text-gray-500 mt-1">Thanh toán linh hoạt từng tháng (30 ngày)</p>
@@ -257,13 +257,13 @@ function CheckoutContent() {
                   </div>
                   <div>
                     <p className="text-lg font-bold text-primary">
-                      {yearlyPrice > 0 ? `${yearlyPrice.toLocaleString('vi-VN')}đ` : 'Miễn phí'}
+                      {yearlyPrice > 0 ? formatCurrency(yearlyPrice) : 'Miễn phí'}
                       <span className="text-xs font-normal text-gray-500"> / năm</span>
                     </p>
                     {monthlyEqPrice > 0 && (
                       <p className="text-[11px] text-emerald-700 font-medium mt-1">
-                        Chỉ ~{monthlyEqPrice.toLocaleString('vi-VN')}đ / tháng
-                        {totalSavings > 0 && ` (Giảm ${totalSavings.toLocaleString('vi-VN')}đ)`}
+                        Chỉ ~{formatCurrency(monthlyEqPrice)} / tháng
+                        {totalSavings > 0 && ` (Giảm ${formatCurrency(totalSavings)})`}
                       </p>
                     )}
                   </div>
@@ -365,15 +365,15 @@ function CheckoutContent() {
                     <span>Tạm tính:</span>
                     <span className="font-semibold text-gray-800">
                       {selectedCycle === 'yearly'
-                        ? `${(monthlyPrice * 12).toLocaleString('vi-VN')}đ`
-                        : `${monthlyPrice.toLocaleString('vi-VN')}đ`}
+                        ? formatCurrency(monthlyPrice * 12)
+                        : formatCurrency(monthlyPrice)}
                     </span>
                   </div>
 
                   {selectedCycle === 'yearly' && totalSavings > 0 && (
                     <div className="flex justify-between text-amber-700 font-semibold">
                       <span>Giảm giá ưu đãi năm:</span>
-                      <span>-{totalSavings.toLocaleString('vi-VN')}đ</span>
+                      <span>-{formatCurrency(totalSavings)}</span>
                     </div>
                   )}
                 </div>
@@ -381,7 +381,7 @@ function CheckoutContent() {
                 <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
                   <span className="text-sm font-bold text-gray-900">Tổng cộng thanh toán:</span>
                   <span className="text-xl font-bold text-primary">
-                    {finalPrice > 0 ? `${finalPrice.toLocaleString('vi-VN')}đ` : 'Miễn phí'}
+                    {finalPrice > 0 ? formatCurrency(finalPrice) : 'Miễn phí'}
                   </span>
                 </div>
               </div>

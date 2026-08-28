@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import {
   SparklesIcon,
-  CheckIcon,
   ShieldCheckIcon,
   UserCircleIcon,
   ClipboardDocumentIcon,
@@ -22,6 +21,7 @@ import {
 
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { Button } from '@/components/common';
+import { copyToClipboard, formatCurrency } from '@/core/utils';
 import toast from 'react-hot-toast';
 
 function OrderDetailContent() {
@@ -36,7 +36,6 @@ function OrderDetailContent() {
   const [transaction, setTransaction] = useState<PaymentTransactionData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(15 * 60);
 
   // Fetch transaction detail from backend API on mount
@@ -168,13 +167,6 @@ function OrderDetailContent() {
     router.push('/checkout');
   };
 
-  // Copy Helper
-  const handleCopy = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(label);
-    toast.success(`Đã sao chép ${label}!`);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
 
   // Format Time Helper (MM:SS)
   const formatTime = (totalSec: number) => {
@@ -344,14 +336,11 @@ function OrderDetailContent() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleCopy(transaction.accountNo || '', 'Số tài khoản')}
+                        onClick={() => copyToClipboard(transaction.accountNo || '', 'Đã sao chép số tài khoản!')}
                         className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
+                        title="Sao chép số tài khoản"
                       >
-                        {copiedField === 'Số tài khoản' ? (
-                          <CheckIcon className="w-4 h-4 text-emerald-600 stroke-[3]" />
-                        ) : (
-                          <ClipboardDocumentIcon className="w-4 h-4" />
-                        )}
+                        <ClipboardDocumentIcon className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -366,7 +355,7 @@ function OrderDetailContent() {
                   <div className="flex justify-between items-center pb-2 border-b border-gray-200">
                     <span className="text-gray-500">Số tiền thanh toán:</span>
                     <span className="font-bold text-primary text-base">
-                      {transaction.amount.toLocaleString('vi-VN')}đ
+                      {formatCurrency(transaction.amount)}
                     </span>
                   </div>
 
@@ -378,20 +367,11 @@ function OrderDetailContent() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => handleCopy(transaction.transferContent, 'Nội dung chuyển khoản')}
+                        onClick={() => copyToClipboard(transaction.transferContent, 'Đã sao chép nội dung chuyển khoản!')}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
                       >
-                        {copiedField === 'Nội dung chuyển khoản' ? (
-                          <>
-                            <CheckIcon className="w-3 h-3 stroke-[3]" />
-                            <span>Đã chép</span>
-                          </>
-                        ) : (
-                          <>
-                            <ClipboardDocumentIcon className="w-3 h-3" />
-                            <span>Sao chép</span>
-                          </>
-                        )}
+                        <ClipboardDocumentIcon className="w-3 h-3" />
+                        <span>Sao chép</span>
                       </button>
                     </div>
                     <p className="font-mono text-base font-extrabold text-emerald-800 tracking-wider">
@@ -463,7 +443,7 @@ function OrderDetailContent() {
                 <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
                   <span className="text-sm font-bold text-gray-900">Tổng thanh toán:</span>
                   <span className="text-xl font-bold text-primary">
-                    {transaction.amount.toLocaleString('vi-VN')}đ
+                    {formatCurrency(transaction.amount)}
                   </span>
                 </div>
               </div>
