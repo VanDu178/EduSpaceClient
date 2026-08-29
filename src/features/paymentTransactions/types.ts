@@ -1,6 +1,13 @@
-import { BillingCycle } from '@/features/membership/types';
+import { BillingCycle, PaymentMethod } from '@/features/membership/types';
 
 export type PaymentTransactionStatus = 'pending' | 'completed' | 'expired' | 'cancelled';
+
+export interface CreatePaymentTransactionParams {
+  planId: number | string;
+  billingCycle: BillingCycle;
+  paymentMethod?: PaymentMethod;
+  expectedPrice?: number;
+}
 
 export interface PaymentTransactionData {
   id: number;

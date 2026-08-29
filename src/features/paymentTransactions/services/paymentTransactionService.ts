@@ -9,12 +9,14 @@ import { PaymentTransactionData, PaymentTransactionStatusResponse } from '../typ
 export async function createPaymentTransactionApi(
   planId: number | string,
   billingCycle: BillingCycle,
-  paymentMethod: PaymentMethod = PAYMENT_METHOD_CODES.VIETQR
+  paymentMethod?: PaymentMethod,
+  expectedPrice?: number
 ): Promise<PaymentTransactionData> {
   const response = await api.post('/payment-transactions', {
     planId: Number(planId),
     billingCycle,
     paymentMethod,
+    expectedPrice,
   });
 
   if (response.data?.success && response.data.data) {

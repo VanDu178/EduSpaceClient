@@ -1,10 +1,14 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { getQueryClient } from '@/components/providers/ReactQueryProvider';
+import { ERROR_CACHE_INVALIDATE_MAP } from '@/core/config/errorCacheMap';
 
 interface FailedRequestItem {
   resolve: (token: string | null) => void;
   reject: (error: unknown) => void;
 }
+
+import { APP_ROUTES } from '@/core/config/routes';
 
 // Khởi tạo instance Axios dùng chung
 const api = axios.create({
@@ -75,6 +79,22 @@ api.interceptors.response.use(
     // Nếu request bị hủy
     if (axios.isCancel(error)) {
       return Promise.reject(error);
+    }
+
+    // Tự động Invalidate Query Cache nếu mã lỗi nằm trong ERROR_CACHE_INVALIDATE_MAP
+    if (typeof window !== 'undefined' && error.response?.data?.errorCode) {
+      const errorCode = error.response.data.errorCode;
+      const cacheRule = ERROR_CACHE_INVALIDATE_MAP[errorCode];
+      if (cacheRule && cacheRule.queryKeys) {
+        try {
+          const queryClient = getQueryClient();
+          cacheRule.queryKeys.forEach((queryKey) => {
+            queryClient.invalidateQueries({ queryKey });
+          });
+        } catch {
+          // Bỏ qua lỗi nếu queryClient không khả dụng
+        }
+      }
     }
 
     const originalRequest = error.config;
@@ -152,8 +172,8 @@ api.interceptors.response.use(
       // Chỉ đăng xuất nếu Refresh Token thực sự bị từ chối (Lỗi 401: hết hạn / bị thu hồi / tài khoản bị khóa)
       if (refreshError?.response?.status === 401) {
         useAuthStore.getState().logout();
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        if (window.location.pathname !== APP_ROUTES.LOGIN) {
+          window.location.href = APP_ROUTES.LOGIN;
         }
       } else {
         // Nếu refresh lỗi do rớt mạng hay server 5xx: GIỮ NGUYÊN SESSION, chỉ bật flag lỗi mạng

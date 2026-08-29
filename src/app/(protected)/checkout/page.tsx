@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/common';
 import toast from 'react-hot-toast';
 import { formatCurrency, calculateSubscriptionDates } from '@/core/utils';
+import { APP_ROUTES } from '@/core/config/routes';
 
 function CheckoutContent() {
   const router = useRouter();
@@ -120,10 +121,25 @@ function CheckoutContent() {
           planId: selectedPlan.id,
           billingCycle: selectedCycle,
           paymentMethod,
+          expectedPrice: finalPrice,
         });
-        router.push(`/checkout/orders/${txData.code}?redirect=${encodeURIComponent(redirectParam)}`);
+        router.push(`${APP_ROUTES.CHECKOUT}/orders/${txData.code}?redirect=${encodeURIComponent(redirectParam)}`);
       } catch (error: any) {
-        toast.error(error?.response?.data?.message || error.message || 'Không thể tạo đơn thanh toán. Vui lòng thử lại!');
+        const errorCode = error?.response?.data?.errorCode;
+        const serverMessage = error?.response?.data?.message;
+
+        if (errorCode === 'PLAN_INACTIVE') {
+          toast.error('Gói hội viên này hiện đã ngưng mở bán. Hệ thống đang chuyển hướng bạn đến trang Bảng giá...');
+          setTimeout(() => {
+            router.push(APP_ROUTES.PRICING);
+          }, 1500);
+        } else if (errorCode === 'PAYMENT_METHOD_UNAVAILABLE') {
+          toast.error('Phương thức thanh toán này hiện đang bảo trì. Vui lòng chọn phương thức khác!');
+        } else if (errorCode === 'PLAN_PRICE_CHANGED') {
+          toast.error('Thông tin giá gói dịch vụ đã được cập nhật. Vui lòng kiểm tra lại thông tin trước khi thực hiện tiếp!');
+        } else {
+          toast.error(serverMessage || error?.message || 'Không thể tạo đơn thanh toán. Vui lòng thử lại!');
+        }
       }
     } else {
       toast('Phương thức thanh toán qua Thẻ/Ví điện tử đang được kết nối cổng tự động. Vui lòng chọn VietQR!');

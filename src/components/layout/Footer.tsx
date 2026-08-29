@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_ROUTES } from "@/core/config/routes";
 
 export const Footer = () => {
   return (
@@ -34,22 +35,22 @@ export const Footer = () => {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Phân tích kỹ thuật
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Giao dịch Forex & Crypto
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Quantitative Bot & Signal
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Phân tích On-Chain
                   </Link>
                 </li>
@@ -63,22 +64,22 @@ export const Footer = () => {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Blog kiến thức
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Giao dịch trading
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Chiến lược chuyên sâu
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Ebook & Thuật toán
                   </Link>
                 </li>
@@ -92,22 +93,22 @@ export const Footer = () => {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                 <li>
-                  <Link href="/" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.HOME} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Giới thiệu TradeVerse
                   </Link>
                 </li>
                 <li>
-                  <Link href="/" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.HOME} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Tầm nhìn & Sứ mệnh
                   </Link>
                 </li>
                 <li>
-                  <Link href="/" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.HOME} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Điều khoản dịch vụ
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
+                  <Link href={APP_ROUTES.BLOGS} className="hover:text-slate-900 dark:hover:text-cyan-300 transition-colors">
                     Học liệu miễn phí
                   </Link>
                 </li>

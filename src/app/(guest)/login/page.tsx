@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
 import { useLoginMutation, useGoogleLoginMutation, useAuthStore } from "@/features/auth";
+import { APP_ROUTES } from "@/core/config/routes";
 
 function LoginContent() {
   const router = useRouter();
@@ -31,12 +32,12 @@ function LoginContent() {
     if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
       return redirectUrl;
     }
-    return "/";
+    return APP_ROUTES.HOME;
   };
 
   const registerHref = redirectUrl
-    ? `/register?redirect=${encodeURIComponent(redirectUrl)}`
-    : "/register";
+    ? `${APP_ROUTES.REGISTER}?redirect=${encodeURIComponent(redirectUrl)}`
+    : APP_ROUTES.REGISTER;
 
   const onFinish = (values: any) => {
     login(

@@ -9,6 +9,8 @@ import { MembershipPlanEmpty } from './MembershipPlanEmpty';
 import { CheckIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 
+import { APP_ROUTES } from '@/core/config/routes';
+
 export function MembershipPlanList() {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -24,9 +26,9 @@ export function MembershipPlanList() {
   const userCurrentPlanCode = userCurrentPlan?.code;
 
   const handleSubscribe = (planCode: string) => {
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/pricing';
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : APP_ROUTES.PRICING;
     router.push(
-      `/checkout?plan=${encodeURIComponent(planCode)}&billing=${billingCycle}&redirect=${encodeURIComponent(currentPath)}`
+      `${APP_ROUTES.CHECKOUT}?plan=${encodeURIComponent(planCode)}&billing=${billingCycle}&redirect=${encodeURIComponent(currentPath)}`
     );
   };
 

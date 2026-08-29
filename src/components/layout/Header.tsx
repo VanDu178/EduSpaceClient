@@ -15,6 +15,7 @@ import {
   KeyIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "@/features/auth";
+import { APP_ROUTES } from "@/core/config/routes";
 
 export const Header = () => {
   const pathname = usePathname();
@@ -24,26 +25,21 @@ export const Header = () => {
   const isLoggedIn = Boolean(user);
 
   const loginHref =
-    pathname && pathname !== "/" && pathname !== "/login" && pathname !== "/register"
-      ? `/login?redirect=${encodeURIComponent(pathname)}`
-      : "/login";
+    pathname && pathname !== APP_ROUTES.HOME && pathname !== APP_ROUTES.LOGIN && pathname !== APP_ROUTES.REGISTER
+      ? `${APP_ROUTES.LOGIN}?redirect=${encodeURIComponent(pathname)}`
+      : APP_ROUTES.LOGIN;
 
   const isPaidUser = Boolean(user?.isPremium || (user?.plan && user.plan.toUpperCase() !== "FREE"));
   const userPlanName =
-    user?.planName ||
-    (isPaidUser
-      ? user?.plan === "VIP_PREMIUM"
-        ? "VIP Pass"
-        : "Gói VIP"
-      : "Gói Free");
+    user?.planName;
 
   const navLinks = [
-    { name: "Trang chủ", href: "/", icon: HomeIcon },
-    { name: "Bài viết", href: "/blogs", icon: DocumentTextIcon },
+    { name: "Trang chủ", href: APP_ROUTES.HOME, icon: HomeIcon },
+    { name: "Bài viết", href: APP_ROUTES.BLOGS, icon: DocumentTextIcon },
   ];
 
   const activeKey =
-    navLinks.find((link) => link.href === "/" ? pathname === "/" : pathname.startsWith(link.href))?.href || "/";
+    navLinks.find((link) => link.href === APP_ROUTES.HOME ? pathname === APP_ROUTES.HOME : pathname.startsWith(link.href))?.href || APP_ROUTES.HOME;
 
   const desktopMenuItems: MenuProps["items"] = navLinks.map((link) => ({
     key: link.href,
@@ -79,7 +75,7 @@ export const Header = () => {
     },
     {
       key: "subscription-tab",
-      label: <Link href="/account?tab=subscription">Gói dịch vụ của tôi</Link>,
+      label: <Link href={`${APP_ROUTES.ACCOUNT}?tab=subscription`}>Gói dịch vụ của tôi</Link>,
       icon: <SparklesIcon className="w-4 h-4 text-sky-600" />,
     },
     {
@@ -99,7 +95,7 @@ export const Header = () => {
       <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-white/90 border-b border-slate-200 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Left: TradeVerse Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href={APP_ROUTES.HOME} className="flex items-center gap-2.5 group">
             <img src="/images/logo.png" alt="TradeVerse Logo" className="h-8 sm:h-9 w-auto object-contain" />
             <span className="text-xl font-bold tracking-tight text-slate-900 font-sans">
               Trade<span className="text-sky-500">Verse</span>
@@ -136,7 +132,7 @@ export const Header = () => {
               <div className="flex items-center gap-2.5">
                 {/* Nút nâng cấp nếu chưa phải gói trả phí */}
                 {!isPaidUser && (
-                  <Link href="/pricing" className="hidden sm:block">
+                  <Link href={APP_ROUTES.PRICING} className="hidden sm:block">
                     <Button
                       type="primary"
                       size="small"

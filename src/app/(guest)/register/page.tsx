@@ -24,6 +24,7 @@ import {
   useAuthStore,
   PasswordStrengthIndicator,
 } from "@/features/auth";
+import { APP_ROUTES } from "@/core/config/routes";
 
 function RegisterContent() {
   const [password, setPassword] = useState("");
@@ -39,12 +40,12 @@ function RegisterContent() {
     if (redirectUrl && redirectUrl.startsWith("/") && !redirectUrl.startsWith("//")) {
       return redirectUrl;
     }
-    return "/";
+    return APP_ROUTES.HOME;
   };
 
   const loginHref = redirectUrl
-    ? `/login?redirect=${encodeURIComponent(redirectUrl)}`
-    : "/login";
+    ? `${APP_ROUTES.LOGIN}?redirect=${encodeURIComponent(redirectUrl)}`
+    : APP_ROUTES.LOGIN;
 
   const onFinish = (values: any) => {
     register(

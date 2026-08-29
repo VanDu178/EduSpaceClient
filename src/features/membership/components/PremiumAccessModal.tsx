@@ -9,6 +9,7 @@ import { Button } from '@/components/common';
 import { useMembershipPlans } from '../hooks';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { formatCurrency } from '@/core/utils';
+import { APP_ROUTES } from '@/core/config/routes';
 
 export function PremiumAccessModal({
   isOpen,
@@ -99,14 +100,14 @@ export function PremiumAccessModal({
 
   // Navigate directly to dedicated /checkout page
   const handleUpgradeNow = () => {
-    const currentRedirect = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/blogs';
+    const currentRedirect = typeof window !== 'undefined' ? window.location.pathname + window.location.search : APP_ROUTES.BLOGS;
     onClose();
-    router.push(`/checkout?plan=${encodeURIComponent(targetPlanCode)}&billing=yearly&redirect=${encodeURIComponent(currentRedirect)}`);
+    router.push(`${APP_ROUTES.CHECKOUT}?plan=${encodeURIComponent(targetPlanCode)}&billing=yearly&redirect=${encodeURIComponent(currentRedirect)}`);
   };
 
   const handleViewPricingPage = () => {
     onClose();
-    router.push('/pricing');
+    router.push(APP_ROUTES.PRICING);
   };
 
   // Price formatting helper calculations for recommended plan

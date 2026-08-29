@@ -4,8 +4,7 @@ import {
   getPaymentTransactionStatusApi,
   cancelPaymentTransactionApi,
 } from '../services/paymentTransactionService';
-import { BillingCycle, PaymentMethod } from '@/features/membership/types';
-import { PaymentTransactionData } from '../types';
+import { PaymentTransactionData, CreatePaymentTransactionParams } from '../types';
 
 export const PAYMENT_TRANSACTION_QUERY_KEYS = {
   all: ['paymentTransactions'] as const,
@@ -43,11 +42,9 @@ export function useCreatePaymentTransaction() {
       planId,
       billingCycle,
       paymentMethod,
-    }: {
-      planId: number | string;
-      billingCycle: BillingCycle;
-      paymentMethod?: PaymentMethod;
-    }) => createPaymentTransactionApi(planId, billingCycle, paymentMethod),
+      expectedPrice,
+    }: CreatePaymentTransactionParams) =>
+      createPaymentTransactionApi(planId, billingCycle, paymentMethod, expectedPrice),
   });
 }
 
