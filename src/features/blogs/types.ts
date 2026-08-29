@@ -56,6 +56,13 @@ export interface GetBlogsParams {
   isPremium?: string;
 }
 
+export interface BlogFilterState {
+  categoryCode: string;
+  searchQuery: string;
+  debouncedSearch: string;
+  page: number;
+}
+
 export interface GetBlogsResponse {
   blogs: Blog[];
   pagination: {

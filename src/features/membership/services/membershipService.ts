@@ -52,7 +52,6 @@ export async function getMembershipPlansApi(): Promise<MembershipPlan[]> {
         yearlyDiscountPercent: Number(plan.yearlyDiscountPercent) || 0,
         popularBadge: plan.popularBadge || undefined,
         tierLevel: Number(plan.tierLevel) || 1,
-        isCurrentPlan: false,
         features: [...includedFeatures, ...unavailableFeatures],
         buttonText: plan.buttonText || (isFree ? 'Gói hiện tại' : `Nâng cấp ${plan.name}`),
         buttonVariant,

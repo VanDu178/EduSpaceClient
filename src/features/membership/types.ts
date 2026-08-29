@@ -17,7 +17,6 @@ export interface MembershipPlan {
   yearlyDiscountPercent?: number; // % discount when billed yearly
   popularBadge?: string; // e.g. "Phổ biến nhất", "Khuyên dùng"
   tierLevel?: number;
-  isCurrentPlan?: boolean;
   features: PlanFeature[];
   buttonText: string;
   buttonVariant: 'primary' | 'secondary' | 'outline' | 'gradient' | 'ghost' | 'danger';
@@ -41,7 +40,9 @@ export interface PremiumAccessModalProps {
   currentPlanName?: string;
 }
 
-export type PaymentMethod = 'vietqr' | 'qr_banking' | 'credit_card' | 'e_wallet' | (string & {});
+import { PAYMENT_METHOD_CODES } from '@/features/paymentMethods/constants';
+
+export type PaymentMethod = (typeof PAYMENT_METHOD_CODES)[keyof typeof PAYMENT_METHOD_CODES] | (string & {});
 
 
 

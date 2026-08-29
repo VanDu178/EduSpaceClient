@@ -10,25 +10,16 @@ import {
   CalendarIcon,
   ClockIcon,
   TagIcon,
-  ExclamationCircleIcon,
   LockClosedIcon,
   SparklesIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
-import { Blog, getBlogBySlugApi, getBlogsApi } from '@/features/blogs';
+import { Blog, BlogNotFound, useBlogBySlug, useBlogs, getReadTime } from '@/features/blogs';
 import { BlogCard } from '@/features/blogs/components/BlogCard';
 import { PremiumAccessModal } from '@/features/membership';
 import { Button } from '@/components/common';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { formatDate } from '@/core/utils';
-
-
-
-function getReadTime(content?: string | null, summary?: string | null) {
-  const textLength = (content?.length || 0) + (summary?.length || 0);
-  const minutes = Math.max(3, Math.ceil(textLength / 400));
-  return `${minutes} phút đọc`;
-}
 
 export default function BlogDetailPage() {
   const params = useParams();
@@ -38,16 +29,32 @@ export default function BlogDetailPage() {
 
   const { user, isInitialized } = useAuthStore();
 
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
   const [showScrollTop, setShowScrollTop] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  // State quản lý danh sách bài viết liên quan
-  const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
-  const [isRelatedLoading, setIsRelatedLoading] = useState<boolean>(true);
   const [selectedRelatedBlog, setSelectedRelatedBlog] = useState<Blog | null>(null);
+
+  // Fetch chi tiết bài viết với TanStack Query (chờ isInitialized)
+  const { data: blog = null, isLoading, isError } = useBlogBySlug(slug, isInitialized);
+
+  // Fetch bài viết cùng thể loại & fallback bài mới nhất
+  const { data: sameCatData, isLoading: isSameCatLoading } = useBlogs(
+    { limit: 6, blogType: blog?.blogType?.code },
+    Boolean(blog && blog.blogType?.code)
+  );
+
+  const { data: fallbackData, isLoading: isFallbackLoading } = useBlogs(
+    { limit: 6 },
+    Boolean(blog)
+  );
+
+  const sameCategoryBlogs = (sameCatData?.blogs || []).filter((b) => b.id !== blog?.id);
+  let relatedBlogs = sameCategoryBlogs.slice(0, 3);
+  if (relatedBlogs.length < 3 && fallbackData?.blogs) {
+    const existingIds = new Set([blog?.id, ...relatedBlogs.map((b) => b.id)]);
+    const fallbackBlogs = fallbackData.blogs.filter((b) => !existingIds.has(b.id));
+    relatedBlogs = [...relatedBlogs, ...fallbackBlogs].slice(0, 3);
+  }
+  const isRelatedLoading = isSameCatLoading || isFallbackLoading;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,89 +72,6 @@ export default function BlogDetailPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    // Chỉ fetch chi tiết bài viết khi đã khởi tạo xong session Auth (isInitialized === true)
-    // Tránh gửi request thiếu Authorization Token khi F5 reload trang
-    if (!slug || !isInitialized) return;
-
-    let isMounted = true;
-    const fetchBlogDetail = async () => {
-      setIsLoading(true);
-      setIsError(false);
-      try {
-        const data = await getBlogBySlugApi(slug);
-        if (isMounted) {
-          setBlog(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch blog detail:', error);
-        if (isMounted) {
-          setIsError(true);
-          setBlog(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchBlogDetail();
-    return () => {
-      isMounted = false;
-    };
-  }, [slug, isInitialized]);
-
-  // Fetch bài viết liên quan (Related Blogs) dựa trên thể loại & fallback bài mới nhất
-  useEffect(() => {
-    if (!blog) return;
-
-    let isMounted = true;
-    const fetchRelatedBlogs = async () => {
-      setIsRelatedLoading(true);
-      try {
-        // Bước 1: Lấy các bài cùng thể loại (blogType)
-        let sameCategoryBlogs: Blog[] = [];
-        if (blog.blogType?.code) {
-          const res = await getBlogsApi({
-            limit: 6,
-            blogType: blog.blogType.code,
-          });
-          sameCategoryBlogs = (res.blogs || []).filter((b) => b.id !== blog.id);
-        }
-
-        let finalRelated = sameCategoryBlogs.slice(0, 3);
-
-        // Bước 2: Bù đắp bằng các bài mới nhất nếu chưa đủ 3 bài
-        if (finalRelated.length < 3) {
-          const fallbackRes = await getBlogsApi({ limit: 6 });
-          const existingIds = new Set([blog.id, ...finalRelated.map((b) => b.id)]);
-          const fallbackBlogs = (fallbackRes.blogs || []).filter(
-            (b) => !existingIds.has(b.id)
-          );
-          finalRelated = [...finalRelated, ...fallbackBlogs].slice(0, 3);
-        }
-
-        if (isMounted) {
-          setRelatedBlogs(finalRelated);
-        }
-      } catch (error) {
-        console.error('Failed to fetch related blogs:', error);
-        if (isMounted) {
-          setRelatedBlogs([]);
-        }
-      } finally {
-        if (isMounted) {
-          setIsRelatedLoading(false);
-        }
-      }
-    };
-
-    fetchRelatedBlogs();
-    return () => {
-      isMounted = false;
-    };
-  }, [blog]);
 
   const handleRelatedPremiumClick = (relatedBlog: Blog) => {
     setSelectedRelatedBlog(relatedBlog);
@@ -155,7 +79,7 @@ export default function BlogDetailPage() {
   };
 
   // Loading Skeleton State
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6 animate-pulse">
         <div className="h-4 bg-gray-200 rounded w-1/4" />
@@ -175,44 +99,18 @@ export default function BlogDetailPage() {
 
   // Not Found / Error State
   if (isError || !blog) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center space-y-4">
-        <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
-          <ExclamationCircleIcon className="w-7 h-7" />
-        </div>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-          Không tìm thấy bài viết
-        </h1>
-        <p className="text-sm text-gray-600 max-w-md mx-auto">
-          Bài viết bạn đang tìm kiếm không tồn tại hoặc đã bị gỡ bỏ khỏi hệ thống.
-        </p>
-        <div className="pt-2">
-          <Link
-            href="/blogs"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ArrowLeftIcon className="w-4 h-4" />
-            Quay lại danh sách bài viết
-          </Link>
-        </div>
-      </div>
-    );
+    return <BlogNotFound />;
   }
 
   const coverImage = blog.bannerUrl || blog.thumbnailUrl;
-  const authorName = blog.creator?.name || blog.creator?.email || 'TradeVerse Team';
-  const publishedDateRaw = blog.publishedAt || blog.createdAt;
-  const formattedDate = formatDate(publishedDateRaw);
-  const formattedUpdatedDate = blog.updatedAt ? formatDate(blog.updatedAt) : null;
-  const hasUpdatedDate =
-    formattedUpdatedDate &&
-    formattedUpdatedDate !== 'Mới đăng' &&
-    formattedUpdatedDate !== formattedDate;
+  const authorName = blog.creator?.name || 'TradeVerse Team';
+  const formattedDate = formatDate(blog.publishedAt || blog.createdAt);
+  const formattedUpdatedDate = formatDate(blog.updatedAt);
+  const hasUpdatedDate = Boolean(blog.updatedAt) && formattedUpdatedDate !== formattedDate;
   const readTime = getReadTime(blog.content, blog.summary);
 
   const isGuest = !user;
   const isAdmin = user?.role === 'admin';
-  const isClientHasNoPaidPlan = user?.role === 'client' && (!user?.isPremium || user?.plan === 'STANDARD');
   const isClientPaidInadequateTier = user?.role === 'client' && user?.isPremium && blog.hasFullAccess === false;
 
   return (

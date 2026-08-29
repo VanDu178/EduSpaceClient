@@ -24,7 +24,7 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
   const { data: plans = [], isLoading: isLoadingPlans } = useMembershipPlans();
 
   const isPaidUser = Boolean(activeSubscription && activeSubscription.status === 'active');
-  const planName = activeSubscription?.plan?.name || (isPaidUser ? 'VIP Member' : 'Miễn Phí');
+  const planName = activeSubscription?.plan?.name || 'Miễn Phí';
 
   // Calculate days remaining
   let daysRemaining = 0;
@@ -81,6 +81,40 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
 
   const isDataLoading = isLoading || isLoadingPlans;
 
+  if (isDataLoading) {
+    return (
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100 animate-pulse">
+        {/* SECTION 1: Active Subscription Overview Header Skeleton */}
+        <div className="p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="h-8 bg-slate-200 rounded-lg w-48" />
+            <div className="h-10 bg-slate-200 rounded-xl w-36 shrink-0" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-4">
+            <div className="h-16 bg-slate-100 rounded-xl" />
+            <div className="h-16 bg-slate-100 rounded-xl" />
+            <div className="h-16 bg-slate-100 rounded-xl" />
+          </div>
+        </div>
+
+        {/* SECTION 2: Features Checklist Skeleton */}
+        <div className="p-6 sm:p-8 space-y-5">
+          <div className="space-y-1">
+            <div className="h-6 bg-slate-200 rounded w-64" />
+            <div className="h-4 bg-slate-100 rounded w-80" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-8 py-1">
+            <div className="h-5 bg-slate-100 rounded w-full" />
+            <div className="h-5 bg-slate-100 rounded w-5/6" />
+            <div className="h-5 bg-slate-100 rounded w-4/6" />
+            <div className="h-5 bg-slate-100 rounded w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100">
       {/* SECTION 1: Active Subscription Overview Header */}
@@ -99,7 +133,7 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
                 className="!rounded-xl font-medium h-10 px-5 flex items-center gap-2 border-none bg-sky-600 hover:!bg-sky-500 text-sm"
                 icon={isPaidUser ? <RocketLaunchIcon className="w-4 h-4" /> : <SparklesIcon className="w-4 h-4 text-amber-300" />}
               >
-                {isPaidUser ? 'Gia hạn / Đổi gói' : 'Nâng cấp VIP ngay'}
+                {isPaidUser ? 'Khám phá gói mới' : 'Nâng cấp ngay'}
                 <ArrowRightIcon className="w-4 h-4" />
               </Button>
             </Link>
@@ -117,7 +151,7 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
               <div>
                 <p className="text-[11px] font-semibold uppercase text-slate-500 tracking-wider">Trạng thái gói</p>
                 <p className="text-sm font-bold text-slate-900 mt-0.5">
-                  {isPaidUser ? 'Đang hoạt động' : 'Miễn phí cơ bản'}
+                  Đang hoạt động
                 </p>
               </div>
             </div>

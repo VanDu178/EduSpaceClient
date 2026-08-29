@@ -8,81 +8,52 @@ import {
   ShieldCheckIcon,
   CalendarDaysIcon,
   QrCodeIcon,
-  CreditCardIcon,
-  DevicePhoneMobileIcon,
   ArrowLeftIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import { BillingCycle, MembershipPlan, PaymentMethod } from '@/features/membership/types';
-import { getMembershipPlansApi, getDefaultPaymentAccountApi, ActivePaymentAccount } from '@/features/membership/services/membershipService';
+import { BillingCycle, MembershipPlan, PaymentMethod, useMembershipPlans, useDefaultPaymentAccount } from '@/features/membership';
+import { useCreatePaymentTransaction } from '@/features/paymentTransactions';
+import { useMySubscriptions } from '@/features/account';
 import {
-  createPaymentTransactionApi,
-  fetchActivePaymentMethodsApi,
-  ActivePaymentMethod,
+  useActivePaymentMethods,
   PaymentMethodIcon,
-  DEFAULT_FALLBACK_PAYMENT_METHODS,
+  PAYMENT_METHOD_CODES,
 } from '@/features/paymentMethods';
 import { Button } from '@/components/common';
 import toast from 'react-hot-toast';
-import { formatCurrency, formatDate } from '@/core/utils';
-
-
+import { formatCurrency, calculateSubscriptionDates } from '@/core/utils';
 
 function CheckoutContent() {
-
   const router = useRouter();
   const searchParams = useSearchParams();
 
   // Search parameters
-  const planCodeParam = searchParams.get('plan') || 'PRO_TRADER';
+  const planCodeParam = searchParams.get('plan');
   const initialBillingParam = (searchParams.get('billing') as BillingCycle) || 'yearly';
-  const redirectParam = searchParams.get('redirect') || '/blogs';
+  const redirectParam = searchParams.get('redirect') || '/';
+
+  // React Query Custom Hooks
+  const { data: plans = [], isLoading: isLoadingPlans } = useMembershipPlans();
+  const { data: subData } = useMySubscriptions();
+  const activeSub = subData?.activeSubscription || null;
+  const activePlanTier = activeSub?.plan?.tierLevel || 0;
+  const { data: paymentAccount = null } = useDefaultPaymentAccount();
+  const { data: activePaymentMethods = [] } = useActivePaymentMethods();
+  const createPaymentTransaction = useCreatePaymentTransaction();
 
   // Component state
-  const [plans, setPlans] = useState<MembershipPlan[]>([]);
-  const [paymentAccount, setPaymentAccount] = useState<ActivePaymentAccount | null>(null);
-  const [activePaymentMethods, setActivePaymentMethods] = useState<ActivePaymentMethod[]>([]);
-  const [isLoadingPlans, setIsLoadingPlans] = useState<boolean>(true);
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>(initialBillingParam);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('vietqr');
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHOD_CODES.VIETQR);
 
-  // Fetch membership plans, default payment account & active payment methods
+  // Sync initial payment method once loaded
   useEffect(() => {
-    let isMounted = true;
-    const fetchData = async () => {
-      setIsLoadingPlans(true);
-      try {
-        const [plansData, accountData, methodsData] = await Promise.all([
-          getMembershipPlansApi(),
-          getDefaultPaymentAccountApi(),
-          fetchActivePaymentMethodsApi(),
-        ]);
-        if (isMounted) {
-          setPlans(plansData);
-          setPaymentAccount(accountData);
-          if (methodsData && methodsData.length > 0) {
-            setActivePaymentMethods(methodsData);
-            setPaymentMethod(methodsData[0].code as PaymentMethod);
-          }
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu thanh toán:', error);
-      } finally {
-        if (isMounted) {
-          setIsLoadingPlans(false);
-        }
-      }
-    };
-
-    fetchData();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (activePaymentMethods.length > 0 && !paymentMethod) {
+      setPaymentMethod(activePaymentMethods[0].code as PaymentMethod);
+    }
+  }, [activePaymentMethods, paymentMethod]);
 
   // Dynamic Payment Methods layout calculation
-  const displayPaymentMethods =
-    activePaymentMethods.length > 0 ? activePaymentMethods : DEFAULT_FALLBACK_PAYMENT_METHODS;
+  const displayPaymentMethods = activePaymentMethods;
   const totalMethodsCount = displayPaymentMethods.length;
 
   const getGridContainerClass = (count: number) => {
@@ -99,14 +70,11 @@ function CheckoutContent() {
   };
 
   // Selected Plan Object
-
   const selectedPlan: MembershipPlan | undefined =
-    plans.find((p) => p.code.toLowerCase() === planCodeParam.toLowerCase()) ||
-    plans.find((p) => p.monthlyPrice > 0) ||
-    plans[0];
+    plans.find((p) => p.code.toLowerCase() === planCodeParam?.toLowerCase());
 
   const monthlyPrice = selectedPlan?.monthlyPrice || 0;
-  const yearlyPrice = selectedPlan?.yearlyPrice || monthlyPrice * 12;
+  const yearlyPrice = selectedPlan?.yearlyPrice || (monthlyPrice * 12 * (100 - (selectedPlan?.yearlyDiscountPercent || 0)) / 100);
   const yearlyDiscountPercent =
     selectedPlan?.yearlyDiscountPercent ||
     (monthlyPrice > 0 ? Math.round(((monthlyPrice * 12 - yearlyPrice) / (monthlyPrice * 12)) * 100) : 0);
@@ -116,18 +84,14 @@ function CheckoutContent() {
   const finalPrice = selectedCycle === 'yearly' ? yearlyPrice : monthlyPrice;
 
   // Date Calculation Helper
-  const now = new Date();
+  const { startDateStr, expiryDateStr, daysCount } = calculateSubscriptionDates(selectedCycle);
 
-
-  const startDateStr = formatDate(now);
-  const expiryDate = new Date(now);
-  if (selectedCycle === 'yearly') {
-    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-  } else {
-    expiryDate.setMonth(expiryDate.getMonth() + 1);
-  }
-  const expiryDateStr = formatDate(expiryDate);
-  const daysCount = selectedCycle === 'yearly' ? 365 : 30;
+  const isBlockedByTier = Boolean(
+    selectedPlan &&
+    activePlanTier > 0 &&
+    (selectedPlan.tierLevel || 0) > 0 &&
+    (selectedPlan.tierLevel || 0) <= activePlanTier
+  );
 
   const handleConfirmPayment = async () => {
     if (!selectedPlan?.id) {
@@ -135,24 +99,27 @@ function CheckoutContent() {
       return;
     }
 
-    if (paymentMethod === 'vietqr' || paymentMethod === 'qr_banking') {
-      setIsProcessing(true);
+    if (isBlockedByTier) {
+      toast.error(`Bạn đang sử dụng gói dịch vụ ${activeSub?.plan?.name || 'tương đương hoặc cao hơn'}. Không thể đăng ký gói cùng cấp hoặc cấp thấp hơn!`);
+      return;
+    }
+
+    if (paymentMethod === PAYMENT_METHOD_CODES.VIETQR) {
       try {
-        const txData = await createPaymentTransactionApi(selectedPlan.id, selectedCycle);
-        toast.success('Khởi tạo đơn thanh toán thành công!');
+        const txData = await createPaymentTransaction.mutateAsync({
+          planId: selectedPlan.id,
+          billingCycle: selectedCycle,
+          paymentMethod,
+        });
         router.push(`/checkout/orders/${txData.code}?redirect=${encodeURIComponent(redirectParam)}`);
       } catch (error: any) {
-        console.error('Lỗi khi tạo giao dịch thanh toán:', error);
         toast.error(error?.response?.data?.message || error.message || 'Không thể tạo đơn thanh toán. Vui lòng thử lại!');
-      } finally {
-        setIsProcessing(false);
       }
     } else {
-      toast('Phương thức thanh toán qua Thẻ/Ví điện tử đang được kết nối cổng tự động. Vui lòng chọn VietQR!', {
-        icon: 'ℹ️',
-      });
+      toast('Phương thức thanh toán qua Thẻ/Ví điện tử đang được kết nối cổng tự động. Vui lòng chọn VietQR!');
     }
   };
+
 
   if (isLoadingPlans) {
     return (
@@ -403,11 +370,10 @@ function CheckoutContent() {
                         className={`p-2.5 rounded-xl border transition-all flex flex-col items-center justify-center text-center gap-1 cursor-pointer ${getItemSpanClass(
                           totalMethodsCount,
                           index
-                        )} ${
-                          isSelected
-                            ? 'border-primary bg-primary-light/20 text-primary font-bold'
-                            : 'border-gray-200 bg-white text-gray-600 hover:text-gray-900'
-                        }`}
+                        )} ${isSelected
+                          ? 'border-primary bg-primary-light/20 text-primary font-bold'
+                          : 'border-gray-200 bg-white text-gray-600 hover:text-gray-900'
+                          }`}
                       >
                         <PaymentMethodIcon iconName={method.icon} className="w-5 h-5" />
                         <span className="text-[10px] sm:text-[11px] truncate max-w-full px-1">{method.name}</span>
@@ -419,7 +385,7 @@ function CheckoutContent() {
               </div>
 
               {/* Payment Details per Active Method */}
-              {(paymentMethod === 'vietqr' || paymentMethod === 'qr_banking') && (
+              {paymentMethod === PAYMENT_METHOD_CODES.VIETQR && (
                 <div className="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-3">
                   <div className="flex items-start gap-3">
                     <div className="p-2.5 bg-emerald-100 text-emerald-800 rounded-xl shrink-0 border border-emerald-200">
@@ -450,7 +416,7 @@ function CheckoutContent() {
                 </div>
               )}
 
-              {paymentMethod === 'credit_card' && (
+              {paymentMethod === PAYMENT_METHOD_CODES.CREDIT_CARD && (
                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-xs">
                   <div className="space-y-1">
                     <label className="font-semibold text-gray-700">Số thẻ Visa / Mastercard / ATM</label>
@@ -492,7 +458,7 @@ function CheckoutContent() {
                 </div>
               )}
 
-              {paymentMethod === 'e_wallet' && (
+              {paymentMethod === PAYMENT_METHOD_CODES.E_WALLET && (
                 <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 text-center space-y-3">
                   <p className="text-xs font-semibold text-gray-700">Quét mã và xác nhận giao dịch bằng ví điện tử</p>
                   <div className="flex items-center justify-center gap-2">
@@ -503,20 +469,39 @@ function CheckoutContent() {
                 </div>
               )}
 
+              {/* Warning Banner when tier is blocked */}
+              {isBlockedByTier && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-xs space-y-1.5">
+                  <div className="flex items-center gap-2 font-bold text-amber-950 text-sm">
+                    <ExclamationTriangleIcon className="w-5 h-5 text-amber-600 shrink-0" />
+                    <span>Nút thanh toán đã bị vô hiệu hóa</span>
+                  </div>
+                  <p className="text-amber-800 leading-relaxed">
+                    Tài khoản của bạn hiện tại đã kích hoạt gói <span className="font-bold text-amber-950">{activeSub?.plan?.name || 'dịch vụ'}</span>.
+                    Hệ thống không hỗ trợ thanh toán hoặc khởi tạo đơn hàng cho các gói cùng cấp hoặc cấp thấp hơn gói bạn đang sở hữu.
+                  </p>
+                </div>
+              )}
+
               {/* Confirm Checkout Action Button */}
-              <Button
-                type="button"
-                variant="primary"
-                size="lg"
-                rounded="xl"
-                fullWidth
-                isLoading={isProcessing}
-                disabled={isProcessing}
-                onClick={handleConfirmPayment}
-                className="cursor-pointer font-bold py-3.5 text-base"
-              >
-                Xác nhận & Thanh toán ngay
-              </Button>
+              <div title={isBlockedByTier ? `Bạn đã sở hữu gói ${activeSub?.plan?.name || 'tương đương/cao hơn'}. Không thể thanh toán.` : undefined}>
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  rounded="xl"
+                  fullWidth
+                  isLoading={createPaymentTransaction.isPending}
+                  disabled={createPaymentTransaction.isPending || isBlockedByTier}
+                  onClick={handleConfirmPayment}
+                  className={`font-bold py-3.5 text-base transition-all ${isBlockedByTier
+                      ? '!bg-gray-200 !text-gray-500 !border-gray-300 cursor-not-allowed'
+                      : 'cursor-pointer'
+                    }`}
+                >
+                  {isBlockedByTier ? `Đã sở hữu gói ${activeSub?.plan?.name || 'cao hơn'}` : 'Xác nhận & Thanh toán ngay'}
+                </Button>
+              </div>
             </div>
           </div>
         </div>

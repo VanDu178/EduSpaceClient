@@ -9,6 +9,8 @@ interface MembershipPlanCardProps {
   plan: MembershipPlan;
   billingCycle: BillingCycle;
   isLoading?: boolean;
+  userCurrentTierLevel?: number;
+  userCurrentPlanCode?: string;
   onSubscribe: (planCode: string) => void;
 }
 
@@ -16,10 +18,26 @@ export function MembershipPlanCard({
   plan,
   billingCycle,
   isLoading = false,
+  userCurrentTierLevel,
+  userCurrentPlanCode,
   onSubscribe,
 }: MembershipPlanCardProps) {
   const isPopular = Boolean(plan.popularBadge);
   const isFree = plan.monthlyPrice === 0;
+
+  const planTier = plan.tierLevel ?? 1;
+  const currentTier = userCurrentTierLevel ?? 1;
+
+  const isCurrentPlan = Boolean(
+    userCurrentPlanCode ? plan.code === userCurrentPlanCode : isFree
+  );
+  const isLowerTier = !isCurrentPlan && planTier < currentTier;
+  const isDisabled = isCurrentPlan || isLowerTier || isLoading;
+
+  let buttonLabel = plan.buttonText;
+  if (isCurrentPlan) {
+    buttonLabel = 'Gói hiện tại';
+  }
 
   // Calculate pricing based on billing cycle
   const displayPrice =
@@ -47,10 +65,11 @@ export function MembershipPlanCard({
 
   return (
     <div
-      className={`relative rounded-2xl flex flex-col justify-between p-6 transition-all duration-200 ${isPopular
-        ? 'bg-white border-2 border-primary'
-        : 'bg-white border border-gray-200'
-        }`}
+      className={`w-full relative rounded-2xl flex flex-col justify-between p-6 transition-all duration-200 ${
+        isPopular && !isCurrentPlan
+          ? 'bg-white border-2 border-primary'
+          : 'bg-white border border-gray-200'
+      }`}
     >
       {/* Popular Badge */}
       {plan.popularBadge && (
@@ -140,11 +159,11 @@ export function MembershipPlanCard({
           variant={plan.buttonVariant}
           size="lg"
           fullWidth
-          disabled={isFree || plan.isCurrentPlan || isLoading}
+          disabled={isDisabled}
           isLoading={isLoading}
           onClick={() => onSubscribe(plan.code)}
         >
-          {plan.isCurrentPlan ? 'Gói hiện tại' : plan.buttonText}
+          {buttonLabel}
         </Button>
       </div>
     </div>

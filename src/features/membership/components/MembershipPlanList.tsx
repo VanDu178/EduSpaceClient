@@ -1,41 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BillingCycle, MembershipPlan } from '../types';
-import { getMembershipPlansApi } from '../services/membershipService';
+import { BillingCycle } from '../types';
+import { useMembershipPlans } from '../hooks';
 import { MembershipPlanCard } from './MembershipPlanCard';
-import { CheckIcon, XMarkIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { MembershipPlanEmpty } from './MembershipPlanEmpty';
+import { CheckIcon, ShieldCheckIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 
 export function MembershipPlanList() {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly');
-  const [plans, setPlans] = useState<MembershipPlan[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { data: plans = [], isLoading } = useMembershipPlans();
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchPlans = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getMembershipPlansApi();
-        if (isMounted) {
-          setPlans(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch membership plans:', error);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
+  // Determine current user plan (tierLevel === 1 || monthlyPrice === 0 as default free plan)
+  const userCurrentPlan = plans.length > 0
+    ? (user?.plan ? plans.find((p) => p.code === user.plan) : null)
+    : null;
 
-    fetchPlans();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const currentTierLevel = userCurrentPlan?.tierLevel ?? 1;
+  const userCurrentPlanCode = userCurrentPlan?.code;
 
   const handleSubscribe = (planCode: string) => {
     const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '/pricing';
@@ -60,38 +46,40 @@ export function MembershipPlanList() {
       </div>
 
       {/* 2. Billing Cycle Toggle Switch */}
-      <div className="flex justify-center items-center">
-        <div className="bg-gray-100 p-1.5 rounded-full flex items-center border border-gray-200">
-          <button
-            type="button"
-            onClick={() => setBillingCycle('monthly')}
-            className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer ${billingCycle === 'monthly'
-              ? 'bg-white text-gray-900 shadow-none border border-gray-200'
-              : 'text-gray-600 hover:text-gray-900'
-              }`}
-          >
-            Thanh toán theo tháng
-          </button>
-          <button
-            type="button"
-            onClick={() => setBillingCycle('yearly')}
-            className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${billingCycle === 'yearly'
-              ? 'bg-primary text-white shadow-none'
-              : 'text-gray-600 hover:text-gray-900'
-              }`}
-          >
-            <span>Thanh toán theo năm</span>
-          </button>
+      {(!isLoading && plans.length > 0) && (
+        <div className="flex justify-center items-center">
+          <div className="bg-gray-100 p-1.5 rounded-full flex items-center border border-gray-200">
+            <button
+              type="button"
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-full transition-all duration-200 cursor-pointer ${billingCycle === 'monthly'
+                ? 'bg-white text-gray-900 shadow-none border border-gray-200'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
+            >
+              Thanh toán theo tháng
+            </button>
+            <button
+              type="button"
+              onClick={() => setBillingCycle('yearly')}
+              className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${billingCycle === 'yearly'
+                ? 'bg-primary text-white shadow-none'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
+            >
+              <span>Thanh toán theo năm</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 3. Membership Plan Cards Grid */}
+      {/* 3. Membership Plan Cards Container */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-6 sm:gap-8">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 animate-pulse h-96"
+              className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 animate-pulse h-96 w-full md:w-[calc(33.333%-1.5rem)] md:max-w-sm"
             >
               <div className="h-6 bg-gray-200 rounded w-1/2" />
               <div className="h-4 bg-gray-200 rounded w-3/4" />
@@ -104,15 +92,20 @@ export function MembershipPlanList() {
             </div>
           ))}
         </div>
+      ) : plans.length === 0 ? (
+        <MembershipPlanEmpty />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+        <div className="flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-6 sm:gap-8">
           {plans.map((plan) => (
-            <MembershipPlanCard
-              key={plan.id}
-              plan={plan}
-              billingCycle={billingCycle}
-              onSubscribe={handleSubscribe}
-            />
+            <div key={plan.id} className="w-full md:w-[calc(33.333%-1.5rem)] md:max-w-sm flex">
+              <MembershipPlanCard
+                plan={plan}
+                billingCycle={billingCycle}
+                userCurrentTierLevel={currentTierLevel}
+                userCurrentPlanCode={userCurrentPlanCode}
+                onSubscribe={handleSubscribe}
+              />
+            </div>
           ))}
         </div>
       )}

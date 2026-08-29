@@ -29,3 +29,33 @@ export function formatCurrency(amount?: number | null): string {
   if (amount === undefined || amount === null) return '0 ₫';
   return `${Number(amount).toLocaleString('vi-VN')} ₫`;
 }
+
+export interface SubscriptionDates {
+  startDateStr: string;
+  expiryDateStr: string;
+  daysCount: number;
+}
+
+/**
+ * Calculates subscription start date, expiry date, and duration count based on billing cycle.
+ */
+export function calculateSubscriptionDates(cycle: string): SubscriptionDates {
+  const now = new Date();
+
+  const startDateStr = formatDate(now);
+  const expiryDate = new Date(now);
+  if (cycle === 'yearly') {
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+  } else {
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
+  }
+  const expiryDateStr = formatDate(expiryDate);
+  const daysCount = cycle === 'yearly' ? 365 : 30;
+
+  return {
+    startDateStr,
+    expiryDateStr,
+    daysCount,
+  };
+}
+

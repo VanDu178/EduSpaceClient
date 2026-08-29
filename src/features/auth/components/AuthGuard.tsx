@@ -2,18 +2,19 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Spin } from "antd";
 import { useAuthStore } from "../stores/useAuthStore";
+import { PageSkeleton } from "@/components/common/PageSkeleton";
 
 interface AuthGuardProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 /**
  * Route Guard cho các trang bảo mật yêu cầu người dùng phải đăng nhập.
  * Nếu người dùng chưa đăng nhập, tự động chuyển hướng tới trang '/login' đính kèm redirect URL.
  */
-export function AuthGuard({ children }: AuthGuardProps) {
+export function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { user, isInitialized } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -29,11 +30,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   }, [isInitialized, user, router, pathname]);
 
   if (!isInitialized || !user) {
-    return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
-        <Spin size="large" />
-      </div>
-    );
+    return <>{fallback ?? <PageSkeleton />}</>;
   }
 
   return <>{children}</>;

@@ -6,7 +6,7 @@ import { XMarkIcon, CheckIcon, SparklesIcon } from '@heroicons/react/24/outline'
 import { MembershipPlan, PremiumAccessModalProps } from '../types';
 import { MascotBannerGraphic } from './MascotBannerGraphic';
 import { Button } from '@/components/common';
-import { getMembershipPlansApi } from '../services/membershipService';
+import { useMembershipPlans } from '../hooks';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { formatCurrency } from '@/core/utils';
 
@@ -22,43 +22,12 @@ export function PremiumAccessModal({
   const router = useRouter();
   const { user } = useAuthStore();
 
-  const [plans, setPlans] = useState<MembershipPlan[]>([]);
-  const [isFetchingPlans, setIsFetchingPlans] = useState<boolean>(false);
+  const { data: plans = [], isLoading: isFetchingPlans } = useMembershipPlans(isOpen);
   const [selectedPlanCode, setSelectedPlanCode] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // Fetch active membership plans when modal opens
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let isMounted = true;
-    const fetchPlans = async () => {
-      setIsFetchingPlans(true);
-      try {
-        const data = await getMembershipPlansApi();
-        if (isMounted) {
-          setPlans(data);
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải danh sách gói hội viên:', error);
-      } finally {
-        if (isMounted) {
-          setIsFetchingPlans(false);
-        }
-      }
-    };
-
-    fetchPlans();
-    return () => {
-      isMounted = false;
-    };
-  }, [isOpen]);
 
   // Determine current user plan (tierLevel === 1 || monthlyPrice === 0 as default free plan)
   const userCurrentPlan = plans.length > 0
-    ? (user?.plan ? plans.find((p) => p.code === user.plan) : null) ||
-    plans.find((p) => p.tierLevel === 1 || p.monthlyPrice === 0) ||
-    plans[0]
+    ? (user?.plan ? plans.find((p) => p.code === user.plan) : null)
     : null;
 
   const displayCurrentPlanName = userCurrentPlan?.name || user?.planName || currentPlanName || 'Cơ bản (Miễn phí)';
@@ -148,9 +117,7 @@ export function PremiumAccessModal({
       {/* 1. Backdrop Overlay */}
       <div
         className="fixed inset-0 bg-slate-900/75 backdrop-blur-xs transition-opacity duration-300"
-        onClick={() => {
-          if (!isLoading) onClose();
-        }}
+        onClick={onClose}
       />
 
       {/* 2. Modal Content Container */}
@@ -159,10 +126,8 @@ export function PremiumAccessModal({
         <button
           type="button"
           onClick={onClose}
-          disabled={isLoading}
           aria-label="Đóng modal"
-          className={`absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors flex items-center justify-center cursor-pointer ${isLoading ? 'pointer-events-none opacity-50 cursor-not-allowed' : ''
-            }`}
+          className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors flex items-center justify-center cursor-pointer"
         >
           <XMarkIcon className="w-5 h-5 stroke-[2.5]" />
         </button>
@@ -178,7 +143,7 @@ export function PremiumAccessModal({
           <div className="space-y-1.5 pr-6 text-left">
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-semibold">
               <SparklesIcon className="w-3 h-3 text-amber-600 animate-pulse" />
-              Nội dung VIP TradeVerse
+              Nội dung trả phí TradeVerse
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug line-clamp-2">
               {postTitle
@@ -218,14 +183,13 @@ export function PremiumAccessModal({
             {/* Right Card: Recommended Plan */}
             <div
               onClick={() => {
-                if (!isLoading && recommendedPlan) {
+                if (recommendedPlan) {
                   setSelectedPlanCode(recommendedPlan.code);
                 }
               }}
-              className={`p-3 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-1.5 ${isLoading ? 'pointer-events-none opacity-60' : ''
-                } ${selectedPlanCode === (recommendedPlan?.code || targetPlanCode)
-                  ? 'border-primary bg-primary-light/30'
-                  : 'border-primary/40 bg-white hover:border-primary'
+              className={`p-3 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between space-y-1.5 ${selectedPlanCode === (recommendedPlan?.code || targetPlanCode)
+                ? 'border-primary bg-primary-light/30'
+                : 'border-primary/40 bg-white hover:border-primary'
                 }`}
             >
               <div className="flex items-center justify-between">
@@ -268,8 +232,7 @@ export function PremiumAccessModal({
               size="md"
               rounded="xl"
               fullWidth
-              isLoading={isLoading}
-              disabled={isLoading || isFetchingPlans}
+              disabled={isFetchingPlans}
               onClick={handleUpgradeNow}
               className="cursor-pointer font-semibold"
             >
@@ -279,9 +242,7 @@ export function PremiumAccessModal({
             <button
               type="button"
               onClick={handleViewPricingPage}
-              disabled={isLoading}
-              className={`text-xs font-medium text-gray-500 hover:text-primary transition-colors underline cursor-pointer ${isLoading ? 'pointer-events-none opacity-50 cursor-not-allowed' : ''
-                }`}
+              className="text-xs font-medium text-gray-500 hover:text-primary transition-colors underline cursor-pointer"
             >
               Xem so sánh chi tiết các gói hội viên
             </button>

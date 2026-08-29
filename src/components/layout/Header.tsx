@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Avatar, Button, Drawer, Dropdown, Menu, Spin, type MenuProps } from "antd";
+import { Avatar, Button, Drawer, Dropdown, Menu, type MenuProps } from "antd";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -122,9 +122,7 @@ export const Header = () => {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Sign In Button / User Profile Menu */}
             {!isInitialized ? (
-              <div className="h-10 px-4 flex items-center justify-center">
-                <Spin size="small" />
-              </div>
+              <div className="w-20 h-10 bg-slate-100/80 rounded-xl animate-pulse" />
             ) : !isLoggedIn ? (
               <Link href={loginHref}>
                 <Button
@@ -229,9 +227,7 @@ export const Header = () => {
           />
           <div className="pt-4 border-t border-slate-200 px-4 mb-4">
             {!isInitialized ? (
-              <div className="h-12 flex items-center justify-center">
-                <Spin />
-              </div>
+              <div className="w-full h-10 bg-slate-100/80 rounded-xl animate-pulse" />
             ) : !isLoggedIn ? (
               <Link
                 href={loginHref}

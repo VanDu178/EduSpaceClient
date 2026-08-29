@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMyTransactions, useCancelTransaction, useDownloadInvoicePdf } from '../hooks';
+import { useMySubscriptions, useMyTransactions, useCancelTransaction, useDownloadInvoicePdf } from '../hooks';
 import { UserTransactionItem } from '../types';
 import {
   CurrencyDollarIcon,
@@ -13,27 +13,40 @@ import {
   ClipboardDocumentIcon,
   EllipsisVerticalIcon,
 } from '@heroicons/react/24/outline';
-import { Table, Tag, Button, Modal, Spin, Empty, Dropdown, MenuProps } from 'antd';
+import { Table, Tag, Button, Modal, Empty, Dropdown, MenuProps, Tooltip } from 'antd';
 import { formatDate, copyToClipboard, formatCurrency } from '@/core/utils';
 import toast from 'react-hot-toast';
-import { useMutation } from '@tanstack/react-query';
-import { createPaymentTransactionApi } from '@/features/paymentMethods/services/paymentMethodService';
+import { useCreatePaymentTransaction } from '@/features/paymentTransactions';
+import { BillingCycle } from '@/features/membership/types';
 
 export function TransactionHistoryView() {
+  const { data: subData } = useMySubscriptions();
+  const activeSub = subData?.activeSubscription || null;
+  const activePlanTier = activeSub?.plan?.tierLevel || 0;
+
   const { data, isLoading, isFetching, refetch } = useMyTransactions();
   const transactions: UserTransactionItem[] = data || [];
 
   const cancelTransaction = useCancelTransaction();
   const downloadInvoicePdf = useDownloadInvoicePdf();
+  const createPaymentTransaction = useCreatePaymentTransaction();
 
   const [selectedTx, setSelectedTx] = useState<UserTransactionItem | null>(null);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  const reSubscribeMutation = useMutation({
-    mutationFn: ({ planId, billingCycle }: { planId: number; billingCycle: any }) =>
-      createPaymentTransactionApi(planId, billingCycle),
-    onSuccess: (newTxData) => {
+  const handleReSubscribe = async (record: UserTransactionItem) => {
+    const planId = record.plan?.id;
+    if (!planId) {
+      toast.error('Gói hội viên không tồn tại hoặc đã ngừng cung cấp');
+      return;
+    }
+    try {
+      const newTxData = await createPaymentTransaction.mutateAsync({
+        planId: Number(planId),
+        billingCycle: (record.billingCycle as BillingCycle) || 'monthly',
+      });
+
       toast.success('Đã khởi tạo đơn thanh toán mới thành công!');
       refetch();
       setSelectedTx({
@@ -50,24 +63,12 @@ export function TransactionHistoryView() {
         plan: newTxData.plan as any,
       });
       setIsPayModalOpen(true);
-    },
-    onError: (err: any) => {
+    } catch (err: any) {
       console.error('Lỗi khi đăng ký lại:', err);
       toast.error(err?.message || 'Không thể đăng ký lại gói dịch vụ');
-    },
-  });
-
-  const handleReSubscribe = (record: UserTransactionItem) => {
-    const planId = record.plan?.id;
-    if (!planId) {
-      toast.error('Gói hội viên không tồn tại hoặc đã ngừng cung cấp');
-      return;
     }
-    reSubscribeMutation.mutate({
-      planId: Number(planId),
-      billingCycle: record.billingCycle || 'monthly',
-    });
   };
+
 
   const filteredItems = transactions.filter((item) => {
     if (filterStatus === 'all') return true;
@@ -213,7 +214,10 @@ export function TransactionHistoryView() {
       width: 90,
       render: (record: UserTransactionItem) => {
         const isDownloading = downloadInvoicePdf.isPending && downloadInvoicePdf.variables === record.code;
-        const isReSubscribing = reSubscribeMutation.isPending && Number(reSubscribeMutation.variables?.planId) === Number(record.plan?.id);
+        const isReSubscribing = createPaymentTransaction.isPending && Number(createPaymentTransaction.variables?.planId) === Number(record.plan?.id);
+
+        const recordPlanTier = record.plan?.tierLevel || 0;
+        const isLowerOrEqualTier = activePlanTier > 0 && recordPlanTier > 0 && recordPlanTier <= activePlanTier;
 
         const menuItems: MenuProps['items'] = [];
 
@@ -231,9 +235,20 @@ export function TransactionHistoryView() {
         if (record.status === 'pending' || record.status === 'pending_payment') {
           menuItems.push({
             key: 'pay_now',
-            label: <span className="font-medium text-emerald-600">Thanh toán</span>,
-            icon: <CreditCardIcon className="w-4 h-4 text-emerald-600" />,
+            disabled: isLowerOrEqualTier,
+            label: (
+              <Tooltip title={isLowerOrEqualTier ? 'Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không cần thanh toán.' : undefined}>
+                <span className={`font-medium ${isLowerOrEqualTier ? 'text-slate-400 cursor-not-allowed' : 'text-emerald-600'}`}>
+                  Thanh toán
+                </span>
+              </Tooltip>
+            ),
+            icon: <CreditCardIcon className={`w-4 h-4 ${isLowerOrEqualTier ? 'text-slate-400' : 'text-emerald-600'}`} />,
             onClick: () => {
+              if (isLowerOrEqualTier) {
+                toast.error('Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể thanh toán đơn hàng này.');
+                return;
+              }
               setSelectedTx(record);
               setIsPayModalOpen(true);
             },
@@ -261,9 +276,22 @@ export function TransactionHistoryView() {
         if (record.status === 'expired' || record.status === 'cancelled') {
           menuItems.push({
             key: 're_subscribe',
-            label: <span className="font-medium text-sky-600">Đăng ký lại gói này</span>,
-            icon: <ArrowPathIcon className="w-4 h-4 text-sky-600" />,
-            onClick: () => handleReSubscribe(record),
+            disabled: isLowerOrEqualTier,
+            label: (
+              <Tooltip title={isLowerOrEqualTier ? 'Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể đăng ký lại.' : undefined}>
+                <span className={`font-medium ${isLowerOrEqualTier ? 'text-slate-400 cursor-not-allowed' : 'text-sky-600'}`}>
+                  Đăng ký lại gói này
+                </span>
+              </Tooltip>
+            ),
+            icon: <ArrowPathIcon className={`w-4 h-4 ${isLowerOrEqualTier ? 'text-slate-400' : 'text-sky-600'}`} />,
+            onClick: () => {
+              if (isLowerOrEqualTier) {
+                toast.error('Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể đăng ký lại gói này.');
+                return;
+              }
+              handleReSubscribe(record);
+            },
           });
         }
 
@@ -333,9 +361,30 @@ export function TransactionHistoryView() {
 
       {/* Table Content */}
       {isLoading ? (
-        <div className="py-12 text-center">
-          <Spin size="large" />
-          <p className="text-xs text-slate-500 mt-3 font-medium">Đang tải danh sách hóa đơn...</p>
+        <div className="space-y-3 animate-pulse py-2">
+          {/* Skeleton Table Header */}
+          <div className="h-10 bg-slate-100 rounded-xl w-full flex items-center px-4 justify-between">
+            <div className="h-3 bg-slate-200 rounded w-24" />
+            <div className="h-3 bg-slate-200 rounded w-28" />
+            <div className="h-3 bg-slate-200 rounded w-20" />
+            <div className="h-3 bg-slate-200 rounded w-20" />
+            <div className="h-3 bg-slate-200 rounded w-24" />
+            <div className="h-3 bg-slate-200 rounded w-16" />
+          </div>
+          {/* Skeleton Table Rows */}
+          {[1, 2, 3, 4, 5].map((idx) => (
+            <div
+              key={idx}
+              className="h-14 bg-white border border-slate-200/70 rounded-xl w-full flex items-center px-4 justify-between gap-4"
+            >
+              <div className="h-4 bg-slate-200 rounded w-24" />
+              <div className="h-4 bg-slate-100 rounded w-28" />
+              <div className="h-4 bg-slate-100 rounded w-20" />
+              <div className="h-4 bg-slate-200 rounded w-20" />
+              <div className="h-6 bg-slate-100 rounded-full w-24" />
+              <div className="h-8 bg-slate-100 rounded-lg w-16" />
+            </div>
+          ))}
         </div>
       ) : filteredItems.length === 0 ? (
         <div className="py-12 text-center">

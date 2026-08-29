@@ -1,11 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMySubscriptionsApi, fetchMyTransactionsApi, cancelTransactionApi, downloadInvoicePdfApi } from '../services';
+import {
+  fetchMySubscriptionsApi,
+  fetchMyTransactionsApi,
+  fetchCurrentUserProfileApi,
+  cancelTransactionApi,
+  downloadInvoicePdfApi,
+} from '../services';
 import toast from 'react-hot-toast';
 
 export const ACCOUNT_QUERY_KEYS = {
   all: ['account'] as const,
   mySubscriptions: () => [...ACCOUNT_QUERY_KEYS.all, 'mySubscriptions'] as const,
   myTransactions: () => [...ACCOUNT_QUERY_KEYS.all, 'myTransactions'] as const,
+  profile: () => [...ACCOUNT_QUERY_KEYS.all, 'profile'] as const,
 };
 
 /**
@@ -27,6 +34,18 @@ export function useMyTransactions(enabled = true) {
   return useQuery({
     queryKey: ACCOUNT_QUERY_KEYS.myTransactions(),
     queryFn: fetchMyTransactionsApi,
+    enabled,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+/**
+ * Hook lấy thông tin chi tiết cá nhân mới nhất của người dùng từ Backend
+ */
+export function useCurrentUserProfile(enabled = true) {
+  return useQuery({
+    queryKey: ACCOUNT_QUERY_KEYS.profile(),
+    queryFn: fetchCurrentUserProfileApi,
     enabled,
     staleTime: 1000 * 60 * 5,
   });
@@ -61,5 +80,3 @@ export function useDownloadInvoicePdf() {
     },
   });
 }
-
-

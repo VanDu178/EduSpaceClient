@@ -4,15 +4,15 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/features/auth';
 import {
+  TAB_TITLE_MAP,
   useMySubscriptions,
   ConsoleSidebar,
   ConsoleHeader,
+  ConsoleSkeleton,
   SubscriptionView,
   ProfileView,
   TransactionHistoryView,
 } from '@/features/account';
-
-import { Spin } from 'antd';
 
 function AccountConsoleContent() {
   const searchParams = useSearchParams();
@@ -23,7 +23,7 @@ function AccountConsoleContent() {
   const tabParam = searchParams.get('tab');
   const validTab = tabParam === 'security' ? 'profile' : tabParam;
   const initialTab =
-    validTab && ['subscription', 'profile', 'transactions'].includes(validTab)
+    validTab && validTab in TAB_TITLE_MAP
       ? validTab
       : 'subscription';
 
@@ -36,7 +36,7 @@ function AccountConsoleContent() {
   // Sync state with URL query parameter
   useEffect(() => {
     const currentTab = tabParam === 'security' ? 'profile' : tabParam;
-    if (currentTab && ['subscription', 'profile', 'transactions'].includes(currentTab)) {
+    if (currentTab && currentTab in TAB_TITLE_MAP) {
       setActiveTab(currentTab);
     }
   }, [tabParam]);
@@ -76,13 +76,7 @@ function AccountConsoleContent() {
 
 export default function AccountConsolePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-[70vh] flex items-center justify-center">
-          <Spin size="large" />
-        </div>
-      }
-    >
+    <Suspense fallback={<ConsoleSkeleton />}>
       <AccountConsoleContent />
     </Suspense>
   );

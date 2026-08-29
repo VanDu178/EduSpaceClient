@@ -1,103 +1,77 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Blog, BlogCategoryOption } from './types';
-import { getBlogTypesApi, getBlogsApi } from './services/blogService';
+import { Pagination } from 'antd';
+import { BlogCategoryOption, BlogFilterState } from './types';
+import { useBlogTypes, useBlogs } from './hooks';
 import { BlogHeader } from './components/BlogHeader';
 import { BlogSearch } from './components/BlogSearch';
 import { BlogGrid } from './components/BlogGrid';
-import { BlogPagination } from './components/BlogPagination';
 
 const ITEMS_PER_PAGE = 6;
 const DEFAULT_CATEGORY: BlogCategoryOption = { code: 'ALL', name: 'Tất cả' };
 
 export function BlogsFeature() {
-  const [categories, setCategories] = useState<BlogCategoryOption[]>([DEFAULT_CATEGORY]);
-  const [selectedCategoryCode, setSelectedCategoryCode] = useState<string>('ALL');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
+  const [blogFilter, setBlogFilter] = useState<BlogFilterState>({
+    categoryCode: 'ALL',
+    searchQuery: '',
+    debouncedSearch: '',
+    page: 1,
+  });
 
   // Debounce search query
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
+      setBlogFilter((prev) => ({
+        ...prev,
+        debouncedSearch: prev.searchQuery,
+        page: 1,
+      }));
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [blogFilter.searchQuery]);
 
-  // Fetch blog types from API on mount
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCategories = async () => {
-      try {
-        const types = await getBlogTypesApi();
-        if (isMounted) {
-          const apiCategories: BlogCategoryOption[] = types.map((t) => ({
-            code: t.code,
-            name: t.name,
-          }));
-          setCategories([DEFAULT_CATEGORY, ...apiCategories]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch blog types:', error);
-      }
-    };
+  // Fetch blog types using TanStack Query
+  const { data: blogTypes = [], isLoading: isLoadingTypes } = useBlogTypes();
+  const categories: BlogCategoryOption[] = [
+    DEFAULT_CATEGORY,
+    ...blogTypes.map((t) => ({ code: t.code, name: t.name })),
+  ];
 
-    fetchCategories();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // Fetch blogs list using TanStack Query
+  const getBlogsParams = {
+    page: blogFilter.page,
+    limit: ITEMS_PER_PAGE,
+    keyword: blogFilter.debouncedSearch.trim() || undefined,
+    blogType: blogFilter.categoryCode === 'ALL' ? undefined : blogFilter.categoryCode,
+  };
 
-  // Fetch blogs list from API when page, category or search query changes
-  useEffect(() => {
-    let isMounted = true;
-    const fetchBlogs = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getBlogsApi({
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-          keyword: debouncedSearch.trim() || undefined,
-          blogType: selectedCategoryCode === 'ALL' ? undefined : selectedCategoryCode,
-        });
-
-        if (isMounted) {
-          setBlogs(data.blogs);
-          setTotalPages(data.pagination.totalPages || 1);
-        }
-      } catch (error) {
-        console.error('Failed to fetch blogs:', error);
-        if (isMounted) {
-          setBlogs([]);
-          setTotalPages(1);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchBlogs();
-    return () => {
-      isMounted = false;
-    };
-  }, [currentPage, selectedCategoryCode, debouncedSearch]);
+  const { data: blogsData, isLoading: isLoadingBlogs } = useBlogs(getBlogsParams);
+  const blogs = blogsData?.blogs || [];
+  const totalItems = blogsData?.pagination?.total || 0;
+  const isLoading = isLoadingTypes || isLoadingBlogs;
 
   const handleCategoryChange = (categoryCode: string) => {
-    setSelectedCategoryCode(categoryCode);
-    setCurrentPage(1);
+    setBlogFilter((prev) => ({
+      ...prev,
+      categoryCode,
+      page: 1,
+    }));
   };
 
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
+    setBlogFilter((prev) => ({
+      ...prev,
+      searchQuery: query,
+    }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setBlogFilter((prev) => ({
+      ...prev,
+      page,
+    }));
   };
 
   return (
@@ -105,14 +79,14 @@ export function BlogsFeature() {
       {/* 1. Header (Title + Category Filter Pills) */}
       <BlogHeader
         categories={categories}
-        selectedCategoryCode={selectedCategoryCode}
+        selectedCategoryCode={blogFilter.categoryCode}
         onSelectCategory={handleCategoryChange}
         isLoading={isLoading}
       />
 
       {/* 2. Search Bar */}
       <BlogSearch
-        searchQuery={searchQuery}
+        searchQuery={blogFilter.searchQuery}
         onSearchChange={handleSearchChange}
       />
 
@@ -120,15 +94,24 @@ export function BlogsFeature() {
       <BlogGrid blogs={blogs} isLoading={isLoading} />
 
       {/* 4. Pagination */}
-      <BlogPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+      {totalItems > ITEMS_PER_PAGE && (
+        <div className="flex items-center justify-center mt-8 sm:mt-10">
+          <Pagination
+            current={blogFilter.page}
+            total={totalItems}
+            pageSize={ITEMS_PER_PAGE}
+            onChange={handlePageChange}
+            showSizeChanger={false}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 export * from './types';
-export * from './services/blogService';
+export * from './services';
+export * from './hooks';
+export * from './components';
+export * from './utils';
 

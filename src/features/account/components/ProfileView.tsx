@@ -7,6 +7,7 @@ import {
   KeyIcon,
   LockClosedIcon,
   CheckCircleIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Button, Input, Form } from 'antd';
 
@@ -21,8 +22,7 @@ export function ProfileView({ activeSubscription, onNavigateTab }: ProfileViewPr
   const { mutate: changePassword, isPending: isChangingPassword } = useChangePasswordMutation();
 
   const planName = activeSubscription?.planName || user?.planName;
-  const isPremium = Boolean(activeSubscription?.isPremium || user?.isPremium);
-  const isGoogleAccount = user?.provider === 'google' || Boolean(user?.googleId);
+  const isGoogleAccount = Boolean(user?.googleId);
 
   const handlePasswordSubmit = (values: any) => {
     changePassword(
@@ -82,88 +82,113 @@ export function ProfileView({ activeSubscription, onNavigateTab }: ProfileViewPr
         </div>
 
 
-        {/* Change Password Section (Centered Form) */}
-        <div className="space-y-6 max-w-xl mx-auto">
-          <div className="text-center space-y-1">
-            <h3 className="text-xl font-bold text-slate-900 flex items-center justify-center gap-2">
-              <KeyIcon className="w-5 h-5 text-sky-600" />
-              Bảo mật & Đổi mật khẩu
-            </h3>
-            <p className="text-xs text-slate-500">
-              Cập nhật mật khẩu thường xuyên để bảo vệ an toàn cho tài khoản TradeVerse của bạn.
-            </p>
-          </div>
-
-          <Form
-            form={passwordForm}
-            layout="vertical"
-            onFinish={handlePasswordSubmit}
-            className="space-y-4 max-w-xl mx-auto text-left"
-          >
-            <Form.Item
-              label={<span className="text-xs font-semibold text-slate-600">Mật khẩu hiện tại</span>}
-              name="currentPassword"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
-            >
-              <Input.Password
-                placeholder="Nhập mật khẩu đang dùng"
-                className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
-                disabled={isChangingPassword}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={<span className="text-xs font-semibold text-slate-600">Mật khẩu mới</span>}
-              name="newPassword"
-              rules={[
-                { required: true, message: 'Vui lòng nhập mật khẩu mới' },
-                { min: 6, message: 'Mật khẩu mới phải có ít nhất 6 ký tự' },
-              ]}
-            >
-              <Input.Password
-                placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-                className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
-                disabled={isChangingPassword}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label={<span className="text-xs font-semibold text-slate-600">Xác nhận mật khẩu mới</span>}
-              name="confirmPassword"
-              dependencies={['newPassword']}
-              rules={[
-                { required: true, message: 'Vui lòng xác nhận mật khẩu mới' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('newPassword') === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
-                  },
-                }),
-              ]}
-            >
-              <Input.Password
-                placeholder="Nhập lại mật khẩu mới"
-                className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
-                disabled={isChangingPassword}
-              />
-            </Form.Item>
-
+        {/* Security & Password Section */}
+        {isGoogleAccount ? (
+          <div className="space-y-4 max-w-xl mx-auto text-center">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-slate-900 flex items-center justify-center gap-2">
+                <ShieldCheckIcon className="w-5 h-5 text-sky-600" />
+                Bảo mật tài khoản
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
+                Mật khẩu cá nhân không lưu trữ tại hệ thống TradeVerse. Bạn không cần đổi mật khẩu tại đây. Mọi cài đặt đổi mật khẩu hoặc xác thực 2 yếu tố (2FA) được quản lý an toàn bởi Google.
+              </p>
+            </div>
 
             <div className="pt-2 flex justify-center">
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isChangingPassword}
-                disabled={isChangingPassword}
-                className="!rounded-xl font-medium border-none bg-sky-600 hover:!bg-sky-500 text-xs sm:text-sm cursor-pointer"
+              <a
+                href="https://myaccount.google.com/security"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-sky-700 transition-colors"
               >
-                Cập nhật mật khẩu
-              </Button>
+                Quản lý tài khoản Google
+                <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
+              </a>
             </div>
-          </Form>
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-6 max-w-xl mx-auto">
+            <div className="text-center space-y-1">
+              <h3 className="text-xl font-bold text-slate-900 flex items-center justify-center gap-2">
+                <KeyIcon className="w-5 h-5 text-sky-600" />
+                Bảo mật & Đổi mật khẩu
+              </h3>
+              <p className="text-xs text-slate-500">
+                Cập nhật mật khẩu thường xuyên để bảo vệ an toàn cho tài khoản TradeVerse của bạn.
+              </p>
+            </div>
+
+            <Form
+              form={passwordForm}
+              layout="vertical"
+              onFinish={handlePasswordSubmit}
+              className="space-y-4 max-w-xl mx-auto text-left"
+            >
+              <Form.Item
+                label={<span className="text-xs font-semibold text-slate-600">Mật khẩu hiện tại</span>}
+                name="currentPassword"
+                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
+              >
+                <Input.Password
+                  placeholder="Nhập mật khẩu đang dùng"
+                  className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
+                  disabled={isChangingPassword}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={<span className="text-xs font-semibold text-slate-600">Mật khẩu mới</span>}
+                name="newPassword"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập mật khẩu mới' },
+                  { min: 6, message: 'Mật khẩu mới phải có ít nhất 6 ký tự' },
+                ]}
+              >
+                <Input.Password
+                  placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
+                  className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
+                  disabled={isChangingPassword}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label={<span className="text-xs font-semibold text-slate-600">Xác nhận mật khẩu mới</span>}
+                name="confirmPassword"
+                dependencies={['newPassword']}
+                rules={[
+                  { required: true, message: 'Vui lòng xác nhận mật khẩu mới' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('newPassword') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password
+                  placeholder="Nhập lại mật khẩu mới"
+                  className="h-10 rounded-xl border-slate-200 hover:!border-sky-500 focus:!border-sky-500 focus-within:!border-sky-500 focus:!shadow-none focus-within:!shadow-none focus:!outline-none focus-within:!ring-2 focus-within:!ring-sky-100"
+                  disabled={isChangingPassword}
+                />
+              </Form.Item>
+
+              <div className="pt-2 flex justify-center">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isChangingPassword}
+                  disabled={isChangingPassword}
+                  className="!rounded-xl font-medium border-none bg-sky-600 hover:!bg-sky-500 text-xs sm:text-sm cursor-pointer"
+                >
+                  Cập nhật mật khẩu
+                </Button>
+              </div>
+            </Form>
+          </div>
+        )}
 
         {/* Security Status Section */}
         <div className="pt-6 border-t border-slate-100 space-y-4">

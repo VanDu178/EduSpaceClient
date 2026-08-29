@@ -14,11 +14,12 @@ import {
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import {
-  getPaymentTransactionStatusApi,
-  cancelPaymentTransactionApi,
-  PaymentTransactionData,
-} from '@/features/paymentMethods';
+  usePaymentTransactionStatus,
+  useCancelPaymentTransaction,
+  PAYMENT_TRANSACTION_STATUS_MAP,
+} from '@/features/paymentTransactions';
 
+import { useMySubscriptions } from '@/features/account';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { Button } from '@/components/common';
 import { copyToClipboard, formatCurrency } from '@/core/utils';
@@ -31,44 +32,43 @@ function OrderDetailContent() {
   const { user } = useAuthStore();
 
   const code = (params?.code as string) || '';
-  const redirectParam = searchParams.get('redirect') || '/blogs';
+  const redirectParam = searchParams.get('redirect') || '/';
 
-  const [transaction, setTransaction] = useState<PaymentTransactionData | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isCheckingStatus, setIsCheckingStatus] = useState<boolean>(false);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(15 * 60);
 
-  // Fetch transaction detail from backend API on mount
-  useEffect(() => {
-    if (!code) return;
-    let isMounted = true;
+  // Fetch active user subscription to check tier level
+  const { data: subData } = useMySubscriptions();
+  const activeSub = subData?.activeSubscription || null;
+  const activePlanTier = activeSub?.plan?.tierLevel || 0;
 
-    const fetchTransaction = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getPaymentTransactionStatusApi(code);
-        if (isMounted && data) {
-          setTransaction(data as PaymentTransactionData);
-        }
-      } catch (error) {
-        console.error('Lỗi khi tải thông tin đơn hàng:', error);
-        toast.error('Không tìm thấy đơn hàng hoặc đơn hàng đã bị vô hiệu.');
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
+  // Fetch & Poll Transaction Status via React Query
+  const {
+    data: transactionData,
+    isLoading,
+    refetch,
+    isFetching: isCheckingStatus,
+  } = usePaymentTransactionStatus(code, {
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      return data?.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING ? 3000 : false;
+    },
+  });
 
-    fetchTransaction();
-    return () => {
-      isMounted = false;
-    };
-  }, [code]);
+  const transaction = transactionData || null;
+  const cancelTransactionMutation = useCancelPaymentTransaction();
+
+  // Calculate if payment is blocked due to active higher/equal tier
+  const txPlanTier = (transaction?.plan as any)?.tierLevel || 0;
+  const isBlockedByTier = Boolean(
+    transaction?.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING &&
+    activePlanTier > 0 &&
+    txPlanTier > 0 &&
+    txPlanTier <= activePlanTier
+  );
 
   // Countdown Timer Logic
   useEffect(() => {
-    if (!transaction || transaction.status !== 'pending') return;
+    if (!transaction || transaction.status !== PAYMENT_TRANSACTION_STATUS_MAP.PENDING) return;
 
     const calculateDiff = () => {
       if (!transaction.expiredAt) return 0;
@@ -83,65 +83,45 @@ function OrderDetailContent() {
       const remaining = calculateDiff();
       setTimeLeftSeconds(remaining);
       if (remaining <= 0) {
-        setTransaction((prev) => (prev ? { ...prev, status: 'expired' } : null));
+        refetch();
         clearInterval(timerId);
       }
     }, 1000);
 
     return () => clearInterval(timerId);
-  }, [transaction]);
+  }, [transaction, refetch]);
 
   // Handle Success Flow (Toast & Redirect) - Chỉ chạy khi Backend ĐÃ duyệt thành công (status === 'completed')
   const handleSuccessRedirect = useCallback(async () => {
     try {
-      // Ép Zustand xóa cache và tải lại thông tin tài khoản mới nhất vừa được Backend duyệt thành công
       const fetchMeLazy = useAuthStore.getState().fetchMeLazy;
       await fetchMeLazy(true);
     } catch (err) {
       console.error('Lỗi làm mới thông tin tài khoản:', err);
     }
 
-    toast.success(`🎉 Thanh toán thành công! Gói VIP đã được kích hoạt.`);
+    toast.success(`🎉 Thanh toán thành công! Gói ${transaction?.plan?.name} đã được kích hoạt.`);
     setTimeout(() => {
       router.push(redirectParam);
       router.refresh();
     }, 1500);
   }, [redirectParam, router]);
 
-  // Polling Status Logic (every 3 seconds)
+  // Watch status changes to trigger success redirect
   useEffect(() => {
-    if (!transaction || transaction.status !== 'pending') return;
-
-    const pollInterval = setInterval(async () => {
-      try {
-        const res = await getPaymentTransactionStatusApi(transaction.code);
-        if (res.status === 'completed') {
-          setTransaction((prev) => (prev ? { ...prev, status: 'completed' } : null));
-          clearInterval(pollInterval);
-          handleSuccessRedirect();
-        } else if (res.status === 'expired' || res.status === 'cancelled') {
-          setTransaction((prev) => (prev ? { ...prev, status: res.status } : null));
-          clearInterval(pollInterval);
-        }
-      } catch (error) {
-        console.error('Lỗi polling đơn hàng:', error);
-      }
-    }, 3000);
-
-    return () => clearInterval(pollInterval);
-  }, [transaction, handleSuccessRedirect]);
+    if (transaction?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED) {
+      handleSuccessRedirect();
+    }
+  }, [transaction?.status, handleSuccessRedirect]);
 
   // Manual Check Handler
   const handleManualCheckStatus = async () => {
-    if (!transaction) return;
-    setIsCheckingStatus(true);
+    if (!code) return;
     try {
-      const res = await getPaymentTransactionStatusApi(transaction.code);
-      if (res.status === 'completed') {
-        setTransaction((prev) => (prev ? { ...prev, status: 'completed' } : null));
+      const res = await refetch();
+      if (res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED) {
         handleSuccessRedirect();
-      } else if (res.status === 'expired') {
-        setTransaction((prev) => (prev ? { ...prev, status: 'expired' } : null));
+      } else if (res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.EXPIRED) {
         toast.error('Mã thanh toán này đã hết hạn. Vui lòng tạo đơn mới!');
       } else {
         toast('Hệ thống chưa ghi nhận tiền vào. Vui lòng đợi trong giây lát...', { icon: '⏳' });
@@ -149,16 +129,14 @@ function OrderDetailContent() {
     } catch (error) {
       console.error('Lỗi kiểm tra thủ công:', error);
       toast.error('Không thể kết nối đến máy chủ. Vui lòng thử lại!');
-    } finally {
-      setIsCheckingStatus(false);
     }
   };
 
   // Cancel Handler
   const handleCancelTransaction = async () => {
-    if (transaction && transaction.status === 'pending') {
+    if (transaction && transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING) {
       try {
-        await cancelPaymentTransactionApi(transaction.code);
+        await cancelTransactionMutation.mutateAsync(transaction.code);
         toast.success('Đã hủy giao dịch thanh toán.');
       } catch (err) {
         console.error('Lỗi khi hủy giao dịch:', err);
@@ -166,6 +144,7 @@ function OrderDetailContent() {
     }
     router.push('/checkout');
   };
+
 
 
   // Format Time Helper (MM:SS)
@@ -254,7 +233,7 @@ function OrderDetailContent() {
             </div>
 
             {/* Status Views */}
-            {transaction.status === 'completed' && (
+            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED && (
               <div className="p-8 bg-white rounded-3xl border border-gray-200 text-center space-y-4">
                 <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-50 animate-bounce">
                   <CheckCircleIcon className="w-10 h-10 stroke-[2.5]" />
@@ -269,7 +248,7 @@ function OrderDetailContent() {
               </div>
             )}
 
-            {transaction.status === 'expired' && (
+            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.EXPIRED && (
               <div className="p-6 bg-white rounded-3xl border border-gray-200 text-center space-y-4">
                 <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto border-4 border-amber-50">
                   <ExclamationTriangleIcon className="w-8 h-8" />
@@ -286,131 +265,154 @@ function OrderDetailContent() {
               </div>
             )}
 
-            {transaction.status === 'pending' && (
-              <div className="bg-white rounded-3xl border border-gray-200 p-5 sm:p-6 space-y-5">
-                {/* Timer Header Bar */}
-                <div className="flex items-center justify-between p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs">
-                  <div className="flex items-center gap-2 font-semibold">
-                    <span className="relative flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                    </span>
-                    <span>Đang chờ chuyển khoản tự động...</span>
+            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING && (
+              isBlockedByTier ? (
+                <div className="p-6 bg-amber-50 rounded-3xl border border-amber-200 text-center space-y-4">
+                  <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto border-4 border-amber-50">
+                    <ExclamationTriangleIcon className="w-8 h-8" />
                   </div>
-                  <div className="flex items-center gap-1 font-mono font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 text-xs">
-                    <ClockIcon className="w-4 h-4" />
-                    <span>{formatTime(timeLeftSeconds)}</span>
-                  </div>
-                </div>
-
-                {/* VietQR Code Display */}
-                <div className="flex flex-col items-center justify-center text-center space-y-2">
-                  <div className="p-3 bg-white border-2 border-primary/40 rounded-2xl flex flex-col items-center shrink-0 space-y-1.5 overflow-hidden">
-                    <div className="w-48 h-48 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-200">
-                      {transaction.qrCodeUrl ? (
-                        <img src={transaction.qrCodeUrl} alt="VietQR Code" className="w-full h-full object-contain" />
-                      ) : (
-                        <div className="text-xs text-gray-400">Không thể tải mã QR</div>
-                      )}
-                    </div>
-                    <span className="text-[11px] text-gray-600 font-semibold">
-                      Quét mã VietQR bằng ứng dụng Ngân hàng / Ví điện tử
-                    </span>
-                  </div>
-                </div>
-
-                {/* Transfer Info Details */}
-                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-xs">
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                    <span className="text-gray-500">Ngân hàng thụ hưởng:</span>
-                    <span className="font-bold text-gray-900">
-                      {transaction.paymentAccount?.bank?.name || transaction.bankCode || 'MB Bank'}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                    <span className="text-gray-500">Số tài khoản:</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-gray-900 text-sm">
-                        {transaction.accountNo || '0399998888'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(transaction.accountNo || '', 'Đã sao chép số tài khoản!')}
-                        className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
-                        title="Sao chép số tài khoản"
-                      >
-                        <ClipboardDocumentIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                    <span className="text-gray-500">Chủ tài khoản:</span>
-                    <span className="font-bold text-gray-900 uppercase">
-                      {transaction.accountHolder || 'CONG TY TRADEVERSE VIP'}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                    <span className="text-gray-500">Số tiền thanh toán:</span>
-                    <span className="font-bold text-primary text-base">
-                      {formatCurrency(transaction.amount)}
-                    </span>
-                  </div>
-
-                  {/* Transfer Content Highlight Box */}
-                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-bold text-emerald-900 uppercase">
-                        Nội dung chuyển khoản (Bắt buộc):
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(transaction.transferContent, 'Đã sao chép nội dung chuyển khoản!')}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
-                      >
-                        <ClipboardDocumentIcon className="w-3 h-3" />
-                        <span>Sao chép</span>
-                      </button>
-                    </div>
-                    <p className="font-mono text-base font-extrabold text-emerald-800 tracking-wider">
-                      {transaction.transferContent}
-                    </p>
-                    <p className="text-[10px] text-emerald-700">
-                      ⚠️ Quý khách vui lòng điền <span className="font-bold">chính xác tuyệt đối</span> nội dung trên để hệ thống tự động kích hoạt gói ngay lập tức.
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-bold text-gray-900">Giao dịch bị chặn thanh toán</h3>
+                    <p className="text-xs text-gray-700 leading-relaxed max-w-md mx-auto">
+                      Tài khoản của bạn đã sở hữu gói dịch vụ <span className="font-bold text-amber-900">{activeSub?.plan?.name || 'tương đương hoặc cao hơn'}</span> (Cấp độ Tier {activePlanTier}).
+                      Đơn hàng #{transaction.code} là gói {transaction.plan?.name || ''} (Tier {txPlanTier}) nên hệ thống không cho phép thực hiện thanh toán.
                     </p>
                   </div>
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <Button type="button" variant="primary" size="md" rounded="xl" onClick={() => router.push('/account?tab=subscription')}>
+                      Quản lý Gói dịch vụ của tôi
+                    </Button>
+                    <Button type="button" variant="outline" size="md" rounded="xl" onClick={() => handleCancelTransaction()}>
+                      Hủy đơn hàng này
+                    </Button>
+                  </div>
                 </div>
+              ) : (
+                <div className="bg-white rounded-3xl border border-gray-200 p-5 sm:p-6 space-y-5">
+                  {/* Timer Header Bar */}
+                  <div className="flex items-center justify-between p-3 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 text-xs">
+                    <div className="flex items-center gap-2 font-semibold">
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                      </span>
+                      <span>Đang chờ chuyển khoản tự động...</span>
+                    </div>
+                    <div className="flex items-center gap-1 font-mono font-bold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-200 text-xs">
+                      <ClockIcon className="w-4 h-4" />
+                      <span>{formatTime(timeLeftSeconds)}</span>
+                    </div>
+                  </div>
 
-                {/* Actions */}
-                <div className="space-y-2 pt-1">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="lg"
-                    rounded="xl"
-                    fullWidth
-                    isLoading={isCheckingStatus}
-                    disabled={isCheckingStatus}
-                    onClick={handleManualCheckStatus}
-                    className="cursor-pointer font-bold py-3.5 text-base"
-                  >
-                    <ArrowPathIcon className="w-5 h-5 mr-1.5 inline-block" />
-                    Tôi đã chuyển khoản (Kiểm tra ngay)
-                  </Button>
+                  {/* VietQR Code Display */}
+                  <div className="flex flex-col items-center justify-center text-center space-y-2">
+                    <div className="p-3 bg-white border-2 border-primary/40 rounded-2xl flex flex-col items-center shrink-0 space-y-1.5 overflow-hidden">
+                      <div className="w-48 h-48 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-200">
+                        {transaction.qrCodeUrl ? (
+                          <img src={transaction.qrCodeUrl} alt="VietQR Code" className="w-full h-full object-contain" />
+                        ) : (
+                          <div className="text-xs text-gray-400">Không thể tải mã QR</div>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-gray-600 font-semibold">
+                        Quét mã VietQR bằng ứng dụng Ngân hàng / Ví điện tử
+                      </span>
+                    </div>
+                  </div>
 
-                  <button
-                    type="button"
-                    disabled={isCheckingStatus}
-                    onClick={handleCancelTransaction}
-                    className={`w-full py-2 text-xs font-semibold text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-center ${isCheckingStatus ? 'pointer-events-none opacity-50' : ''
-                      }`}
-                  >
-                    Hủy giao dịch này / Chọn phương thức khác
-                  </button>
+                  {/* Transfer Info Details */}
+                  <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-xs">
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                      <span className="text-gray-500">Ngân hàng thụ hưởng:</span>
+                      <span className="font-bold text-gray-900">
+                        {transaction.paymentAccount?.bank?.name || transaction.bankCode || 'MB Bank'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                      <span className="text-gray-500">Số tài khoản:</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-gray-900 text-sm">
+                          {transaction.accountNo || '0399998888'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(transaction.accountNo || '', 'Đã sao chép số tài khoản!')}
+                          className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
+                          title="Sao chép số tài khoản"
+                        >
+                          <ClipboardDocumentIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                      <span className="text-gray-500">Chủ tài khoản:</span>
+                      <span className="font-bold text-gray-900 uppercase">
+                        {transaction.accountHolder || 'CONG TY TRADEVERSE VIP'}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                      <span className="text-gray-500">Số tiền thanh toán:</span>
+                      <span className="font-bold text-primary text-base">
+                        {formatCurrency(transaction.amount)}
+                      </span>
+                    </div>
+
+                    {/* Transfer Content Highlight Box */}
+                    <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-bold text-emerald-900 uppercase">
+                          Nội dung chuyển khoản (Bắt buộc):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(transaction.transferContent, 'Đã sao chép nội dung chuyển khoản!')}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 transition-colors cursor-pointer"
+                        >
+                          <ClipboardDocumentIcon className="w-3 h-3" />
+                          <span>Sao chép</span>
+                        </button>
+                      </div>
+                      <p className="font-mono text-base font-extrabold text-emerald-800 tracking-wider">
+                        {transaction.transferContent}
+                      </p>
+                      <p className="text-[10px] text-emerald-700">
+                        ⚠️ Quý khách vui lòng điền <span className="font-bold">chính xác tuyệt đối</span> nội dung trên để hệ thống tự động kích hoạt gói ngay lập tức.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="space-y-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="lg"
+                      rounded="xl"
+                      fullWidth
+                      isLoading={isCheckingStatus}
+                      disabled={isCheckingStatus}
+                      onClick={handleManualCheckStatus}
+                      className="cursor-pointer font-bold py-3.5 text-base"
+                    >
+                      <ArrowPathIcon className="w-5 h-5 mr-1.5 inline-block" />
+                      Tôi đã chuyển khoản (Kiểm tra ngay)
+                    </Button>
+
+                    <button
+                      type="button"
+                      disabled={isCheckingStatus}
+                      onClick={handleCancelTransaction}
+                      className={`w-full py-2 text-xs font-semibold text-gray-500 hover:text-gray-800 transition-colors cursor-pointer text-center ${isCheckingStatus ? 'pointer-events-none opacity-50' : ''
+                        }`}
+                    >
+                      Hủy giao dịch này / Chọn phương thức khác
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
             )}
           </div>
 

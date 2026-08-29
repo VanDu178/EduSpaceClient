@@ -2,18 +2,19 @@
 
 import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Spin } from "antd";
 import { useAuthStore } from "../stores/useAuthStore";
+import { PageSkeleton } from "@/components/common/PageSkeleton";
 
 interface GuestGuardProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
 /**
  * Route Guard cho các trang public dành riêng cho khách chưa đăng nhập (như /login, /register).
  * Nếu người dùng đã đăng nhập, tự động chuyển hướng về trang redirectUrl hoặc trang chủ '/'.
  */
-function GuestGuardContent({ children }: GuestGuardProps) {
+function GuestGuardContent({ children, fallback }: GuestGuardProps) {
   const { user, isInitialized } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -30,26 +31,16 @@ function GuestGuardContent({ children }: GuestGuardProps) {
   }, [isInitialized, user, router, redirectUrl]);
 
   if (!isInitialized || user) {
-    return (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
-        <Spin size="large" />
-      </div>
-    );
+    return <>{fallback ?? <PageSkeleton />}</>;
   }
 
   return <>{children}</>;
 }
 
-export function GuestGuard({ children }: GuestGuardProps) {
+export function GuestGuard({ children, fallback }: GuestGuardProps) {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
-          <Spin size="large" />
-        </div>
-      }
-    >
-      <GuestGuardContent>{children}</GuestGuardContent>
+    <Suspense fallback={fallback ?? <PageSkeleton />}>
+      <GuestGuardContent fallback={fallback}>{children}</GuestGuardContent>
     </Suspense>
   );
 }

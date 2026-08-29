@@ -1,7 +1,11 @@
-import { ActivePaymentMethod } from './types';
+/**
+ * HẰNG SỐ CHUẨN DUY NHẤT DÙNG CHO CÁC MÃ PHƯƠNG THỨC THANH TOÁN (PAYMENT METHOD CODES)
+ * Tất cả các mã đều viết dưới dạng IN HOA (UPPERCASE)
+ */
+export const PAYMENT_METHOD_CODES = {
+  VIETQR: 'VIETQR',
+  CREDIT_CARD: 'CREDIT_CARD',
+  E_WALLET: 'E_WALLET',
+} as const;
 
-export const DEFAULT_FALLBACK_PAYMENT_METHODS: ActivePaymentMethod[] = [
-  { id: 1, code: 'vietqr', name: 'VietQR', description: null, icon: 'QrCodeIcon', sortOrder: 1, isActive: true },
-  { id: 2, code: 'credit_card', name: 'Thẻ NH', description: null, icon: 'CreditCardIcon', sortOrder: 2, isActive: true },
-  { id: 3, code: 'e_wallet', name: 'Ví điện tử', description: null, icon: 'DevicePhoneMobileIcon', sortOrder: 3, isActive: true },
-];
+export type PaymentMethodCode = keyof typeof PAYMENT_METHOD_CODES;
