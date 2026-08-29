@@ -1,8 +1,10 @@
+import { UserRole } from '@/core/constants/roles';
+
 export interface User {
   id: number;
   email: string;
   name?: string | null;
-  role: 'admin' | 'client';
+  role: UserRole;
   status: 'active' | 'locked';
   avatarUrl?: string | null;
   googleId?: string | null;

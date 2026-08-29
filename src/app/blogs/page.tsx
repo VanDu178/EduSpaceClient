@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { BlogsFeature } from '@/features/blogs';
+import { BlogListPage } from '@/features/blogs';
 
 export const metadata: Metadata = {
   title: 'Tất Cả Bài Viết - TradeVerse Blog',
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function BlogsPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 pb-12">
-      <BlogsFeature />
+      <BlogListPage />
     </main>
   );
 }

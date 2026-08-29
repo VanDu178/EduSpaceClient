@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Pagination } from 'antd';
-import { BlogCategoryOption, BlogFilterState } from './types';
-import { useBlogTypes, useBlogs } from './hooks';
-import { BlogHeader } from './components/BlogHeader';
-import { BlogSearch } from './components/BlogSearch';
-import { BlogGrid } from './components/BlogGrid';
+import { BlogCategoryOption, BlogFilterState } from '../types';
+import { useBlogTypes, useBlogs } from '../hooks';
+import { BlogHeader } from '../components/BlogHeader';
+import { BlogSearch } from '../components/BlogSearch';
+import { BlogGrid } from '../components/BlogGrid';
 
 const ITEMS_PER_PAGE = 6;
 const DEFAULT_CATEGORY: BlogCategoryOption = { code: 'ALL', name: 'Tất cả' };
 
-export function BlogsFeature() {
+export function BlogListPage() {
   const [blogFilter, setBlogFilter] = useState<BlogFilterState>({
     categoryCode: 'ALL',
     searchQuery: '',
@@ -109,9 +109,5 @@ export function BlogsFeature() {
   );
 }
 
-export * from './types';
-export * from './services';
-export * from './hooks';
-export * from './components';
-export * from './utils';
-
+// Alias for backwards compatibility if needed
+export { BlogListPage as BlogsFeature };

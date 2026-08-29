@@ -43,18 +43,23 @@ function CheckoutContent() {
 
   // Component state
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>(initialBillingParam);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHOD_CODES.VIETQR);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | ''>('');
 
   // Sync initial payment method once loaded
   useEffect(() => {
-    if (activePaymentMethods.length > 0 && !paymentMethod) {
-      setPaymentMethod(activePaymentMethods[0].code as PaymentMethod);
+    if (activePaymentMethods.length > 0) {
+      if (!paymentMethod || !activePaymentMethods.some((m) => m.code === paymentMethod)) {
+        setPaymentMethod(activePaymentMethods[0].code as PaymentMethod);
+      }
+    } else {
+      setPaymentMethod('' as string);
     }
   }, [activePaymentMethods, paymentMethod]);
 
   // Dynamic Payment Methods layout calculation
   const displayPaymentMethods = activePaymentMethods;
   const totalMethodsCount = displayPaymentMethods.length;
+  const isNoPaymentMethod = activePaymentMethods.length === 0 || !paymentMethod;
 
   const getGridContainerClass = (count: number) => {
     if (count === 1) return 'grid grid-cols-1 gap-2.5';
@@ -101,6 +106,11 @@ function CheckoutContent() {
 
     if (isBlockedByTier) {
       toast.error(`Bạn đang sử dụng gói dịch vụ ${activeSub?.plan?.name || 'tương đương hoặc cao hơn'}. Không thể đăng ký gói cùng cấp hoặc cấp thấp hơn!`);
+      return;
+    }
+
+    if (isNoPaymentMethod) {
+      toast.error('Hiện không có phương thức thanh toán nào hoạt động. Vui lòng quay lại sau!');
       return;
     }
 
@@ -359,29 +369,40 @@ function CheckoutContent() {
                   Phương thức thanh toán
                 </label>
 
-                <div className={getGridContainerClass(totalMethodsCount)}>
-                  {displayPaymentMethods.map((method, index) => {
-                    const isSelected = paymentMethod === method.code;
-                    return (
-                      <button
-                        key={method.id || method.code}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.code as PaymentMethod)}
-                        className={`p-2.5 rounded-xl border transition-all flex flex-col items-center justify-center text-center gap-1 cursor-pointer ${getItemSpanClass(
-                          totalMethodsCount,
-                          index
-                        )} ${isSelected
-                          ? 'border-primary bg-primary-light/20 text-primary font-bold'
-                          : 'border-gray-200 bg-white text-gray-600 hover:text-gray-900'
-                          }`}
-                      >
-                        <PaymentMethodIcon iconName={method.icon} className="w-5 h-5" />
-                        <span className="text-[10px] sm:text-[11px] truncate max-w-full px-1">{method.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
+                {activePaymentMethods.length === 0 ? (
+                  <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-amber-900 space-y-1.5">
+                    <div className="flex items-center gap-2 font-bold text-xs sm:text-sm text-amber-950">
+                      <ExclamationTriangleIcon className="w-5 h-5 text-amber-600 shrink-0" />
+                      <span>Hệ thống thanh toán đang được bảo trì.</span>
+                    </div>
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      Hiện chưa có phương thức thanh toán nào đang hoạt động. Vui lòng thử lại sau!
+                    </p>
+                  </div>
+                ) : (
+                  <div className={getGridContainerClass(totalMethodsCount)}>
+                    {displayPaymentMethods.map((method, index) => {
+                      const isSelected = paymentMethod === method.code;
+                      return (
+                        <button
+                          key={method.id || method.code}
+                          type="button"
+                          onClick={() => setPaymentMethod(method.code as PaymentMethod)}
+                          className={`p-2.5 rounded-xl border transition-all flex flex-col items-center justify-center text-center gap-1 cursor-pointer ${getItemSpanClass(
+                            totalMethodsCount,
+                            index
+                          )} ${isSelected
+                            ? 'border-primary bg-primary-light/20 text-primary font-bold'
+                            : 'border-gray-200 bg-white text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                          <PaymentMethodIcon iconName={method.icon} className="w-5 h-5" />
+                          <span className="text-[10px] sm:text-[11px] truncate max-w-full px-1">{method.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Payment Details per Active Method */}
@@ -492,14 +513,18 @@ function CheckoutContent() {
                   rounded="xl"
                   fullWidth
                   isLoading={createPaymentTransaction.isPending}
-                  disabled={createPaymentTransaction.isPending || isBlockedByTier}
+                  disabled={createPaymentTransaction.isPending || isBlockedByTier || isNoPaymentMethod}
                   onClick={handleConfirmPayment}
-                  className={`font-bold py-3.5 text-base transition-all ${isBlockedByTier
-                      ? '!bg-gray-200 !text-gray-500 !border-gray-300 cursor-not-allowed'
-                      : 'cursor-pointer'
+                  className={`font-bold py-3.5 text-base transition-all ${isBlockedByTier || isNoPaymentMethod
+                    ? '!bg-gray-200 !text-gray-500 !border-gray-300 cursor-not-allowed'
+                    : 'cursor-pointer'
                     }`}
                 >
-                  {isBlockedByTier ? `Đã sở hữu gói ${activeSub?.plan?.name || 'cao hơn'}` : 'Xác nhận & Thanh toán ngay'}
+                  {isNoPaymentMethod
+                    ? 'Không có phương thức thanh toán khả dụng'
+                    : isBlockedByTier
+                      ? `Đã sở hữu gói ${activeSub?.plan?.name || 'cao hơn'}`
+                      : 'Xác nhận & Thanh toán ngay'}
                 </Button>
               </div>
             </div>
