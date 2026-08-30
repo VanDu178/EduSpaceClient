@@ -12,6 +12,7 @@ import {
   ArrowPathIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
+  LightBulbIcon,
 } from '@heroicons/react/24/outline';
 import {
   usePaymentTransactionStatus,
@@ -34,7 +35,7 @@ function OrderDetailContent() {
   const code = (params?.code as string) || '';
   const redirectParam = searchParams.get('redirect') || '/';
 
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(15 * 60);
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(24 * 60 * 60);
 
   // Fetch active user subscription to check tier level
   const { data: subData } = useMySubscriptions();
@@ -50,12 +51,22 @@ function OrderDetailContent() {
   } = usePaymentTransactionStatus(code, {
     refetchInterval: (query) => {
       const data = query.state.data;
-      return data?.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING ? 3000 : false;
+      return (
+        data?.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING ||
+        data?.status === PAYMENT_TRANSACTION_STATUS_MAP.PARTIALLY_PAID
+      ) ? 3000 : false;
     },
   });
 
   const transaction = transactionData || null;
   const cancelTransactionMutation = useCancelPaymentTransaction();
+
+  // Calculated properties
+  const txAmount = Number(transaction?.amount || 0);
+  const txPaidAmount = Number(transaction?.paidAmount || 0);
+  const txOverpaidAmount = Number((transaction as any)?.overpaidAmount || Math.max(0, txPaidAmount - txAmount));
+  const txRemainingAmount = Number((transaction as any)?.remainingAmount || Math.max(0, txAmount - txPaidAmount));
+  const refundsList = (transaction as any)?.refunds || [];
 
   // Calculate if payment is blocked due to active higher/equal tier
   const txPlanTier = (transaction?.plan as any)?.tierLevel || 0;
@@ -68,7 +79,7 @@ function OrderDetailContent() {
 
   // Countdown Timer Logic
   useEffect(() => {
-    if (!transaction || transaction.status !== PAYMENT_TRANSACTION_STATUS_MAP.PENDING) return;
+    if (!transaction || (transaction.status !== PAYMENT_TRANSACTION_STATUS_MAP.PENDING && transaction.status !== PAYMENT_TRANSACTION_STATUS_MAP.PARTIALLY_PAID)) return;
 
     const calculateDiff = () => {
       if (!transaction.expiredAt) return 0;
@@ -109,7 +120,10 @@ function OrderDetailContent() {
 
   // Watch status changes to trigger success redirect
   useEffect(() => {
-    if (transaction?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED) {
+    if (
+      transaction?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED ||
+      transaction?.status === PAYMENT_TRANSACTION_STATUS_MAP.OVERPAID
+    ) {
       handleSuccessRedirect();
     }
   }, [transaction?.status, handleSuccessRedirect]);
@@ -119,7 +133,10 @@ function OrderDetailContent() {
     if (!code) return;
     try {
       const res = await refetch();
-      if (res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED) {
+      if (
+        res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED ||
+        res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.OVERPAID
+      ) {
         handleSuccessRedirect();
       } else if (res.data?.status === PAYMENT_TRANSACTION_STATUS_MAP.EXPIRED) {
         toast.error('Mã thanh toán này đã hết hạn. Vui lòng tạo đơn mới!');
@@ -147,10 +164,14 @@ function OrderDetailContent() {
 
 
 
-  // Format Time Helper (MM:SS)
+  // Format Time Helper (HH:MM:SS hoặc MM:SS)
   const formatTime = (totalSec: number) => {
-    const mins = Math.floor(totalSec / 60);
+    const hours = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
     const secs = totalSec % 60;
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -233,18 +254,70 @@ function OrderDetailContent() {
             </div>
 
             {/* Status Views */}
-            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED && (
-              <div className="p-8 bg-white rounded-3xl border border-gray-200 text-center space-y-4">
-                <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-50 animate-bounce">
-                  <CheckCircleIcon className="w-10 h-10 stroke-[2.5]" />
+            {(transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.COMPLETED ||
+              transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.OVERPAID) && (
+                <div className="p-8 bg-white rounded-3xl border border-gray-200 text-center space-y-4">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-50 animate-bounce">
+                    <CheckCircleIcon className="w-10 h-10 stroke-[2.5]" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-gray-900">Thanh toán thành công!</h3>
+                    <p className="text-sm text-gray-600">
+                      Gói hội viên <span className="font-bold text-primary">{transaction.plan?.name}</span> đã được kích hoạt thành công.
+                    </p>
+                  </div>
+
+                  {txOverpaidAmount > 0 && (
+                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-left text-xs space-y-2">
+                      <div className="flex items-center gap-2 font-bold text-emerald-900 text-sm">
+                        <SparklesIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span>Kích hoạt gói thành công. Ghi nhận thanh toán dư {formatCurrency(txOverpaidAmount)}</span>
+                      </div>
+                      <p className="text-emerald-800 text-[11px]">
+                        Hệ thống đã ghi nhận số tiền thanh toán thừa của bạn. Bộ phận CSKH sẽ chủ động liên hệ hoàn trả số tiền thừa này.
+                      </p>
+                      {refundsList.length > 0 && (
+                        <div className="pt-2 border-t border-emerald-200 space-y-2">
+                          <span className="font-bold text-emerald-950 block">Lịch sử CSKH hoàn tiền dư:</span>
+                          {refundsList.map((rf: any, index: number) => (
+                            <div key={rf.id || index} className="p-2.5 bg-white rounded-xl border border-emerald-200 space-y-1 text-[11px]">
+                              <div className="flex justify-between font-semibold text-emerald-900">
+                                <span>Mã hoàn tiền: {rf.code}</span>
+                                <span className="font-bold text-emerald-700">+{formatCurrency(Number(rf.amount))}</span>
+                              </div>
+                              {rf.refundRef && <p className="text-slate-600 font-mono">Mã NH: {rf.refundRef}</p>}
+                              {rf.proofUrls && rf.proofUrls.length > 0 && (
+                                <div className="pt-1">
+                                  <span className="text-slate-500 font-medium block mb-1">Ảnh minh chứng hoàn tiền:</span>
+                                  <div className="flex gap-2 flex-wrap">
+                                    {rf.proofUrls.map((url: string, i: number) => (
+                                      <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block w-14 h-14 rounded-lg overflow-hidden border border-slate-200 hover:opacity-80 transition-opacity">
+                                        <img src={url} alt={`Minh chứng ${i + 1}`} className="w-full h-full object-cover" />
+                                      </a>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-xs text-gray-500 animate-pulse">Đang tự động chuyển hướng...</p>
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-gray-900">Thanh toán thành công!</h3>
-                  <p className="text-sm text-gray-600">
-                    Gói hội viên <span className="font-bold text-primary">{transaction.plan?.name}</span> đã được kích hoạt thành công.
-                  </p>
+              )}
+
+            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PARTIALLY_PAID && (
+              <div className="p-4 bg-orange-50/90 rounded-2xl border border-orange-200 text-orange-900 text-xs space-y-2">
+                <div className="flex items-center gap-2 font-bold text-orange-900 text-sm">
+                  <ExclamationTriangleIcon className="w-5 h-5 text-orange-600 shrink-0" />
+                  <span>Đã nhận {formatCurrency(txPaidAmount)} / Cần {formatCurrency(txAmount)}. Còn thiếu {formatCurrency(txRemainingAmount)}</span>
                 </div>
-                <p className="text-xs text-gray-500 animate-pulse">Đang tự động chuyển hướng...</p>
+                <p className="text-orange-800 text-[11px] leading-relaxed">
+                  Giao dịch của bạn đã nhận được <strong className="font-bold">{formatCurrency(txPaidAmount)}</strong>. Quý khách vui lòng quét mã VietQR bên dưới hoặc chuyển khoản bổ sung <strong className="font-bold text-orange-950 underline">{formatCurrency(txRemainingAmount)}</strong> với cùng nội dung <strong className="font-mono font-bold text-orange-950">{transaction.transferContent}</strong> để gói dịch vụ được kích hoạt tự động.
+                </p>
               </div>
             )}
 
@@ -256,7 +329,7 @@ function OrderDetailContent() {
                 <div className="space-y-1">
                   <h3 className="text-lg font-bold text-gray-900">Đơn hàng đã hết hạn</h3>
                   <p className="text-xs text-gray-600">
-                    Mã VietQR chuyển khoản chỉ có hiệu lực trong 15 phút. Vui lòng bấm nút dưới đây để tạo mã thanh toán mới.
+                    Mã VietQR chuyển khoản chỉ có hiệu lực trong 24 giờ. Vui lòng bấm nút dưới đây để tạo mã thanh toán mới.
                   </p>
                 </div>
                 <Button type="button" variant="primary" size="md" rounded="xl" onClick={() => router.push('/checkout')}>
@@ -265,7 +338,7 @@ function OrderDetailContent() {
               </div>
             )}
 
-            {transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING && (
+            {(transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PENDING || transaction.status === PAYMENT_TRANSACTION_STATUS_MAP.PARTIALLY_PAID) && (
               isBlockedByTier ? (
                 <div className="p-6 bg-amber-50 rounded-3xl border border-amber-200 text-center space-y-4">
                   <div className="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto border-4 border-amber-50">
@@ -305,7 +378,7 @@ function OrderDetailContent() {
                   </div>
 
                   {/* VietQR Code Display */}
-                  <div className="flex flex-col items-center justify-center text-center space-y-2">
+                  <div className="flex flex-col items-center justify-center text-center space-y-3">
                     <div className="p-3 bg-white border-2 border-primary/40 rounded-2xl flex flex-col items-center shrink-0 space-y-1.5 overflow-hidden">
                       <div className="w-48 h-48 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 border border-slate-200">
                         {transaction.qrCodeUrl ? (
@@ -317,6 +390,14 @@ function OrderDetailContent() {
                       <span className="text-[11px] text-gray-600 font-semibold">
                         Quét mã VietQR bằng ứng dụng Ngân hàng / Ví điện tử
                       </span>
+                    </div>
+
+                    {/* QR Scanning UX Tip Banner */}
+                    <div className="w-full p-3 bg-amber-50/80 rounded-2xl border border-amber-200 text-left text-xs text-amber-900 flex items-start gap-2.5">
+                      <LightBulbIcon className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="text-[11px] leading-relaxed text-amber-900">
+                        <strong className="font-bold text-amber-950">Mẹo:</strong> Khi quét mã QR bằng App Ngân hàng, <strong className="font-bold text-amber-950">Số tiền</strong> và <strong className="font-bold text-amber-950">Nội dung chuyển khoản</strong> sẽ tự động điền chính xác. Quý khách vui lòng <span className="font-bold text-amber-950 underline">không sửa nội dung chuyển khoản</span> để gói dịch vụ được kích hoạt tự động tức thì.
+                      </div>
                     </div>
                   </div>
 

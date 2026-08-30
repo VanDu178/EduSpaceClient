@@ -24,6 +24,144 @@ import toast from 'react-hot-toast';
 import { formatCurrency, calculateSubscriptionDates } from '@/core/utils';
 import { APP_ROUTES } from '@/core/config/routes';
 
+function CheckoutSkeleton() {
+  return (
+    <main className="min-h-screen bg-gray-50 text-gray-900 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
+        {/* Navigation & Header Ribbon Skeleton */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-gray-200">
+          <div className="h-4 bg-gray-200 rounded-md w-36" />
+        </div>
+
+        {/* Page Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* LEFT COLUMN: Order Details & Customization (7 Columns) */}
+          <div className="lg:col-span-7 space-y-6">
+            {/* Title Section */}
+            <div className="space-y-2.5">
+              <div className="h-8 bg-gray-200 rounded-lg w-64" />
+              <div className="h-4 bg-gray-200 rounded-md w-full max-w-md" />
+            </div>
+
+            {/* Block 1: Choose Billing Cycle Skeleton */}
+            <div className="space-y-3">
+              <div className="h-3.5 bg-gray-200 rounded-md w-40" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl border border-gray-200 bg-white space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 bg-gray-200 rounded w-20" />
+                    <div className="w-4 h-4 rounded-full bg-gray-200" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="h-6 bg-gray-200 rounded w-28" />
+                    <div className="h-3 bg-gray-200 rounded w-36" />
+                  </div>
+                </div>
+                <div className="p-4 rounded-2xl border border-gray-200 bg-white space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 bg-gray-200 rounded w-28" />
+                    <div className="w-4 h-4 rounded-full bg-gray-200" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="h-6 bg-gray-200 rounded w-28" />
+                    <div className="h-3 bg-gray-200 rounded w-40" />
+                  </div>
+                </div>
+              </div>
+              <div className="h-4 bg-gray-200 rounded-md w-72" />
+            </div>
+
+            {/* Block 2: Included Features Checklist Skeleton */}
+            <div className="space-y-3">
+              <div className="h-3.5 bg-gray-200 rounded-md w-48" />
+              <div className="p-4 bg-white rounded-2xl border border-gray-200 space-y-3.5">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-200 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-200 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded w-4/5" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-200 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-200 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3" />
+                </div>
+              </div>
+            </div>
+
+            {/* Block 3: Guarantees Skeleton */}
+            <div className="p-4 bg-gray-100/70 rounded-2xl border border-gray-200 space-y-2">
+              <div className="h-4 bg-gray-200 rounded-md w-56" />
+              <div className="h-3 bg-gray-200 rounded-md w-4/5" />
+              <div className="h-3 bg-gray-200 rounded-md w-2/3" />
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Order Summary Skeleton (5 Columns) */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-white rounded-3xl border border-gray-200 space-y-6 p-5 sm:p-6">
+              {/* Header & Items */}
+              <div className="space-y-3 pb-5 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <div className="h-5 bg-gray-200 rounded-md w-32" />
+                  <div className="h-4 bg-gray-200 rounded-md w-16" />
+                </div>
+                <div className="space-y-2.5 pt-2">
+                  <div className="flex justify-between">
+                    <div className="h-3.5 bg-gray-200 rounded w-20" />
+                    <div className="h-3.5 bg-gray-200 rounded w-24" />
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="h-3.5 bg-gray-200 rounded w-28" />
+                    <div className="h-3.5 bg-gray-200 rounded w-28" />
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="h-3.5 bg-gray-200 rounded w-16" />
+                    <div className="h-3.5 bg-gray-200 rounded w-20" />
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
+                  <div className="h-4 bg-gray-200 rounded w-36" />
+                  <div className="h-6 bg-gray-200 rounded w-28" />
+                </div>
+              </div>
+
+              {/* Payment Methods Selector Skeleton */}
+              <div className="space-y-3">
+                <div className="h-3.5 bg-gray-200 rounded w-36" />
+                <div className="grid grid-cols-3 gap-2.5">
+                  <div className="h-14 bg-gray-100 rounded-xl border border-gray-200" />
+                  <div className="h-14 bg-gray-100 rounded-xl border border-gray-200" />
+                  <div className="h-14 bg-gray-100 rounded-xl border border-gray-200" />
+                </div>
+              </div>
+
+              {/* Payment Info Box Skeleton */}
+              <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-200 rounded-xl shrink-0" />
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-4 bg-gray-200 rounded w-44" />
+                    <div className="h-3 bg-gray-200 rounded w-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Submit Button Skeleton */}
+              <div className="h-12 bg-gray-200 rounded-xl w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -101,17 +239,15 @@ function CheckoutContent() {
 
   const handleConfirmPayment = async () => {
     if (!selectedPlan?.id) {
-      toast.error('Gói hội viên không hợp lệ. Vui lòng thử lại!');
+      toast.error('Gói dịch vụ không tồn tại hoặc đã ngưng mở bán. Vui lòng chọn gói dịch vụ khác!');
       return;
     }
-
     if (isBlockedByTier) {
-      toast.error(`Bạn đang sử dụng gói dịch vụ ${activeSub?.plan?.name || 'tương đương hoặc cao hơn'}. Không thể đăng ký gói cùng cấp hoặc cấp thấp hơn!`);
+      toast.error(`Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể đăng ký gói cùng cấp hoặc cấp thấp hơn!`);
       return;
     }
-
     if (isNoPaymentMethod) {
-      toast.error('Hiện không có phương thức thanh toán nào hoạt động. Vui lòng quay lại sau!');
+      toast.error('Phương thức thanh toán bạn chọn chưa được hổ trợ. Vui lòng chọn phương thức khác!');
       return;
     }
 
@@ -142,20 +278,12 @@ function CheckoutContent() {
         }
       }
     } else {
-      toast('Phương thức thanh toán qua Thẻ/Ví điện tử đang được kết nối cổng tự động. Vui lòng chọn VietQR!');
+      toast.error('Hiện tại hệ thống chưa tích hợp các phương thức thanh toán tự động khác. Vui lòng chọn thanh toán qua VietQR!');
     }
   };
 
-
   if (isLoadingPlans) {
-    return (
-      <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center p-6">
-        <div className="text-center space-y-4 animate-pulse">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-sm font-medium text-gray-600">Đang chuẩn bị màn hình thanh toán an toàn TradeVerse...</p>
-        </div>
-      </div>
-    );
+    return <CheckoutSkeleton />;
   }
 
   return (
@@ -324,7 +452,6 @@ function CheckoutContent() {
                 <span>Chính sách cam kết & Bảo vệ người dùng TradeVerse</span>
               </div>
               <ul className="space-y-1.5 text-[11px] text-amber-800 list-disc list-inside">
-                <li>Hủy tự động gia hạn bất kỳ lúc nào chỉ với 1-click trong Cài đặt tài khoản.</li>
                 <li>Cam kết hoàn tiền 100% trong vòng 7 ngày nếu dịch vụ không đáp ứng kỳ vọng.</li>
                 <li>Thanh toán mã hóa tuyệt đối, không chi phí ẩn, không ràng buộc hợp đồng.</li>
               </ul>
@@ -553,7 +680,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 text-gray-900 p-8">Đang tải trang thanh toán...</div>}>
+    <Suspense fallback={<CheckoutSkeleton />}>
       <CheckoutContent />
     </Suspense>
   );

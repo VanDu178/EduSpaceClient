@@ -71,12 +71,18 @@ export function TransactionHistoryView() {
 
 
   const filteredItems = transactions.filter((item) => {
+    const isSuccess = item.status === 'completed' || item.status === 'active' || item.status === 'overpaid';
+    const isExpired = item.status === 'expired' || (Boolean(item.expiredAt && new Date(item.expiredAt) < new Date()) && !isSuccess);
+
     if (filterStatus === 'all') return true;
     if (filterStatus === 'completed') {
-      return item.status === 'completed' || item.status === 'active';
+      return isSuccess;
     }
     if (filterStatus === 'pending') {
-      return item.status === 'pending' || item.status === 'pending_payment';
+      return (item.status === 'pending' || item.status === 'pending_payment' || item.status === 'partially_paid') && !isExpired;
+    }
+    if (filterStatus === 'expired') {
+      return isExpired;
     }
     return item.status === filterStatus;
   });
@@ -161,8 +167,11 @@ export function TransactionHistoryView() {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) => {
-        if (status === 'completed' || status === 'active') {
+      render: (_: string, record: UserTransactionItem) => {
+        const isSuccess = record.status === 'completed' || record.status === 'active' || record.status === 'overpaid';
+        const isExpired = record.status === 'expired' || (Boolean(record.expiredAt && new Date(record.expiredAt) < new Date()) && !isSuccess);
+
+        if (isSuccess) {
           return (
             <Tag color="success" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
               <span className="flex items-center gap-1">
@@ -172,7 +181,14 @@ export function TransactionHistoryView() {
             </Tag>
           );
         }
-        if (status === 'pending' || status === 'pending_payment') {
+        if (isExpired) {
+          return (
+            <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px]">
+              Đã hết hạn
+            </Tag>
+          );
+        }
+        if (record.status === 'pending' || record.status === 'pending_payment' || record.status === 'partially_paid') {
           return (
             <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
               <span className="flex items-center gap-1">
@@ -182,7 +198,7 @@ export function TransactionHistoryView() {
             </Tag>
           );
         }
-        if (status === 'cancelled') {
+        if (record.status === 'cancelled') {
           return (
             <Tag color="error" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
               <span className="flex items-center gap-1">
@@ -192,16 +208,9 @@ export function TransactionHistoryView() {
             </Tag>
           );
         }
-        if (status === 'expired') {
-          return (
-            <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px]">
-              Đã hết hạn
-            </Tag>
-          );
-        }
         return (
           <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px]">
-            {status}
+            {record.status}
           </Tag>
         );
       },
@@ -219,10 +228,14 @@ export function TransactionHistoryView() {
         const recordPlanTier = record.plan?.tierLevel || 0;
         const isLowerOrEqualTier = activePlanTier > 0 && recordPlanTier > 0 && recordPlanTier <= activePlanTier;
 
+        const isSuccess = record.status === 'completed' || record.status === 'active' || record.status === 'overpaid';
+        const isExpired = record.status === 'expired' || (Boolean(record.expiredAt && new Date(record.expiredAt) < new Date()) && !isSuccess);
+        const isPending = (record.status === 'pending' || record.status === 'pending_payment' || record.status === 'partially_paid') && !isExpired;
+
         const menuItems: MenuProps['items'] = [];
 
-        // 1. Tải hóa đơn (cho đơn completed)
-        if (record.status === 'completed' || record.status === 'active') {
+        // 1. Tải hóa đơn (cho đơn completed/active/overpaid)
+        if (isSuccess) {
           menuItems.push({
             key: 'download_invoice',
             label: <span className="font-medium">Tải hóa đơn</span>,
@@ -231,8 +244,8 @@ export function TransactionHistoryView() {
           });
         }
 
-        // 2. Thanh toán ngay & Hủy đơn (cho đơn pending)
-        if (record.status === 'pending' || record.status === 'pending_payment') {
+        // 2. Thanh toán ngay & Hủy đơn (cho đơn pending/partially_paid chưa hết hạn)
+        if (isPending) {
           menuItems.push({
             key: 'pay_now',
             disabled: isLowerOrEqualTier,
@@ -272,8 +285,8 @@ export function TransactionHistoryView() {
           });
         }
 
-        // 3. Đăng ký lại gói này (cho đơn expired hoặc cancelled)
-        if (record.status === 'expired' || record.status === 'cancelled') {
+        // 3. Đăng ký lại gói này (cho đơn expired, cancelled hoặc nạp dở dang nhưng đã hết hạn)
+        if (isExpired || record.status === 'cancelled') {
           menuItems.push({
             key: 're_subscribe',
             disabled: isLowerOrEqualTier,
