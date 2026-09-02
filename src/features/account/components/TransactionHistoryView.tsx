@@ -12,11 +12,12 @@ import {
   CreditCardIcon,
   ClipboardDocumentIcon,
   EllipsisVerticalIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import { Table, Tag, Button, Modal, Empty, Dropdown, MenuProps, Tooltip } from 'antd';
+import { Table, Tag, Button, Modal, Empty, Dropdown, MenuProps, Tooltip, Popconfirm } from 'antd';
 import { formatDate, copyToClipboard, formatCurrency } from '@/core/utils';
 import toast from 'react-hot-toast';
-import { useCreatePaymentTransaction } from '@/features/paymentTransactions';
+import { useCreatePaymentTransaction, ModalCancel } from '@/features/paymentTransactions';
 import { BillingCycle } from '@/features/membership/types';
 
 export function TransactionHistoryView() {
@@ -32,8 +33,18 @@ export function TransactionHistoryView() {
   const createPaymentTransaction = useCreatePaymentTransaction();
 
   const [selectedTx, setSelectedTx] = useState<UserTransactionItem | null>(null);
+  const [cancelModalTx, setCancelModalTx] = useState<UserTransactionItem | null>(null);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  const cancelTxPaidAmount = Number((cancelModalTx as any)?.paidAmount || Math.max(0, Number(cancelModalTx?.amount || 0) - Number((cancelModalTx as any)?.remainingAmount || 0)));
+
+  const isSelectedPartiallyPaid = selectedTx?.status === 'partially_paid';
+  const modalTxRemaining = Number((selectedTx as any)?.remainingAmount || Math.max(0, Number(selectedTx?.amount || 0) - Number((selectedTx as any)?.paidAmount || 0)));
+  const modalDisplayAmount = isSelectedPartiallyPaid ? modalTxRemaining : Number(selectedTx?.amount || 0);
+  const modalQrCodeUrl = isSelectedPartiallyPaid && selectedTx?.qrCodeUrl
+    ? selectedTx.qrCodeUrl.replace(/amount=\d+/, `amount=${modalDisplayAmount}`)
+    : selectedTx?.qrCodeUrl;
 
   const handleReSubscribe = async (record: UserTransactionItem) => {
     const planId = record.plan?.id;
@@ -71,7 +82,7 @@ export function TransactionHistoryView() {
 
 
   const filteredItems = transactions.filter((item) => {
-    const isSuccess = item.status === 'completed' || item.status === 'active' || item.status === 'overpaid';
+    const isSuccess = item.status === 'completed' || item.status === 'overpaid';
     const isExpired = item.status === 'expired' || (Boolean(item.expiredAt && new Date(item.expiredAt) < new Date()) && !isSuccess);
 
     if (filterStatus === 'all') return true;
@@ -79,7 +90,7 @@ export function TransactionHistoryView() {
       return isSuccess;
     }
     if (filterStatus === 'pending') {
-      return (item.status === 'pending' || item.status === 'pending_payment' || item.status === 'partially_paid') && !isExpired;
+      return (item.status === 'pending' || item.status === 'partially_paid') && !isExpired;
     }
     if (filterStatus === 'expired') {
       return isExpired;
@@ -90,10 +101,10 @@ export function TransactionHistoryView() {
   const handleCancelTx = async (code: string) => {
     try {
       await cancelTransaction.mutateAsync(code);
-      toast.success(`Đã hủy hóa đơn #${code} thành công.`);
+      toast.success(`Đã hủy giao dịch #${code} thành công.`);
     } catch (error) {
-      console.error('Lỗi khi hủy hóa đơn:', error);
-      toast.error('Hủy hóa đơn thất bại. Vui lòng thử lại.');
+      console.error('Lỗi khi hủy giao dịch:', error);
+      toast.error('Hủy giao dịch thất bại. Vui lòng thử lại.');
     }
   };
 
@@ -168,7 +179,7 @@ export function TransactionHistoryView() {
       dataIndex: 'status',
       key: 'status',
       render: (_: string, record: UserTransactionItem) => {
-        const isSuccess = record.status === 'completed' || record.status === 'active' || record.status === 'overpaid';
+        const isSuccess = record.status === 'completed' || record.status === 'overpaid';
         const isExpired = record.status === 'expired' || (Boolean(record.expiredAt && new Date(record.expiredAt) < new Date()) && !isSuccess);
 
         if (isSuccess) {
@@ -188,7 +199,17 @@ export function TransactionHistoryView() {
             </Tag>
           );
         }
-        if (record.status === 'pending' || record.status === 'pending_payment' || record.status === 'partially_paid') {
+        if (record.status === 'partially_paid') {
+          return (
+            <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
+              <span className="flex items-center gap-1">
+                <ClockIcon className="w-3.5 h-3.5" />
+                Đã thanh toán một phần
+              </span>
+            </Tag>
+          );
+        }
+        if (record.status === 'pending' || record.status === 'pending_payment') {
           return (
             <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
               <span className="flex items-center gap-1">
@@ -269,42 +290,19 @@ export function TransactionHistoryView() {
 
           menuItems.push({
             key: 'cancel_tx',
-            label: <span className="font-medium text-red-600">Hủy đơn</span>,
+            label: <span className="font-medium text-red-600 block w-full">Hủy đơn</span>,
             icon: <XCircleIcon className="w-4 h-4 text-red-600" />,
-            danger: true,
-            onClick: () => {
-              Modal.confirm({
-                title: 'Hủy hóa đơn',
-                content: `Bạn có chắc chắn muốn hủy hóa đơn #${record.code} không?`,
-                okText: 'Hủy hóa đơn',
-                okType: 'danger',
-                cancelText: 'Quay lại',
-                onOk: () => handleCancelTx(record.code),
-              });
-            },
+            onClick: () => setCancelModalTx(record),
           });
         }
 
-        // 3. Đăng ký lại gói này (cho đơn expired, cancelled hoặc nạp dở dang nhưng đã hết hạn)
-        if (isExpired || record.status === 'cancelled') {
+        // 3. Đăng ký lại gói này (cho đơn completed, expired, cancelled nếu user không dùng gói tương đương hoặc cao hơn)
+        if ((isSuccess || isExpired || record.status === 'cancelled') && !isLowerOrEqualTier) {
           menuItems.push({
             key: 're_subscribe',
-            disabled: isLowerOrEqualTier,
-            label: (
-              <Tooltip title={isLowerOrEqualTier ? 'Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể đăng ký lại.' : undefined}>
-                <span className={`font-medium ${isLowerOrEqualTier ? 'text-slate-400 cursor-not-allowed' : 'text-sky-600'}`}>
-                  Đăng ký lại gói này
-                </span>
-              </Tooltip>
-            ),
-            icon: <ArrowPathIcon className={`w-4 h-4 ${isLowerOrEqualTier ? 'text-slate-400' : 'text-sky-600'}`} />,
-            onClick: () => {
-              if (isLowerOrEqualTier) {
-                toast.error('Bạn đang sử dụng gói dịch vụ tương đương hoặc cao hơn. Không thể đăng ký lại gói này.');
-                return;
-              }
-              handleReSubscribe(record);
-            },
+            label: <span className="font-medium text-sky-600">Đăng ký lại gói này</span>,
+            icon: <ArrowPathIcon className="w-4 h-4 text-sky-600" />,
+            onClick: () => handleReSubscribe(record),
           });
         }
 
@@ -425,6 +423,7 @@ export function TransactionHistoryView() {
         }
         open={isPayModalOpen}
         onCancel={() => setIsPayModalOpen(false)}
+        width={680}
         footer={[
           <Button key="close" onClick={() => setIsPayModalOpen(false)} className="!rounded-lg text-xs font-medium">
             Đóng
@@ -433,106 +432,140 @@ export function TransactionHistoryView() {
       >
         {selectedTx && (
           <div className="space-y-4 pt-3 text-xs">
-            {selectedTx.qrCodeUrl ? (
-              <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 text-center space-y-3">
-                <div className="flex items-center justify-center gap-1.5 font-semibold text-slate-900">
-                  <QrCodeIcon className="w-4 h-4 text-emerald-600" />
-                  Mã QR Thanh toán VietQR
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+              {/* Left Column: VietQR Code */}
+              {modalQrCodeUrl && (
+                <div className="md:col-span-5 bg-slate-50/80 rounded-2xl border border-slate-100 p-4 text-center flex flex-col items-center justify-center space-y-2.5">
+                  <div className="bg-white p-2 rounded-xl border border-slate-200/80">
+                    <img
+                      src={modalQrCodeUrl}
+                      alt="Mã VietQR"
+                      className="w-40 h-40 object-contain mx-auto"
+                    />
+                  </div>
+                  <span>Quét mã VietQR bằng ứng dụng Ngân hàng / Ví điện tử</span>
                 </div>
-                <img
-                  src={selectedTx.qrCodeUrl}
-                  alt="Mã VietQR"
-                  className="w-48 h-48 mx-auto object-contain bg-white p-2 rounded-xl border border-slate-200"
-                />
-                <p className="text-[11px] text-slate-500">
-                  Quét mã QR bằng ứng dụng ngân hàng và nhập đúng nội dung chuyển khoản để đơn được tự động kích hoạt.
-                </p>
-              </div>
-            ) : null}
+              )}
 
-            {/* Bank Transfer Info Box */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-              <div className="font-semibold text-slate-900 border-b border-slate-200 pb-2">
-                Thông tin chuyển khoản thủ công
-              </div>
+              {/* Right Column: Flat List Details */}
+              <div className={`${modalQrCodeUrl ? 'md:col-span-7' : 'md:col-span-12'} space-y-3`}>
+                <div className="font-semibold text-slate-900 pb-1 text-xs flex items-center justify-between border-b border-slate-100">
+                  <span>Thông tin chuyển khoản thủ công</span>
+                  <span className="text-[11px] text-slate-400 font-normal">Chuyển khoản 24/7</span>
+                </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Ngân hàng:</span>
-                <span className="font-bold text-slate-900">
-                  {selectedTx.paymentAccount?.bank?.shortName || selectedTx.bankCode || 'MBBank'}
-                </span>
-              </div>
+                <div className="divide-y divide-slate-100 text-xs sm:text-sm">
+                  {/* Bank Name */}
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-500">Ngân hàng:</span>
+                    <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                      {selectedTx.paymentAccount?.bank?.name}
+                    </span>
+                  </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Số tài khoản:</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-slate-900">
-                    {selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888'}
-                  </span>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888',
-                        'Đã sao chép số tài khoản!'
-                      )
-                    }
-                    className="p-1 text-sky-600 hover:bg-sky-50 rounded transition-colors"
-                    title="Sao chép"
-                  >
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                  </button>
+                  {/* Account No */}
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-500">Số tài khoản:</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">
+                        {selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888'}
+                      </span>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888',
+                            'Đã sao chép số tài khoản!'
+                          )
+                        }
+                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        title="Sao chép"
+                      >
+                        <ClipboardDocumentIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Account Holder */}
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-500">Chủ tài khoản:</span>
+                    <span className="font-bold text-slate-900 uppercase text-xs sm:text-sm">
+                      {selectedTx.paymentAccount?.accountHolder || selectedTx.accountHolder || 'TRADEVERSE GLOBAL'}
+                    </span>
+                  </div>
+
+                  {/* Amount */}
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-slate-500">Số tiền thanh toán:</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900 text-xs sm:text-sm">
+                        {formatCurrency(modalDisplayAmount)}
+                      </span>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(String(modalDisplayAmount || 0), 'Đã sao chép số tiền!')
+                        }
+                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        title="Sao chép"
+                      >
+                        <ClipboardDocumentIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Transfer Content */}
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-500">Nội dung chuyển khoản:</span>
+                      <span className="text-[10px] px-1.5 py-0.5 font-semibold text-amber-800 bg-amber-100 rounded border border-amber-200 uppercase">
+                        Bắt buộc
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">
+                        {selectedTx.transferContent || selectedTx.code}
+                      </span>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            selectedTx.transferContent || selectedTx.code,
+                            'Đã sao chép nội dung chuyển khoản!'
+                          )
+                        }
+                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+                        title="Sao chép nội dung"
+                      >
+                        <ClipboardDocumentIcon className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Chủ tài khoản:</span>
-                <span className="font-semibold text-slate-900 uppercase">
-                  {selectedTx.paymentAccount?.accountHolder || selectedTx.accountHolder || 'TRADEVERSE GLOBAL'}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-slate-500">Số tiền:</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-emerald-600 text-sm">
-                    {formatCurrency(selectedTx.amount)}
-                  </span>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(String(selectedTx.amount || 0), 'Đã sao chép số tiền!')
-                    }
-                    className="p-1 text-sky-600 hover:bg-sky-50 rounded transition-colors"
-                    title="Sao chép"
-                  >
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center bg-sky-50 p-2.5 rounded-lg border border-sky-100">
-                <span className="text-slate-600 font-medium">Nội dung CK:</span>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono font-bold text-sky-700">
-                    {selectedTx.transferContent || selectedTx.code}
-                  </span>
-                  <button
-                    onClick={() =>
-                      copyToClipboard(
-                        selectedTx.transferContent || selectedTx.code,
-                        'Đã sao chép nội dung chuyển khoản!'
-                      )
-                    }
-                    className="p-1 text-sky-600 hover:bg-sky-100 rounded transition-colors"
-                    title="Sao chép nội dung"
-                  >
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+            {/* Note banner at bottom */}
+            <div className="p-2.5 bg-amber-50/80 rounded-xl border border-amber-200/70 text-[11px] text-amber-900 leading-tight">
+              ⚠️ <strong className="font-semibold text-amber-950">Lưu ý:</strong> Vui lòng giữ <strong className="font-bold text-amber-950">chính xác tuyệt đối nội dung chuyển khoản trên</strong> để hệ thống tự động kích hoạt giao dịch.
             </div>
           </div>
         )}
       </Modal>
+
+      {/* Confirmation Modal for Transaction Cancellation */}
+      <ModalCancel
+        isOpen={Boolean(cancelModalTx)}
+        onClose={() => setCancelModalTx(null)}
+        onConfirm={async () => {
+          if (cancelModalTx) {
+            await handleCancelTx(cancelModalTx.code);
+            setCancelModalTx(null);
+          }
+        }}
+        code={cancelModalTx?.code}
+        planName={cancelModalTx?.plan?.name}
+        status={cancelModalTx?.status}
+        paidAmount={cancelTxPaidAmount}
+        isLoading={cancelTransaction.isPending}
+      />
     </div>
   );
 }

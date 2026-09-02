@@ -23,7 +23,13 @@ interface SubscriptionViewProps {
 export function SubscriptionView({ activeSubscription, isLoading = false }: SubscriptionViewProps) {
   const { data: plans = [], isLoading: isLoadingPlans } = useMembershipPlans();
 
-  const isPaidUser = Boolean(activeSubscription && activeSubscription.status === 'active');
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const isPaidUser = Boolean(
+    activeSubscription &&
+    activeSubscription.endDate &&
+    new Date(activeSubscription.endDate).setHours(23, 59, 59, 999) >= startOfToday.getTime()
+  );
   const planName = activeSubscription?.plan?.name || 'Miễn Phí';
 
   // Calculate days remaining
@@ -151,7 +157,7 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
               <div>
                 <p className="text-[11px] font-semibold uppercase text-slate-500 tracking-wider">Trạng thái gói</p>
                 <p className="text-sm font-bold text-slate-900 mt-0.5">
-                  Đang hoạt động
+                  {isPaidUser ? 'Đang hoạt động' : 'Hết hạn'}
                 </p>
               </div>
             </div>
@@ -237,34 +243,6 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
           </ul>
         ) : (
           <p className="text-xs text-slate-500 py-2">Chưa có danh sách tính năng khả dụng.</p>
-        )}
-
-        {/* Subtle CTA Banner for Free Users */}
-        {!isPaidUser && (
-          <div className="mt-4 p-4 rounded-xl bg-sky-50/70 border border-sky-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center shrink-0">
-                <SparklesIcon className="w-4 h-4 text-sky-600" />
-              </div>
-              <div>
-                <h4 className="text-xs font-semibold text-sky-900">
-                  Nâng cấp gói TradeVerse VIP
-                </h4>
-                <p className="text-xs text-sky-700 mt-0.5">
-                  Mở khóa toàn bộ tín hiệu tự động, tính năng phân tích và hỗ trợ ưu tiên.
-                </p>
-              </div>
-            </div>
-            <Link href="/pricing" className="shrink-0">
-              <Button
-                type="primary"
-                size="small"
-                className="!rounded-lg font-medium h-8 px-3.5 text-xs border-none bg-sky-600 hover:!bg-sky-500"
-              >
-                Khám phá các gói
-              </Button>
-            </Link>
-          </div>
         )}
       </div>
     </div>

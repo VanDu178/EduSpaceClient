@@ -1,19 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createPaymentTransactionApi,
+  getPaymentTransactionByCodeApi,
   getPaymentTransactionStatusApi,
   cancelPaymentTransactionApi,
 } from '../services/paymentTransactionService';
-import { PaymentTransactionData, CreatePaymentTransactionParams } from '../types';
+import { PaymentTransactionData, PaymentTransactionStatusResponse, CreatePaymentTransactionParams } from '../types';
 
 export const PAYMENT_TRANSACTION_QUERY_KEYS = {
   all: ['paymentTransactions'] as const,
+  byCode: (code: string) => [...PAYMENT_TRANSACTION_QUERY_KEYS.all, 'byCode', code] as const,
   status: (code: string) => [...PAYMENT_TRANSACTION_QUERY_KEYS.all, 'status', code] as const,
 };
 
 export interface UsePaymentTransactionStatusOptions {
   enabled?: boolean;
   refetchInterval?: number | false | ((query: any) => number | false);
+}
+
+/**
+ * Hook lấy chi tiết đầy đủ đơn hàng giao dịch thanh toán theo Code (Cho lần nạp đầu)
+ */
+export function usePaymentTransactionByCode(code: string, enabled = true) {
+  return useQuery<PaymentTransactionData>({
+    queryKey: PAYMENT_TRANSACTION_QUERY_KEYS.byCode(code),
+    queryFn: () => getPaymentTransactionByCodeApi(code),
+    enabled: Boolean(code) && enabled,
+    staleTime: 1000 * 60 * 5, // Cache detail data trong 5 phút
+  });
 }
 
 /**
@@ -25,7 +39,7 @@ export function usePaymentTransactionStatus(
 ) {
   const { enabled = true, refetchInterval } = options || {};
 
-  return useQuery<PaymentTransactionData>({
+  return useQuery<PaymentTransactionStatusResponse>({
     queryKey: PAYMENT_TRANSACTION_QUERY_KEYS.status(code),
     queryFn: () => getPaymentTransactionStatusApi(code),
     enabled: Boolean(code) && enabled,
@@ -43,8 +57,10 @@ export function useCreatePaymentTransaction() {
       billingCycle,
       paymentMethod,
       expectedPrice,
+      cancelCode,
+      forceNew,
     }: CreatePaymentTransactionParams) =>
-      createPaymentTransactionApi(planId, billingCycle, paymentMethod, expectedPrice),
+      createPaymentTransactionApi(planId, billingCycle, paymentMethod, expectedPrice, cancelCode, forceNew),
   });
 }
 

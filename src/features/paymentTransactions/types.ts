@@ -7,6 +7,8 @@ export interface CreatePaymentTransactionParams {
   billingCycle: BillingCycle;
   paymentMethod?: PaymentMethod;
   expectedPrice?: number;
+  cancelCode?: string;
+  forceNew?: boolean;
 }
 
 export interface PaymentRefund {
@@ -67,18 +69,6 @@ export interface PaymentTransactionData {
 }
 
 export interface PaymentTransactionStatusResponse {
-  id?: number;
-  code?: string;
   status: PaymentTransactionStatus;
-  amount?: number;
   paidAmount?: number;
-  overpaidAmount?: number;
-  remainingAmount?: number;
-  totalRefundedAmount?: number;
-  notes?: string | null;
-  transferContent?: string;
-  qrCodeUrl?: string;
-  expiredAt?: string;
-  paidAt?: string | null;
-  refunds?: PaymentRefund[];
 }
