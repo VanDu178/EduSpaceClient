@@ -4,19 +4,18 @@ import { useState, useEffect } from 'react';
 import {
   MagnifyingGlassIcon,
   PlusIcon,
-  TicketIcon,
   FunnelIcon,
   ChevronRightIcon,
   ClockIcon,
   TagIcon,
   XMarkIcon,
-  ArrowPathIcon,
   InboxIcon
 } from '@heroicons/react/24/outline';
 import { Ticket } from '../services/ticketSupportService';
 import { getStatusConfig, getCategoryLabel } from '../utils';
 import { STATUS_OPTIONS, CATEGORY_OPTIONS } from '../constants';
 import { useDebounce } from '@/core/hooks';
+import { Select } from 'antd';
 
 export interface TicketFilters {
   search?: string;
@@ -105,35 +104,22 @@ export function SupportTicketList({
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center bg-white border border-slate-200 rounded-xl px-3 py-1 focus-within:border-sky-500">
-            <select
-              value={filterState.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="bg-transparent text-xs sm:text-sm font-medium text-slate-700 py-1 focus:outline-none cursor-pointer pr-1"
-            >
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            value={filterState.status}
+            onChange={(value) => handleFilterChange('status', value)}
+            options={STATUS_OPTIONS}
+            disabled={isLoading}
+            className="w-44 text-xs sm:text-sm font-medium"
+          />
 
           {/* Category Filter */}
-          <div className="flex items-center space-x-2 bg-white border border-slate-200 rounded-xl px-3 py-1 focus-within:border-sky-500">
-            <TagIcon className="w-4 h-4 text-slate-400 shrink-0" />
-            <select
-              value={filterState.category}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="bg-transparent text-xs sm:text-sm font-medium text-slate-700 py-1 focus:outline-none cursor-pointer pr-1"
-            >
-              {CATEGORY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            value={filterState.category}
+            onChange={(value) => handleFilterChange('category', value)}
+            options={CATEGORY_OPTIONS}
+            disabled={isLoading}
+            className="w-48 text-xs sm:text-sm font-medium"
+          />
         </div>
 
         {/* Right: Search Input (at the end) */}
@@ -143,14 +129,16 @@ export function SupportTicketList({
             type="text"
             placeholder="Tìm kiếm theo mã ticket, tiêu đề hoặc nội dung..."
             value={filterState.search}
+            disabled={isLoading}
             onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="w-full pl-10 pr-9 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:outline-none transition"
+            className="w-full pl-10 pr-9 py-2 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:border-sky-500 focus:outline-none transition disabled:opacity-50 disabled:bg-slate-50"
           />
           {filterState.search && (
             <button
               type="button"
+              disabled={isLoading}
               onClick={() => handleFilterChange('search', '')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-md cursor-pointer"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               title="Xóa tìm kiếm"
             >
               <XMarkIcon className="w-4 h-4" />

@@ -22,6 +22,8 @@ export const metadata: Metadata = {
 
 import { SupportChatWidget } from "@/features/chatSupport";
 import { SocketProvider } from "@/core/config/socket/SocketContext";
+import { NotificationProvider } from "@/core/contexts";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children,
@@ -37,10 +39,13 @@ export default function RootLayout({
               <GoogleAuthProvider>
                 <AuthProvider>
                   <SocketProvider>
-                    <Wrapper>
-                      {children}
-                      <SupportChatWidget />
-                    </Wrapper>
+                    <NotificationProvider>
+                      <Wrapper>
+                        {children}
+                        <SupportChatWidget />
+                        <Toaster position="top-right" reverseOrder={false} />
+                      </Wrapper>
+                    </NotificationProvider>
                   </SocketProvider>
                 </AuthProvider>
               </GoogleAuthProvider>

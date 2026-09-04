@@ -7,6 +7,7 @@ import {
   useTicketDetailQuery,
   useCreateTicketMutation,
   useAddTicketCommentMutation,
+  useTicketRealtime,
   FormCreate,
   SupportTicketList,
   SupportTicketDetail,
@@ -16,11 +17,14 @@ import {
 
 export function SupportView() {
   const [filters, setFilters] = useState<TicketFilters>({});
+  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
+
+  // Realtime Socket listener cho Ticket list & detail
+  useTicketRealtime(selectedTicketId || undefined);
   const { data: ticketsRes, isLoading: isLoadingTickets, refetch: refetchTickets } = useTicketsQuery(filters);
   const { isPending: isSubmittingTicket, mutateAsync: createTicketMutation } = useCreateTicketMutation();
   const { isPending: isSubmittingComment, mutateAsync: addTicketCommentMutation } = useAddTicketCommentMutation();
 
-  const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Form states for Create Ticket

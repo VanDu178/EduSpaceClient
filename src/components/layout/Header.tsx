@@ -17,6 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "@/features/auth";
 import { APP_ROUTES } from "@/core/config/routes";
+import { NotificationBell } from "@/components/common/NotificationBell";
 
 export const Header = () => {
   const pathname = usePathname();
@@ -149,6 +150,9 @@ export const Header = () => {
                     </Button>
                   </Link>
                 )}
+
+                {/* Icon Quả chuông thông báo tập trung */}
+                <NotificationBell />
 
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={["click"]}>
                   <div className="group flex items-center gap-2.5 py-1 px-1 sm:px-1.5 cursor-pointer transition-all select-none">
