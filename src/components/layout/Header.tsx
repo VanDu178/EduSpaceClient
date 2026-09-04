@@ -14,6 +14,8 @@ import {
   SparklesIcon,
   KeyIcon,
   TicketIcon,
+  VideoCameraIcon,
+  WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "@/features/auth";
 import { APP_ROUTES } from "@/core/config/routes";
@@ -38,6 +40,8 @@ export const Header = () => {
   const navLinks = [
     { name: "Trang chủ", href: APP_ROUTES.HOME, icon: HomeIcon },
     { name: "Bài viết", href: APP_ROUTES.BLOGS, icon: DocumentTextIcon },
+    { name: "Video", href: APP_ROUTES.VIDEOS, icon: VideoCameraIcon },
+    { name: "Công cụ", href: APP_ROUTES.TOOLS, icon: WrenchScrewdriverIcon },
   ];
 
   const activeKey =
@@ -116,7 +120,7 @@ export const Header = () => {
               selectedKeys={[activeKey]}
               items={desktopMenuItems}
               theme="light"
-              className="border-none !bg-transparent min-w-[420px] font-medium"
+              className="border-none !bg-transparent min-w-[360px] font-medium"
               disabledOverflow
             />
           </nav>
