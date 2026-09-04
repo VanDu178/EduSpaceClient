@@ -9,6 +9,7 @@ export const APP_ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   BLOGS: '/blogs',
+  SUPPORT: '/support',
 } as const;
 
 export type AppRoute = (typeof APP_ROUTES)[keyof typeof APP_ROUTES];

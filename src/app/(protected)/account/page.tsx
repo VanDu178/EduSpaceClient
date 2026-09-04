@@ -12,6 +12,7 @@ import {
   SubscriptionView,
   ProfileView,
   TransactionHistoryView,
+  SupportView,
 } from '@/features/account';
 
 function AccountConsoleContent() {
@@ -66,6 +67,7 @@ function AccountConsoleContent() {
               <ProfileView activeSubscription={activeSub} onNavigateTab={handleSelectTab} />
             )}
             {activeTab === 'transactions' && <TransactionHistoryView />}
+            {activeTab === 'support' && <SupportView />}
           </main>
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
   DocumentTextIcon,
   SparklesIcon,
   KeyIcon,
+  TicketIcon,
 } from "@heroicons/react/24/outline";
 import { useAuthStore } from "@/features/auth";
 import { APP_ROUTES } from "@/core/config/routes";
@@ -77,6 +78,11 @@ export const Header = () => {
       key: "subscription-tab",
       label: <Link href={`${APP_ROUTES.ACCOUNT}?tab=subscription`}>Gói dịch vụ của tôi</Link>,
       icon: <SparklesIcon className="w-4 h-4 text-sky-600" />,
+    },
+    {
+      key: "support-center",
+      label: <Link href={`${APP_ROUTES.ACCOUNT}?tab=support`}>Trung tâm hỗ trợ</Link>,
+      icon: <TicketIcon className="w-4 h-4 text-amber-600" />,
     },
     {
       type: "divider",

@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { SupportChatWidget } from "@/features/chatSupport";
+import { SocketProvider } from "@/core/config/socket/SocketContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +36,12 @@ export default function RootLayout({
             <AppThemeProvider>
               <GoogleAuthProvider>
                 <AuthProvider>
-                  <Wrapper>{children}</Wrapper>
+                  <SocketProvider>
+                    <Wrapper>
+                      {children}
+                      <SupportChatWidget />
+                    </Wrapper>
+                  </SocketProvider>
                 </AuthProvider>
               </GoogleAuthProvider>
             </AppThemeProvider>
