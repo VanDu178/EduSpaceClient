@@ -20,9 +20,8 @@ export function ConsoleSidebar({ activeTab, onSelectTab }: ConsoleSidebarProps) 
 
   // Query tickets để đếm số lượng ticket cần user phản hồi
   const { data: ticketsRes } = useTicketsQuery(undefined, true);
-  const pendingCount = Array.isArray(ticketsRes?.data)
-    ? ticketsRes.data.filter((t: any) => t.status === 'PENDING_USER').length
-    : 0;
+  const allTickets = ticketsRes?.pages?.flatMap((p: any) => p.data || []) || [];
+  const pendingCount = allTickets.filter((t: any) => t.status === 'PENDING_USER').length;
 
   const handleItemClick = (item: { key: string; label: string; icon: any; href?: string }) => {
     if (item.href) {

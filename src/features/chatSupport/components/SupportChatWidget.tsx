@@ -74,10 +74,86 @@ export const SupportChatWidget = () => {
 
   // Lắng nghe socket event 'new_message'
   useSocketEvent<{ conversationId: number; message: SupportMessage }>('new_message', (data) => {
+    if (!data || !data.message) return;
     setMessages((prev) => {
       if (prev.some((m) => m.id === data.message.id)) return prev;
       return [...prev, data.message];
     });
+
+    if (data.message.senderType === 'AGENT') {
+      // Sound alert
+      try {
+        if (typeof window !== 'undefined') {
+          const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContext) {
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+          }
+        }
+      } catch {
+        // Ignore audio errors
+      }
+
+      if (!isOpen) {
+        toast.custom(
+          (t) => (
+            <div
+              onClick={() => {
+                toast.dismiss(t.id);
+                setIsOpen(true);
+              }}
+              className={`${
+                t.visible ? 'animate-enter' : 'animate-leave'
+              } max-w-sm w-full bg-white shadow-xl rounded-xl pointer-events-auto border border-sky-100 p-4 flex gap-3 items-start backdrop-blur-md cursor-pointer hover:bg-sky-50/50 transition-colors`}
+            >
+              <div className="p-2 bg-sky-50 rounded-lg shrink-0 text-sky-600">
+                <ChatBubbleLeftRightIcon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-slate-900 line-clamp-1">
+                  Phản hồi từ Chuyên viên CSKH
+                </p>
+                <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{data.message.content}</p>
+              </div>
+            </div>
+          ),
+          { duration: 5000 }
+        );
+
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+          try {
+            const winNoti = new Notification('Tin nhắn mới từ CSKH EduSpace', {
+              body: data.message.content,
+              icon: '/images/logo.png',
+            });
+            winNoti.onclick = () => {
+              window.focus();
+              setIsOpen(true);
+            };
+          } catch (err) {
+            console.error('[SupportChatWidget] Window notification error:', err);
+          }
+        }
+      }
+    }
+  });
+
+  // Lắng nghe socket event 'conversation_converted'
+  useSocketEvent<{ conversationId: number; ticketCode: string }>('conversation_converted', (data) => {
+    if (data?.ticketCode) {
+      setAutoConvertedTicketCode(data.ticketCode);
+    }
+    setConversation((prev) => (prev ? { ...prev, status: 'CONVERTED_TO_TICKET' } : null));
   });
 
   // Scroll to bottom of chat

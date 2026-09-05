@@ -1,13 +1,6 @@
-export type TicketStatusKey = 'OPEN' | 'IN_PROGRESS' | 'PENDING_USER' | 'RESOLVED' | 'CLOSED';
+import { TicketStatusKey, TicketStatusConfig } from './types';
 
-export interface TicketStatusConfig {
-  code: TicketStatusKey;
-  label: string;
-  dotClass: string;
-  textClass: string;
-  bgClass: string;
-  badgeClass: string;
-}
+export type { TicketStatusKey, TicketStatusConfig };
 
 export const TICKET_STATUS_MAP: Record<TicketStatusKey, TicketStatusConfig> = {
   OPEN: {
@@ -60,11 +53,34 @@ export const STATUS_OPTIONS = [
   })),
 ];
 
-export const CATEGORY_OPTIONS = [
-  { value: 'ALL', label: 'Tất cả Danh mục' },
-  { value: 'TECHNICAL', label: 'Kỹ thuật & Lỗi hệ thống' },
-  { value: 'PAYMENT', label: 'Thanh toán & Gói' },
-  { value: 'ACCOUNT', label: 'Tài khoản & Bảo mật' },
+export const TICKET_CATEGORY_OPTIONS = [
+  { value: 'TECHNICAL', label: 'Kỹ thuật & lỗi hệ thống' },
+  { value: 'PAYMENT', label: 'Thanh toán & gói dịch vụ' },
+  { value: 'ACCOUNT', label: 'Tài khoản & bảo mật' },
   { value: 'OTHER', label: 'Khác' },
 ];
 
+export const CATEGORY_OPTIONS = [
+  { value: 'ALL', label: 'Tất cả Danh mục' },
+  ...TICKET_CATEGORY_OPTIONS,
+];
+
+/**
+ * TẬP TRUNG HÓA TẤT CẢ TÊN SOCKET EVENT CHO TICKET SUPPORT (FE CLIENT)
+ */
+export const TICKET_SOCKET_EVENTS = {
+  COMMENT_ADDED: 'ticket:comment_added',
+  STATUS_CHANGED: 'ticket:status_changed',
+  CREATED: 'ticket:created',
+  UPDATED: 'ticket:updated',
+  JOIN_TICKET: 'join_ticket',
+  LEAVE_TICKET: 'leave_ticket',
+} as const;
+
+export const DEFAULT_TICKET_PARAMS = {
+  search: '',
+  status: 'ALL',
+  category: 'ALL',
+} as const;
+
+export const DEFAULT_PARAMS = DEFAULT_TICKET_PARAMS;

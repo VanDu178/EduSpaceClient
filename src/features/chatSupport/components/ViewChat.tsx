@@ -8,7 +8,8 @@ import {
   PhotoIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
-import { SupportConversation, SupportMessage, chatSupportService } from '../services/chatSupportService';
+import { SupportConversation, SupportMessage } from '../services/chatSupportService';
+import { uploadService } from '@/features/upload';
 import { TickerNotice } from './TickerNotice';
 import toast from 'react-hot-toast';
 
@@ -55,7 +56,7 @@ export function ViewChat({
     return () => {
       if (pendingAttachmentsRef.current.length > 0) {
         pendingAttachmentsRef.current.forEach((url) => {
-          chatSupportService.deleteImage(url).catch((err) => console.error('Lỗi tự động xóa ảnh rác:', err));
+          uploadService.deleteFile(url).catch((err) => console.error('Lỗi tự động xóa ảnh rác:', err));
         });
       }
     };
@@ -76,9 +77,9 @@ export function ViewChat({
 
     try {
       setIsUploading(true);
-      const res = await chatSupportService.uploadImage(file);
-      if (res?.url) {
-        setPendingAttachments((prev) => [...prev, res.url]);
+      const url = await uploadService.uploadSingleFile(file, 'support-chat');
+      if (url) {
+        setPendingAttachments((prev) => [...prev, url]);
         toast.success('Đã tải hình ảnh thành công.');
       }
     } catch (err: any) {
@@ -93,7 +94,7 @@ export function ViewChat({
     setPendingAttachments((prev) => prev.filter((_, i) => i !== index));
     if (targetUrl) {
       try {
-        await chatSupportService.deleteImage(targetUrl);
+        await uploadService.deleteFile(targetUrl);
       } catch (err) {
         console.error('Lỗi xóa file ảnh khỏi storage:', err);
       }

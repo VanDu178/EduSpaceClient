@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ticketSupportService } from '../services/ticketSupportService';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ticketSupportService } from '../services';
 
 export const TICKET_QUERY_KEYS = {
   all: ['ticketSupport'] as const,
@@ -11,13 +11,19 @@ export const TICKET_QUERY_KEYS = {
  * Hook lấy danh sách Tickets hỗ trợ của người dùng
  */
 export function useTicketsQuery(
-  params?: { status?: string; category?: string; search?: string; page?: number; limit?: number },
+  params?: { status?: string; category?: string; search?: string; limit?: number },
   enabled = true
 ) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: TICKET_QUERY_KEYS.tickets(params),
-    queryFn: () => ticketSupportService.getTickets(params),
+    queryFn: ({ pageParam }) =>
+      ticketSupportService.getTickets({
+        ...params,
+        cursor: pageParam as number | undefined
+      }),
     enabled,
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => lastPage?.pagination?.nextCursor ?? undefined,
     staleTime: 1000 * 60,
   });
 }

@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useNotification } from "@/core/contexts/NotificationContext";
 import { NotificationItem } from "@/core/services/notificationService";
+import { formatDate } from "@/core/utils";
 
 export const NotificationBell: React.FC = () => {
   const router = useRouter();
@@ -58,7 +59,7 @@ export const NotificationBell: React.FC = () => {
       if (diffMins < 60) return `${diffMins} phút trước`;
       if (diffHours < 24) return `${diffHours} giờ trước`;
       if (diffDays < 7) return `${diffDays} ngày trước`;
-      return date.toLocaleDateString("vi-VN");
+      return formatDate(dateString);
     } catch {
       return dateString;
     }
@@ -153,7 +154,7 @@ export const NotificationBell: React.FC = () => {
       onOpenChange={setOpen}
       placement="bottomRight"
       overlayClassName="notification-bell-popover"
-      overlayInnerStyle={{ padding: 0, backgroundColor: "transparent" }}
+      styles={{ container: { padding: 0, backgroundColor: "transparent" } }}
     >
       <button
         type="button"

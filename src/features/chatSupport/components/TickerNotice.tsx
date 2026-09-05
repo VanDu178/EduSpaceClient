@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ExclamationTriangleIcon, ArrowUpRightIcon } from '@heroicons/react/24/outline';
+import { ExclamationTriangleIcon, ArrowUpRightIcon, TicketIcon } from '@heroicons/react/24/outline';
 
 interface TickerNoticeProps {
   redirectCountdown: number | null;
@@ -43,24 +43,20 @@ export function TickerNotice({
         </div>
       )}
 
-      {/* Auto-converted Ticket Notice Banner */}
+      {/* Converted Ticket Notice Banner */}
       {autoConvertedTicketCode && (
-        <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-amber-800 text-xs flex items-start justify-between space-x-2 mb-3">
+        <div className="bg-sky-50 border border-sky-200 p-3.5 rounded-2xl text-sky-800 text-xs flex items-start justify-between space-x-2 mb-3">
           <div className="flex items-start space-x-2">
-            <ExclamationTriangleIcon className="w-5 h-5 flex-shrink-0 text-amber-600 mt-0.5" />
+            <TicketIcon className="w-5 h-5 flex-shrink-0 text-sky-600 mt-0.5" />
             <div>
-              <p className="font-semibold text-amber-900">Admin hiện ngoài giờ trực.</p>
-              <p>
-                Hệ thống đã tự động tạo Ticket{' '}
-                <span className="font-mono underline font-bold">#{autoConvertedTicketCode}</span>.
-              </p>
+              <p className="font-semibold text-sky-900">Cuộc trò chuyện đã được chuyển thành yêu cầu hỗ trợ</p>
             </div>
           </div>
           <Link
             href="/account?tab=support"
-            className="text-xs text-amber-700 font-bold underline shrink-0 hover:text-amber-900"
+            className="text-xs text-sky-700 font-bold underline shrink-0 hover:text-sky-900"
           >
-            Xem Ticket ↗
+            Xem yêu cầu hỗ trợ ↗
           </Link>
         </div>
       )}

@@ -55,25 +55,6 @@ export const chatSupportService = {
   getAdminStatus: async () => {
     const res = await api.get('/support/admin/status');
     return res.data;
-  },
-
-  uploadImage: async (file: File) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', 'support-chat');
-    const res = await api.post('/upload/single', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res.data.data;
-  },
-
-  deleteImage: async (urlOrPath: string) => {
-    const res = await api.delete('/upload', {
-      data: { url: urlOrPath }
-    });
-    return res.data.success;
   }
 };
 

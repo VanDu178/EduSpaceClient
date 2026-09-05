@@ -5,37 +5,50 @@ import toast from 'react-hot-toast';
 import {
   useTicketsQuery,
   useTicketDetailQuery,
-  useCreateTicketMutation,
   useAddTicketCommentMutation,
   useTicketRealtime,
   FormCreate,
-  SupportTicketList,
-  SupportTicketDetail,
+  ViewList,
+  ViewDetail,
   Ticket,
-  TicketFilters
+  TicketQueryParams,
 } from '@/features/ticketSupport';
+import { useUploadMultipleMutation } from '@/features/upload';
+
+export interface CommentFile {
+  file: File;
+  url: string;
+}
 
 export function SupportView() {
-  const [filters, setFilters] = useState<TicketFilters>({});
+  const [params, setParams] = useState<TicketQueryParams>({});
   const [selectedTicketId, setSelectedTicketId] = useState<number | null>(null);
 
   // Realtime Socket listener cho Ticket list & detail
   useTicketRealtime(selectedTicketId || undefined);
-  const { data: ticketsRes, isLoading: isLoadingTickets, refetch: refetchTickets } = useTicketsQuery(filters);
-  const { isPending: isSubmittingTicket, mutateAsync: createTicketMutation } = useCreateTicketMutation();
-  const { isPending: isSubmittingComment, mutateAsync: addTicketCommentMutation } = useAddTicketCommentMutation();
+  const {
+    data: ticketsRes,
+    isLoading: isLoadingTickets,
+    refetch: refetchTickets,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useTicketsQuery(params);
+
+  const rawTickets: Ticket[] = ticketsRes?.pages.flatMap((page) => page?.data || []) || [];
+  const ticketsMap = new Map<number, Ticket>();
+  rawTickets.forEach((t) => ticketsMap.set(t.id, t));
+  const tickets = Array.from(ticketsMap.values());
+  const totalCount = ticketsRes?.pages?.[0]?.pagination?.total ?? tickets.length;
+
+  const { isPending: isSubmittingCommentMutation, mutateAsync: addTicketCommentMutation } = useAddTicketCommentMutation();
+  const { mutateAsync: uploadImages, isPending: isUploadingImages } = useUploadMultipleMutation('support-tickets');
 
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Form states for Create Ticket
-  const [newTicketTitle, setNewTicketTitle] = useState('');
-  const [newTicketDesc, setNewTicketDesc] = useState('');
-  const [newTicketCategory, setNewTicketCategory] = useState<Ticket['category']>('TECHNICAL');
-  const [newTicketAttachments, setNewTicketAttachments] = useState<string[]>([]);
-
   // Form states for Ticket Comment
   const [commentText, setCommentText] = useState('');
-  const [commentAttachments, setCommentAttachments] = useState<string[]>([]);
+  const [commentFiles, setCommentFiles] = useState<CommentFile[]>([]);
 
   // Fetch detail if ticket is selected
   const { data: ticketDetailRes, isLoading: isLoadingDetail, refetch: refetchDetail } = useTicketDetailQuery(
@@ -43,66 +56,50 @@ export function SupportView() {
     Boolean(selectedTicketId)
   );
 
-  const tickets: Ticket[] = ticketsRes?.data || [];
   const selectedTicket: Ticket | null = ticketDetailRes?.data || null;
 
-  const handleCreateTicket = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTicketTitle.trim() || !newTicketDesc.trim()) {
-      toast.error('Vui lòng nhập đầy đủ tiêu đề và nội dung mô tả');
-      return;
-    }
-
-    try {
-      await createTicketMutation({
-        title: newTicketTitle,
-        description: newTicketDesc,
-        category: newTicketCategory,
-        attachments: newTicketAttachments.length > 0 ? newTicketAttachments : undefined,
-      });
-
-      toast.success('Tạo Yêu cầu hỗ trợ (Ticket) thành công!');
-      setShowCreateModal(false);
-      setNewTicketTitle('');
-      setNewTicketDesc('');
-      setNewTicketCategory('TECHNICAL');
-      setNewTicketAttachments([]);
-      refetchTickets();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || err?.message || 'Không thể tạo Ticket');
-    }
-  };
+  const isSubmittingComment = isSubmittingCommentMutation || isUploadingImages;
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!commentText.trim() && commentAttachments.length === 0) return;
+    if (!commentText.trim() && commentFiles.length === 0) return;
     if (isSubmittingComment || !selectedTicketId) return;
 
     try {
+      // 1. Upload ảnh đính kèm lên Supabase Storage trước
+      let uploadedUrls: string[] = [];
+      if (commentFiles.length > 0) {
+        const rawFiles = commentFiles.map((item) => item.file);
+        uploadedUrls = await uploadImages(rawFiles);
+      }
+
+      // 2. Gửi comment kèm danh sách Public URL ảnh từ Supabase Storage
       await addTicketCommentMutation({
         id: selectedTicketId,
         data: {
           content: commentText.trim(),
-          attachments: commentAttachments.length > 0 ? commentAttachments : undefined,
+          attachments: uploadedUrls.length > 0 ? uploadedUrls : undefined,
         },
       });
 
       toast.success('Đã gửi phản hồi thành công!');
       setCommentText('');
-      setCommentAttachments([]);
-      refetchDetail();
-      refetchTickets();
+      // Dọn dẹp URL tĩnh của trình duyệt
+      commentFiles.forEach((item) => URL.revokeObjectURL(item.url));
+      setCommentFiles([]);
     } catch (err: any) {
       toast.error(err?.response?.data?.message || err?.message || 'Lỗi gửi phản hồi');
     }
   };
 
-  const handleRemoveCreateAttachment = (index: number) => {
-    setNewTicketAttachments((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleRemoveCommentAttachment = (index: number) => {
-    setCommentAttachments((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveCommentFile = (index: number) => {
+    setCommentFiles((prev) => {
+      const target = prev[index];
+      if (target?.url) {
+        URL.revokeObjectURL(target.url);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   return (
@@ -116,13 +113,13 @@ export function SupportView() {
           </div>
         ) : selectedTicket ? (
           <div>
-            <SupportTicketDetail
+            <ViewDetail
               ticket={selectedTicket}
               commentText={commentText}
               setCommentText={setCommentText}
-              commentAttachments={commentAttachments}
-              setCommentAttachments={setCommentAttachments}
-              onRemoveCommentAttachment={handleRemoveCommentAttachment}
+              commentFiles={commentFiles}
+              setCommentFiles={setCommentFiles}
+              onRemoveCommentFile={handleRemoveCommentFile}
               onAddComment={handleAddComment}
               isSubmittingComment={isSubmittingComment}
               onBack={() => setSelectedTicketId(null)}
@@ -142,31 +139,24 @@ export function SupportView() {
       ) : (
         /* If looking at ticket list inside console */
         <div>
-          <SupportTicketList
+          <ViewList
             tickets={tickets}
             isLoading={isLoadingTickets}
             onOpenCreateModal={() => setShowCreateModal(true)}
             onSelectTicket={(id) => setSelectedTicketId(id)}
-            filters={filters}
-            onFilterChange={setFilters}
-            totalCount={ticketsRes?.pagination?.total ?? tickets.length}
+            params={params}
+            onParamsChange={setParams}
+            totalCount={totalCount}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onFetchNextPage={fetchNextPage}
           />
 
           {/* Create Modal Form */}
           {showCreateModal && (
             <FormCreate
               onClose={() => setShowCreateModal(false)}
-              onSubmit={handleCreateTicket}
-              newTicketTitle={newTicketTitle}
-              setNewTicketTitle={setNewTicketTitle}
-              newTicketCategory={newTicketCategory}
-              setNewTicketCategory={setNewTicketCategory}
-              newTicketDesc={newTicketDesc}
-              setNewTicketDesc={setNewTicketDesc}
-              newTicketAttachments={newTicketAttachments}
-              setNewTicketAttachments={setNewTicketAttachments}
-              onRemoveAttachment={handleRemoveCreateAttachment}
-              isSubmittingTicket={isSubmittingTicket}
+              onSuccess={() => refetchTickets()}
             />
           )}
         </div>
