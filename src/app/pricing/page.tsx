@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { MembershipPlanList } from '@/features/membership';
 
@@ -9,7 +10,13 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <main className="min-h-screen bg-slate-50/50">
-      <MembershipPlanList />
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-slate-500 text-sm">Đang tải gói hội viên...</div>
+        </div>
+      }>
+        <MembershipPlanList />
+      </Suspense>
     </main>
   );
 }

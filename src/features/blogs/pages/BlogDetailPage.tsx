@@ -136,7 +136,7 @@ export function BlogDetailPage() {
           </Link>
           <span>/</span>
           <span className="text-gray-400 truncate max-w-[150px]">
-            {blog.slug}
+            {blog.title}
           </span>
         </div>
       </div>

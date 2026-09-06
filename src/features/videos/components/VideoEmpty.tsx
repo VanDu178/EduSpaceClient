@@ -1,0 +1,26 @@
+'use client';
+
+import { VideoCameraIcon } from '@heroicons/react/24/outline';
+
+export interface VideoEmptyProps {
+  title?: string;
+  message?: string;
+  action?: React.ReactNode;
+}
+
+export function VideoEmpty({
+  title = 'Không tìm thấy video nào',
+  message = 'Không tìm thấy video phù hợp với tìm kiếm hoặc bộ lọc danh mục của bạn. Hãy thử xóa bộ lọc hoặc tìm kiếm với từ khóa khác.',
+  action,
+}: VideoEmptyProps) {
+  return (
+    <div className="text-center py-20">
+      <VideoCameraIcon className="w-10 h-10 text-gray-400 mx-auto stroke-1" />
+      <h3 className="text-base font-semibold text-gray-800">{title}</h3>
+      <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto">
+        {message}
+      </p>
+      {action && <div className="pt-2">{action}</div>}
+    </div>
+  );
+}

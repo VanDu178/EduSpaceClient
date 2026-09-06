@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { BillingCycle } from '../types';
 import { useMembershipPlans } from '../hooks';
 import { MembershipPlanCard } from './MembershipPlanCard';
@@ -17,6 +17,9 @@ export function MembershipPlanList() {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly');
   const { data: plans = [], isLoading } = useMembershipPlans();
 
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get('redirect');
+
   // Determine current user plan (tierLevel === 1 || monthlyPrice === 0 as default free plan)
   const userCurrentPlan = plans.length > 0
     ? (user?.plan ? plans.find((p) => p.code === user.plan) : null)
@@ -26,9 +29,10 @@ export function MembershipPlanList() {
   const userCurrentPlanCode = userCurrentPlan?.code;
 
   const handleSubscribe = (planCode: string) => {
-    const currentPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : APP_ROUTES.PRICING;
+    const defaultPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : APP_ROUTES.PRICING;
+    const redirectTarget = redirectParam || defaultPath;
     router.push(
-      `${APP_ROUTES.CHECKOUT}?plan=${encodeURIComponent(planCode)}&billing=${billingCycle}&redirect=${encodeURIComponent(currentPath)}`
+      `${APP_ROUTES.CHECKOUT}?plan=${encodeURIComponent(planCode)}&billing=${billingCycle}&redirect=${encodeURIComponent(redirectTarget)}`
     );
   };
 
