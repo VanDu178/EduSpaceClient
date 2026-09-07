@@ -99,10 +99,10 @@ export async function getVideoTypesApi(): Promise<VideoType[]> {
 }
 
 /**
- * Lấy thông tin chi tiết 1 Video theo ID (Public API)
+ * Lấy thông tin chi tiết 1 Video theo ID hoặc Slug (Client API với Dynamic Auth)
  */
 export async function getVideoByIdApi(id: string): Promise<Video> {
-  const response = await api.get(`/videos/${id}`);
+  const response = await api.get(`/videos/client/${id}`);
   const data = response.data?.data || response.data;
   const rawVideo = data?.video || data;
   return normalizeVideo(rawVideo);

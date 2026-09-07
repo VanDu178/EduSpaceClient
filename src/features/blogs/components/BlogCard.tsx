@@ -47,7 +47,7 @@ export function BlogCard({ blog }: BlogCardProps) {
         </div>
 
         {/* Card Body */}
-        <div className="p-4 sm:p-5 space-y-2 flex-1 flex flex-col">
+        <div className="!p-3 !sm:p-4 space-y-2 flex-1 flex flex-col">
           {/* Tags */}
           <div className="flex flex-wrap items-center gap-1.5">
             {blog.blogType?.name && (
@@ -77,7 +77,7 @@ export function BlogCard({ blog }: BlogCardProps) {
       </Link>
 
       {/* Card Footer */}
-      <div className="px-4 sm:px-5 pb-4 pt-2.5 border-t border-gray-100 flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 flex-shrink-0">
+      <div className="!px-3 !sm:px-4 pb-4 pt-2.5 border-t border-gray-100 flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 flex-shrink-0">
         <div className="w-5 h-5 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-[10px] flex-shrink-0">
           {authorName.charAt(0).toUpperCase()}
         </div>

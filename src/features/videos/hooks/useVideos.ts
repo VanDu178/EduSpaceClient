@@ -62,6 +62,25 @@ export function useVideoAccess(video?: Video | null): VideoAccessResult {
     };
   }
 
+  // 0. Nếu Backend đã đánh giá cờ hasFullAccess chính thức từ Policy Engine
+  if (typeof (video as any).hasFullAccess === 'boolean') {
+    const isFull = (video as any).hasFullAccess;
+    const teaserSecs = typeof video.teaserDuration === 'number' ? video.teaserDuration : 0;
+    return {
+      hasFullAccess: isFull,
+      isPremium: video.isPremium,
+      isTeaser: !isFull,
+      teaserDuration: isFull ? 0 : teaserSecs,
+      reason: isFull
+        ? video.isPremium
+          ? 'PREMIUM_GRANTED'
+          : 'FREE_VIDEO'
+        : !accessToken
+        ? 'NOT_LOGGED_IN'
+        : 'FEATURE_NOT_IN_PLAN',
+    };
+  }
+
   // 1. Video Miễn Phí (isPremium === false) -> Ai cũng được xem full
   if (!video.isPremium) {
     return {

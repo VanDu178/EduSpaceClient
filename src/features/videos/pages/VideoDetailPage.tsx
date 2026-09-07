@@ -265,7 +265,7 @@ export function VideoDetailPage() {
                 </div>
                 <div className="space-y-2 max-w-md">
                   <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Đã hết thời lượng xem thử ({teaserDuration}s)
+                    Đã hết thời lượng xem thử
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                     {reason === 'NOT_LOGGED_IN'
@@ -288,14 +288,17 @@ export function VideoDetailPage() {
                     {reason === 'NOT_LOGGED_IN' ? 'Đăng nhập ngay' : 'Xem các Gói Hội Viên'}
                   </Button>
 
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="md"
+                    rounded="xl"
                     onClick={handleReplayTeaser}
-                    className="w-full sm:w-auto px-4 py-2.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    leftIcon={<ArrowPathIcon className="w-4 h-4" />}
+                    className="w-full sm:w-auto px-6 !bg-slate-900/80 !text-slate-300 hover:!text-white hover:!bg-slate-800 !border-slate-700/80 transition-all font-semibold whitespace-nowrap shrink-0"
                   >
-                    <ArrowPathIcon className="w-4 h-4" />
                     Xem lại bản xem thử
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

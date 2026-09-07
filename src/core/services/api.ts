@@ -169,14 +169,16 @@ api.interceptors.response.use(
     } catch (refreshError: any) {
       processQueue(refreshError, null);
 
-      // Chỉ đăng xuất nếu Refresh Token thực sự bị từ chối (Lỗi 401: hết hạn / bị thu hồi / tài khoản bị khóa)
+      // Giải phóng hoàn toàn session trong Zustand RAM store để tránh kẹt trạng thái Zombie Auth State
+      useAuthStore.getState().logout();
+
+      // Nếu Refresh Token thực sự bị từ chối (Lỗi 401: hết hạn / bị thu hồi / tài khoản bị khóa)
       if (refreshError?.response?.status === 401) {
-        useAuthStore.getState().logout();
         if (window.location.pathname !== APP_ROUTES.LOGIN) {
           window.location.href = APP_ROUTES.LOGIN;
         }
       } else {
-        // Nếu refresh lỗi do rớt mạng hay server 5xx: GIỮ NGUYÊN SESSION, chỉ bật flag lỗi mạng
+        // Nếu refresh lỗi do rớt mạng hay server 5xx: bật flag lỗi mạng
         useAuthStore.getState().setNetworkError(true);
       }
 

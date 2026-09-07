@@ -9,6 +9,5 @@ export * from './components/VideoFilterBar';
 export * from './components/VideoCard';
 export * from './components/VideoEmpty';
 export * from './components/VideoGrid';
-export * from './components/VideoDetailModal';
 export * from './pages/VideoListPage';
 export * from './pages/VideoDetailPage';
