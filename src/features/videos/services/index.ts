@@ -1,7 +1,8 @@
 import api from '@/core/services/api';
 import { GetVideosParams, Video, VideoListResponse, VideoType } from '../types';
+import { PROCESS_STATUS, VIDEO_SOURCE_TYPES, VIDEO_STATUS } from '../constants';
 
-const API_BASE_ORIGIN = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+const API_BASE_ORIGIN = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '');
 
 function formatMediaUrl(url?: string | null): string | null {
   if (!url) return null;
@@ -40,13 +41,14 @@ function normalizeVideo(raw: any): Video {
       raw.sourceType ||
       raw.source_type ||
       (youtubeVideoId || (rawVideoUrl && (rawVideoUrl.includes('youtube.com') || rawVideoUrl.includes('youtu.be')))
-        ? 'youtube'
-        : 'direct_upload'),
+        ? VIDEO_SOURCE_TYPES.YOUTUBE
+        : VIDEO_SOURCE_TYPES.DIRECT_UPLOAD),
     duration: typeof raw.duration === 'number' ? raw.duration : Number(raw.duration || 0),
     isPremium: Boolean(raw.isPremium ?? raw.is_premium ?? false),
     teaserDuration: raw.teaserDuration ?? raw.teaser_duration ?? 0,
     views: raw.views ?? 0,
-    status: raw.status || 'published',
+    status: raw.status || VIDEO_STATUS.PUBLISHED,
+    processStatus: raw.processStatus || raw.process_status || (raw.status === PROCESS_STATUS.PROCESSING ? PROCESS_STATUS.PROCESSING : PROCESS_STATUS.READY),
     videoTypeId: raw.videoTypeId || raw.video_type_id || raw.videoType?.id || 1,
     videoType: raw.videoType || raw.video_type,
     creator: raw.creator,
@@ -72,8 +74,8 @@ export async function getVideosApi(
   const rawVideos = Array.isArray(data.videos)
     ? data.videos
     : Array.isArray(data)
-    ? data
-    : [];
+      ? data
+      : [];
 
   return {
     videos: rawVideos.map(normalizeVideo),

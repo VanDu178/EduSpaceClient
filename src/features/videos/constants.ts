@@ -16,16 +16,6 @@ export const VIDEO_SOURCE_TYPES = {
 
 export const ITEMS_PER_PAGE = 6;
 
-
-
-export const DEFAULT_VIDEO_PARAMS: GetVideosParams = {
-  page: 1,
-  limit: 12,
-  sortBy: 'createdAt',
-  sortOrder: 'desc',
-  status: 'published',
-};
-
 export const VIDEO_SORT_OPTIONS = [
   { label: 'Mới nhất', sortBy: 'createdAt', sortOrder: 'desc' },
   { label: 'Cũ nhất', sortBy: 'createdAt', sortOrder: 'asc' },
@@ -33,3 +23,18 @@ export const VIDEO_SORT_OPTIONS = [
   { label: 'Thời lượng (Dài -> Ngắn)', sortBy: 'duration', sortOrder: 'desc' },
   { label: 'Thời lượng (Ngắn -> Dài)', sortBy: 'duration', sortOrder: 'asc' },
 ] as const;
+
+
+
+export const VIDEO_STATUS = {
+  DRAFT: 'draft',
+  PUBLISHED: 'published',
+  ARCHIVED: 'archived',
+} as const
+
+
+export const PROCESS_STATUS = {
+  PROCESSING: 'processing',
+  READY: 'ready',
+  FAILED: 'failed',
+} as const

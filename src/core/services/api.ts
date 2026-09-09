@@ -50,6 +50,7 @@ api.interceptors.request.use(
       const isAuthRoute =
         config.url?.includes('/auth/login') ||
         config.url?.includes('/auth/refresh') ||
+        config.url?.includes('/auth/logout') ||
         config.url?.includes('/auth/me');
 
       if (token && !isAuthRoute) {
@@ -108,13 +109,14 @@ api.interceptors.response.use(
     }
 
     // Nếu không có originalRequest hoặc lỗi không phải 401 Unauthorized
-    // Hoặc đây là request login/refresh thì trả về lỗi luôn
+    // Hoặc đây là request login/refresh/logout thì trả về lỗi luôn không retry
     if (
       !originalRequest ||
       error.response?.status !== 401 ||
       originalRequest._retry ||
       originalRequest.url?.includes('/auth/login') ||
-      originalRequest.url?.includes('/auth/refresh')
+      originalRequest.url?.includes('/auth/refresh') ||
+      originalRequest.url?.includes('/auth/logout')
     ) {
       return Promise.reject(error);
     }
@@ -169,12 +171,14 @@ api.interceptors.response.use(
     } catch (refreshError: any) {
       processQueue(refreshError, null);
 
-      // Giải phóng hoàn toàn session trong Zustand RAM store để tránh kẹt trạng thái Zombie Auth State
-      useAuthStore.getState().logout();
+      // Giải phóng hoàn toàn session trong Zustand RAM store ngay lập tức
+      useAuthStore.getState().setAuth(null, null);
+      useAuthStore.getState().logout().catch(() => { });
 
-      // Nếu Refresh Token thực sự bị từ chối (Lỗi 401: hết hạn / bị thu hồi / tài khoản bị khóa)
-      if (refreshError?.response?.status === 401) {
-        if (window.location.pathname !== APP_ROUTES.LOGIN) {
+      const status = refreshError?.response?.status;
+      // Nếu Refresh Token thực sự bị từ chối (4xx: hết hạn / thiếu cookie / bị thu hồi / tài khoản bị khóa)
+      if (status && status >= 400 && status < 500) {
+        if (typeof window !== 'undefined' && window.location.pathname !== APP_ROUTES.LOGIN) {
           window.location.href = APP_ROUTES.LOGIN;
         }
       } else {

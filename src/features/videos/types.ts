@@ -1,5 +1,6 @@
 export type SourceType = 'direct_upload' | 'youtube';
 export type VideoStatus = 'draft' | 'published' | 'archived';
+export type ProcessStatus = 'processing' | 'ready' | 'failed';
 
 export interface VideoType {
   id: number;
@@ -33,6 +34,7 @@ export interface Video {
   teaserDuration?: number; // in seconds
   views: number;
   status: VideoStatus;
+  processStatus?: ProcessStatus;
   videoTypeId: number;
   videoType?: VideoType;
   creator?: VideoCreator;

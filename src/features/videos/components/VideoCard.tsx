@@ -2,10 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { PlayIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, VideoCameraIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Video } from '../types';
 import { formatDuration } from '../utils';
 import { formatDate } from '@/core/utils';
+import { PROCESS_STATUS } from '../constants';
 
 interface VideoCardProps {
   video: Video;
@@ -14,6 +15,8 @@ interface VideoCardProps {
 
 export function VideoCard({ video, onSelect }: VideoCardProps) {
   const isPremium = video.isPremium;
+  const isProcessing = video.processStatus === PROCESS_STATUS.PROCESSING;
+  const isFailed = video.processStatus === PROCESS_STATUS.FAILED;
   const videoTypeName = video.videoType?.name || 'Bài giảng';
   const authorName = video.creator?.name || 'TradeVerse Team';
   const formattedDate = formatDate(video.createdAt);
@@ -66,6 +69,12 @@ export function VideoCard({ video, onSelect }: VideoCardProps) {
         <div className="!p-3 !sm:p-4 space-y-2 flex-1 flex flex-col">
           {/* Tags */}
           <div className="flex flex-wrap items-center gap-1.5">
+            {isProcessing && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium text-sky-700 bg-sky-50 rounded-md">
+                <ArrowPathIcon className="w-3 h-3 animate-spin text-sky-600" />
+                Đang xử lý HLS
+              </span>
+            )}
             <span className="px-2 py-0.5 text-[11px] font-medium text-primary bg-primary-light/60 rounded-md">
               {videoTypeName}
             </span>

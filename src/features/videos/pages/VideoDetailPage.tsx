@@ -19,6 +19,7 @@ import {
   ChevronUpIcon,
 } from '@heroicons/react/24/outline';
 import { useVideoDetail, useVideoAccess, useVideos } from '../hooks/useVideos';
+import { HlsPlayer } from '../components/HlsPlayer';
 import { formatDuration } from '../utils';
 import { Button } from '@/components/common/Button';
 import { formatDate } from '@/core/utils';
@@ -183,9 +184,10 @@ export function VideoDetailPage() {
     );
   }
 
+  const isProcessing = video.processStatus === 'processing' || (video.status as string) === 'processing';
   const youtubeEmbedUrl = getYoutubeEmbedUrl(video.youtubeVideoId, video.videoUrl);
   const isYoutube = video.sourceType === 'youtube' || Boolean(youtubeEmbedUrl);
-  const authorName = video.creator?.name || 'TradeVerse Team';
+  const authorName = video.creator?.name;
   const formattedDate = formatDate(video.createdAt);
 
   return (
@@ -215,7 +217,7 @@ export function VideoDetailPage() {
           {/* 1. Main Video Player Container (16:9 Aspect Ratio) */}
           <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-gray-200">
             {/* Teaser Mode Top Warning Banner */}
-            {!hasFullAccess && isTeaser && teaserDuration > 0 && !isTeaserLimitReached && (
+            {!hasFullAccess && isTeaser && teaserDuration > 0 && !isTeaserLimitReached && !isProcessing && (
               <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-slate-950/90 to-transparent p-3.5 flex items-center justify-between text-xs text-white">
                 <div className="flex items-center gap-2 font-medium text-amber-300 bg-amber-950/90 px-3 py-1 rounded-lg border border-amber-500/40">
                   <SparklesIcon className="w-4 h-4 text-amber-400 animate-pulse" />
@@ -231,8 +233,22 @@ export function VideoDetailPage() {
               </div>
             )}
 
-            {/* Video Player: YouTube Embed vs HTML5 Direct Storage */}
-            {isYoutube && youtubeEmbedUrl ? (
+            {/* Video Player: HLS Transcoding State vs YouTube Embed vs HTML5 Direct Storage */}
+            {isProcessing ? (
+              <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                  <ArrowPathIcon className="w-7 h-7 animate-spin" />
+                </div>
+                <div className="space-y-2 max-w-lg">
+                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                    Video đang trong quá trình xử lý
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    Video đang được hệ thống xử lý. Vui lòng quay lại sau ít phút nữa.
+                  </p>
+                </div>
+              </div>
+            ) : isYoutube && youtubeEmbedUrl ? (
               <iframe
                 src={youtubeEmbedUrl}
                 title={video.title}
@@ -241,14 +257,14 @@ export function VideoDetailPage() {
                 className="w-full h-full border-0"
               />
             ) : video.videoUrl ? (
-              <video
-                ref={videoRef}
+              <HlsPlayer
+                video={video}
                 src={video.videoUrl}
-                controls
-                autoPlay
+                poster={video.thumbnailUrl || undefined}
+                autoPlay={true}
+                videoRefOut={videoRef}
                 onTimeUpdate={handleTimeUpdate}
                 onSeeking={handleSeeking}
-                className="w-full h-full object-contain"
               />
             ) : (
               <div className="p-8 text-center text-slate-400 space-y-2 flex flex-col items-center justify-center h-full">
@@ -314,7 +330,7 @@ export function VideoDetailPage() {
             {/* Left: Author & Views / Date */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary-light text-primary border border-primary/20 flex items-center justify-center font-bold text-base shrink-0">
-                {authorName.charAt(0).toUpperCase()}
+                {authorName?.charAt(0).toUpperCase()}
               </div>
               <div className="space-y-0.5">
                 <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight">
@@ -336,6 +352,12 @@ export function VideoDetailPage() {
 
             {/* Right: Badges (Video Type & Paid / Free Status) */}
             <div className="flex flex-wrap items-center gap-2">
+              {isProcessing && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200/80 rounded-md">
+                  <ArrowPathIcon className="w-3.5 h-3.5 animate-spin text-sky-600" />
+                  Đang chuyển đổi HLS
+                </span>
+              )}
               <span className="px-2.5 py-1 text-xs font-medium text-primary bg-primary-light/60 border border-primary/20 rounded-md">
                 {video.videoType?.name || 'Bài giảng'}
               </span>

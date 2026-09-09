@@ -51,7 +51,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       lastCheckedAt: null,
       isNetworkError: false,
     });
-    await logoutApi();
+    try {
+      await logoutApi();
+    } catch {
+      // Suppress background logout API errors
+    }
   },
 
   fetchMeLazy: async (force = false) => {

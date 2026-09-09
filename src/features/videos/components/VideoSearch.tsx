@@ -1,7 +1,6 @@
 'use client';
 
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
-
 interface VideoSearchProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
