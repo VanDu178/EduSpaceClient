@@ -24,6 +24,7 @@ import { Button } from '@/components/common';
 import { useAuthStore } from '@/features/auth/stores/useAuthStore';
 import { formatDate } from '@/core/utils';
 import { USER_ROLE } from '@/core/constants/roles';
+import { sanitizeHtml } from '@/core/utils/sanitize';
 
 export function BlogDetailPage() {
   const params = useParams();
@@ -37,8 +38,9 @@ export function BlogDetailPage() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRelatedBlog, setSelectedRelatedBlog] = useState<Blog | null>(null);
 
-  // Fetch chi tiết bài viết với TanStack Query (chờ isInitialized)
-  const { data: blog = null, isLoading, isError } = useBlogBySlug(slug, isInitialized);
+  // Fetch chi tiết bài viết với TanStack Query (chờ isInitialized và bao gồm authScope)
+  const authScope = user ? `${user.id}_${user.role}_${user.isPremium ? 'premium' : 'free'}` : 'guest';
+  const { data: blog = null, isLoading, isError } = useBlogBySlug(slug, authScope, isInitialized);
 
   // Fetch bài viết cùng thể loại & fallback bài mới nhất
   const { data: sameCatData, isLoading: isSameCatLoading } = useBlogs(
@@ -51,11 +53,12 @@ export function BlogDetailPage() {
     Boolean(blog)
   );
 
-  const sameCategoryBlogs = (sameCatData?.blogs || []).filter((b) => b.id !== blog?.id);
+  const currentBlogId = String(blog?.id || '');
+  const sameCategoryBlogs = (sameCatData?.blogs || []).filter((b) => String(b.id) !== currentBlogId);
   let relatedBlogs = sameCategoryBlogs.slice(0, 3);
   if (relatedBlogs.length < 3 && fallbackData?.blogs) {
-    const existingIds = new Set([blog?.id, ...relatedBlogs.map((b) => b.id)]);
-    const fallbackBlogs = fallbackData.blogs.filter((b) => !existingIds.has(b.id));
+    const existingIds = new Set([currentBlogId, ...relatedBlogs.map((b) => String(b.id))]);
+    const fallbackBlogs = fallbackData.blogs.filter((b) => !existingIds.has(String(b.id)));
     relatedBlogs = [...relatedBlogs, ...fallbackBlogs].slice(0, 3);
   }
   const isRelatedLoading = isSameCatLoading || isFallbackLoading;
@@ -238,7 +241,7 @@ export function BlogDetailPage() {
                 ? '[mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_50%,transparent_100%)]'
                 : ''
                 }`}
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
             />
 
             {/* Premium Access Callout Container */}

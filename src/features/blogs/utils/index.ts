@@ -28,14 +28,21 @@ export function getCoverConfig(code?: string): {
 
 export function extractPlainText(input?: string | null): string {
   if (!input) return '';
-  return input
-    .replace(/<[^>]+>/g, ' ') // Xóa toàn bộ các thẻ HTML, giữ lại nội dung chữ bên trong
-    .replace(/&nbsp;/g, ' ')  // Decode ký tự khoảng trắng HTML
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')     // Chuẩn hóa nhiều khoảng trắng thành 1 khoảng trắng
-    .trim();
+  if (typeof window === 'undefined' || typeof DOMParser === 'undefined') {
+    return input
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(input, 'text/html');
+    doc.querySelectorAll('script, style').forEach((el) => el.remove());
+    return (doc.body.textContent || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  } catch {
+    return input.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
 }

@@ -6,7 +6,7 @@ export const BLOGS_QUERY_KEYS = {
   all: ['blogs'] as const,
   types: () => [...BLOGS_QUERY_KEYS.all, 'types'] as const,
   list: (params?: GetBlogsParams) => [...BLOGS_QUERY_KEYS.all, 'list', params] as const,
-  detail: (slug: string) => [...BLOGS_QUERY_KEYS.all, 'detail', slug] as const,
+  detail: (slug: string, authScope?: string) => [...BLOGS_QUERY_KEYS.all, 'detail', slug, authScope] as const,
 };
 
 /**
@@ -36,9 +36,9 @@ export function useBlogs(params?: GetBlogsParams, enabled = true) {
 /**
  * Hook lấy chi tiết bài blog theo Slug (Public)
  */
-export function useBlogBySlug(slug: string, enabled = true) {
+export function useBlogBySlug(slug: string, authScope?: string, enabled = true) {
   return useQuery({
-    queryKey: BLOGS_QUERY_KEYS.detail(slug),
+    queryKey: BLOGS_QUERY_KEYS.detail(slug, authScope),
     queryFn: () => getBlogBySlugApi(slug),
     enabled: Boolean(slug) && enabled,
     staleTime: 1000 * 60 * 5, // Cache 5 phút
