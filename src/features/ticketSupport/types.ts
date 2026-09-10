@@ -51,6 +51,8 @@ export interface Ticket {
   creatorId: number;
   assigneeId?: number | null;
   sourceConversationId?: number | null;
+  creatorUnreadCount?: number;
+  assigneeUnreadCount?: number;
   resolvedAt?: string | null;
   createdAt: string;
   updatedAt: string;

@@ -24,7 +24,9 @@ export function useTicketsQuery(
     enabled,
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage) => lastPage?.pagination?.nextCursor ?? undefined,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 10,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 }
 

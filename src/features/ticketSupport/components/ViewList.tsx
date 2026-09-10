@@ -211,18 +211,35 @@ export function ViewList({
           <div className="divide-y divide-slate-100">
             {tickets.map((t) => {
               const statusConfig = getStatusConfig(t.status);
+              const unreadCount = t.creatorUnreadCount || 0;
+              const hasUnread = unreadCount > 0;
+
               return (
                 <div
                   key={t.id}
                   onClick={() => onSelectTicket?.(t.id)}
-                  className="block p-4 sm:p-5 hover:bg-slate-50/80 transition group cursor-pointer"
+                  className={`block p-4 sm:p-5 transition group cursor-pointer border-l-4 ${
+                    hasUnread
+                      ? 'bg-sky-50/40 border-l-sky-500 hover:bg-sky-50/70'
+                      : 'border-l-transparent hover:bg-slate-50/80'
+                  }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     {/* Left details */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-slate-900 group-hover:text-sky-600 transition truncate">
-                        {t.title}
-                      </h3>
+                      <div className="flex items-center space-x-2">
+                        <h3 className={`text-base font-semibold text-slate-900 group-hover:text-sky-600 transition truncate ${hasUnread ? 'font-bold text-sky-950' : ''}`}>
+                          {t.title}
+                        </h3>
+                        {hasUnread && (
+                          <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-600 border border-rose-200 animate-pulse shrink-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                            <span>
+                              {unreadCount > 1 ? `${unreadCount} phản hồi mới` : 'Phản hồi mới'}
+                            </span>
+                          </span>
+                        )}
+                      </div>
 
                       <p className="text-xs sm:text-sm text-slate-600 line-clamp-1 mt-1">
                         {t.description}
@@ -255,8 +272,8 @@ export function ViewList({
 
                     {/* Right Icon CTA */}
                     <div className="flex items-center space-x-2 shrink-0 self-end sm:self-center">
-                      <span className="text-xs font-semibold text-sky-600 group-hover:underline hidden sm:inline">
-                        Chi tiết
+                      <span className={`text-xs font-semibold group-hover:underline hidden sm:inline ${hasUnread ? 'text-rose-600' : 'text-sky-600'}`}>
+                        {hasUnread ? 'Xem phản hồi' : 'Chi tiết'}
                       </span>
                       <div className="p-2 text-slate-400 group-hover:text-sky-600 group-hover:bg-sky-50 rounded-xl transition">
                         <ChevronRightIcon className="w-5 h-5" />

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline';
 import { useAuthStore } from '@/features/auth';
-import { useTicketsQuery } from '@/features/ticketSupport';
+import { useTicketsQuery, useTicketRealtime } from '@/features/ticketSupport';
 import { NAVIGATION_GROUPS } from '../constants';
 
 interface ConsoleSidebarProps {
@@ -18,10 +18,15 @@ export function ConsoleSidebar({ activeTab, onSelectTab }: ConsoleSidebarProps) 
   const { logout } = useAuthStore();
   const router = useRouter();
 
-  // Query tickets để đếm số lượng ticket cần user phản hồi
+  // Kích hoạt lắng nghe Socket realtime cho Ticket ở cấp Sidebar để cập nhật badge tức thì
+  useTicketRealtime();
+
+  // Query tickets để đếm số lượng ticket cần user phản hồi hoặc có phản hồi mới từ Admin
   const { data: ticketsRes } = useTicketsQuery(undefined, true);
   const allTickets = ticketsRes?.pages?.flatMap((p: any) => p.data || []) || [];
-  const pendingCount = allTickets.filter((t: any) => t.status === 'PENDING_USER').length;
+  const unreadOrPendingCount = allTickets.filter(
+    (t: any) => (t.creatorUnreadCount && t.creatorUnreadCount > 0) || t.status === 'PENDING_USER'
+  ).length;
 
   const handleItemClick = (item: { key: string; label: string; icon: any; href?: string }) => {
     if (item.href) {
@@ -45,7 +50,7 @@ export function ConsoleSidebar({ activeTab, onSelectTab }: ConsoleSidebarProps) 
                 {group.items.map((item: any) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.key;
-                  const showBadge = item.key === 'support' && pendingCount > 0;
+                  const showBadge = item.key === 'support' && unreadOrPendingCount > 0;
 
                   return (
                     <button
@@ -66,10 +71,10 @@ export function ConsoleSidebar({ activeTab, onSelectTab }: ConsoleSidebarProps) 
                         <span className="truncate">{item.label}</span>
                       </div>
 
-                      {/* Pending user ticket badge */}
+                      {/* Unread admin response or pending user ticket badge */}
                       {showBadge && (
-                        <span className="text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full animate-pulse">
-                          {pendingCount}
+                        <span className="text-[10px] font-bold bg-rose-500 text-white px-2 py-0.5 rounded-full animate-pulse">
+                          {unreadOrPendingCount}
                         </span>
                       )}
                     </button>

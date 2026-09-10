@@ -18,6 +18,7 @@ import { useSocket, useSocketEvent } from '@/core/config/socket/SocketContext';
 import toast from 'react-hot-toast';
 import { ViewChat } from './ViewChat';
 import { useAuthStore } from '@/features/auth';
+import { useTicketRealtime } from '@/features/ticketSupport';
 
 export const SupportChatWidget = () => {
   const router = useRouter();
@@ -26,6 +27,9 @@ export const SupportChatWidget = () => {
   const [isAdminOnline, setIsAdminOnline] = useState(false);
 
   const { socket } = useSocket();
+
+  // Kích hoạt realtime ticket socket listener trên toàn bộ giao diện Client
+  useTicketRealtime();
 
   // Custom Hooks
   const { data: adminStatusRes } = useAdminStatusQuery(isOpen);

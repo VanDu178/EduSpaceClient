@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
   useTicketsQuery,
   useTicketDetailQuery,
   useAddTicketCommentMutation,
   useTicketRealtime,
+  TICKET_QUERY_KEYS,
   FormCreate,
   ViewList,
   ViewDetail,
@@ -57,6 +60,39 @@ export function SupportView() {
   );
 
   const selectedTicket: Ticket | null = ticketDetailRes?.data || null;
+
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const ticketIdParam = searchParams?.get('ticketId');
+
+  const handleSelectTicket = useCallback((id: number) => {
+    setSelectedTicketId(id);
+    // Optimistic Update: Xóa creatorUnreadCount = 0 trong cache ngay lập tức (0ms) để Sidebar & List giảm badge lập tức
+    queryClient.setQueriesData({ queryKey: ['ticketSupport', 'tickets'] }, (oldData: any) => {
+      if (!oldData || !oldData.pages) return oldData;
+      return {
+        ...oldData,
+        pages: oldData.pages.map((page: any) => ({
+          ...page,
+          data: page.data?.map((t: any) =>
+            t.id === id ? { ...t, creatorUnreadCount: 0 } : t
+          )
+        }))
+      };
+    });
+    // Invalidate chỉ danh sách Ticket (không đụng tới ticketDetail để tránh lặp vô tận)
+    queryClient.invalidateQueries({ queryKey: ['ticketSupport', 'tickets'] });
+  }, [queryClient]);
+
+  // Tự động chọn Ticket nếu có ticketId trên query URL (ví dụ từ liên kết thông báo)
+  useEffect(() => {
+    if (ticketIdParam) {
+      const parsedId = parseInt(ticketIdParam, 10);
+      if (!isNaN(parsedId)) {
+        handleSelectTicket(parsedId);
+      }
+    }
+  }, [ticketIdParam, handleSelectTicket]);
 
   const isSubmittingComment = isSubmittingCommentMutation || isUploadingImages;
 
@@ -143,7 +179,7 @@ export function SupportView() {
             tickets={tickets}
             isLoading={isLoadingTickets}
             onOpenCreateModal={() => setShowCreateModal(true)}
-            onSelectTicket={(id) => setSelectedTicketId(id)}
+            onSelectTicket={handleSelectTicket}
             params={params}
             onParamsChange={setParams}
             totalCount={totalCount}

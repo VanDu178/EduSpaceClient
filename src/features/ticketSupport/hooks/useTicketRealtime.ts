@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSocket, useSocketEvent } from '@/core/config/socket/SocketContext';
+import toast from 'react-hot-toast';
 import { TICKET_QUERY_KEYS } from './index';
 import { TICKET_SOCKET_EVENTS } from '../constants';
 
@@ -47,6 +48,12 @@ export function useTicketRealtime(ticketId?: number) {
     const targetId = data?.ticketId || ticketId;
     if (targetId) {
       queryClient.invalidateQueries({ queryKey: TICKET_QUERY_KEYS.ticketDetail(targetId) });
+    }
+    if (data?.comment?.sender?.role === 'admin') {
+      toast.success('Có phản hồi mới từ bộ phận CSKH cho yêu cầu hỗ trợ của bạn!', {
+        icon: '💬',
+        duration: 4000
+      });
     }
     debouncedInvalidateTickets();
   });
