@@ -17,9 +17,11 @@ import {
 import { useSocket, useSocketEvent } from '@/core/config/socket/SocketContext';
 import toast from 'react-hot-toast';
 import { ViewChat } from './ViewChat';
+import { useAuthStore } from '@/features/auth';
 
 export const SupportChatWidget = () => {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isAdminOnline, setIsAdminOnline] = useState(false);
 
@@ -254,6 +256,8 @@ export const SupportChatWidget = () => {
       toast.error(err?.response?.data?.message || err?.message || 'Lỗi gửi tin nhắn');
     }
   };
+
+  if (!user) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50">

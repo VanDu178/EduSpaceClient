@@ -114,7 +114,7 @@ export function ViewDetail({
 
             <span className="text-xs text-slate-500 flex items-center space-x-1">
               <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-              <span>Khởi tạo lúc: {formatDate(ticket.createdAt, true)}</span>
+              <span>Đã gửi lúc: {formatDate(ticket.createdAt, true)}</span>
             </span>
           </div>
         </div>
@@ -197,7 +197,6 @@ export function ViewDetail({
                         </div>
 
                         <span className="text-xs text-slate-400 flex items-center space-x-1">
-                          <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
                           <span>{formatDate(comment.createdAt, true)}</span>
                         </span>
                       </div>
