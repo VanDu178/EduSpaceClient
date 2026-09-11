@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { BlogListPage } from '@/features/blogs';
+import { BlogListPage } from '@/modules/blogs';
 
 export const metadata: Metadata = {
   title: 'Tất Cả Bài Viết - TradeVerse Blog',

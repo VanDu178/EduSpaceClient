@@ -11,14 +11,14 @@ import {
   ArrowLeftIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import { BillingCycle, MembershipPlan, PaymentMethod, useMembershipPlans, useDefaultPaymentAccount } from '@/features/membership';
-import { useCreatePaymentTransaction } from '@/features/paymentTransactions';
-import { useMySubscriptions } from '@/features/account';
+import { BillingCycle, MembershipPlan, PaymentMethod, useMembershipPlans, useDefaultPaymentAccount } from '@/modules/membership';
+import { useCreatePaymentTransaction } from '@/modules/paymentTransactions';
+import { useMySubscriptions } from '@/modules/account';
 import {
   useActivePaymentMethods,
   PaymentMethodIcon,
   PAYMENT_METHOD_CODES,
-} from '@/features/paymentMethods';
+} from '@/modules/paymentMethods';
 import { Button } from '@/components/common';
 import toast from 'react-hot-toast';
 import { formatCurrency, calculateSubscriptionDates } from '@/core/utils';

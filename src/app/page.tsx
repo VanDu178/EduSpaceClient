@@ -4,7 +4,7 @@ import {
   ServicesSection,
   SignalsSection,
   CtaSection,
-} from "@/features/home";
+} from "@/modules/home";
 
 export default function Home() {
   return (

@@ -17,7 +17,7 @@ import {
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
-import { useResetPasswordMutation } from "@/features/auth";
+import { useResetPasswordMutation } from "@/modules/auth";
 
 function ResetPasswordForm() {
   const router = useRouter();

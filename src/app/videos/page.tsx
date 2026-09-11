@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { VideoListPage } from '@/features/videos';
+import { VideoListPage } from '@/modules/videos';
 
 export const metadata: Metadata = {
   title: 'Thư Viện Video - TradeVerse',

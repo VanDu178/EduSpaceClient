@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { AuthGuard } from '@/features/auth';
+import { AuthGuard } from '@/modules/auth';
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;

@@ -16,7 +16,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common/Button";
 import { GoogleIcon } from "@/core/icons";
-import { useLoginMutation, useGoogleLoginMutation, useAuthStore } from "@/features/auth";
+import { useLoginMutation, useGoogleLoginMutation, useAuthStore } from "@/modules/auth";
 import { APP_ROUTES } from "@/core/config/routes";
 
 function LoginContent() {

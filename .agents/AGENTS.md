@@ -24,7 +24,7 @@ Tổ chức thư mục chuẩn bên trong `src/`:
 - `src/app/`: Page components, routes và layouts.
 - `src/components/common/`: Reusable stateless UI components (Buttons, Inputs, Dialogs).
 - `src/components/layout/`: Page layouts (Header, Sidebar, Navigation).
-- `src/features/`: Feature modules (`components/`, `hooks/`, `services/`, `types.ts`, `constants.ts`, `index.ts`).
+- `src/modules/`: Feature modules (`components/`, `hooks/`, `services/`, `types.ts`, `constants.ts`, `index.ts`).
 - `src/core/`: Core infrastructure (`config/`, `contexts/`, `hooks/`, `icons/`, `services/`, `styles/`, `utils/`).
 - **File Imports:** Bắt buộc dùng absolute path alias `@/` (ví dụ: `import api from '@/core/services/api'`).
 

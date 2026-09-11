@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAuthStore, refreshTokenApi, getMeApi } from "@/features/auth";
+import { useAuthStore, refreshTokenApi, getMeApi } from "@/modules/auth";
 
 interface AuthProviderProps {
   children: React.ReactNode;

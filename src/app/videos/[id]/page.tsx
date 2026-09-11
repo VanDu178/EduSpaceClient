@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { VideoDetailPage } from '@/features/videos';
+import { VideoDetailPage } from '@/modules/videos';
 
 export const metadata: Metadata = {
   title: 'Xem Video - TradeVerse',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useAuthStore } from '@/features/auth';
+import { useAuthStore } from '@/modules/auth';
 import {
   TAB_TITLE_MAP,
   useMySubscriptions,
@@ -13,7 +13,7 @@ import {
   ProfileView,
   TransactionHistoryView,
   SupportView,
-} from '@/features/account';
+} from '@/modules/account';
 
 function AccountConsoleContent() {
   const searchParams = useSearchParams();

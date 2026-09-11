@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { AuthGuard } from '@/features/auth';
-import { ConsoleSkeleton } from '@/features/account';
+import { AuthGuard } from '@/modules/auth';
+import { ConsoleSkeleton } from '@/modules/account';
 
 interface AccountLayoutProps {
   children: React.ReactNode;

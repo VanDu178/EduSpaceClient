@@ -22,7 +22,7 @@ import {
   useForgotPasswordMutation,
   useResetPasswordMutation,
   PasswordStrengthIndicator,
-} from "@/features/auth";
+} from "@/modules/auth";
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<1 | 2>(1);

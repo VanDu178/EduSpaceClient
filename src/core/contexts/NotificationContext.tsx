@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { useSocketEvent } from '@/core/config/socket/SocketContext';
-import { useAuthStore } from '@/features/auth';
+import { useAuthStore } from '@/modules/auth';
 import notificationService, { NotificationItem } from '@/core/services/notificationService';
 import { BellIcon, TicketIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 

@@ -17,7 +17,7 @@ import {
   VideoCameraIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { useAuthStore } from "@/features/auth";
+import { useAuthStore } from "@/modules/auth";
 import { APP_ROUTES } from "@/core/config/routes";
 import { NotificationBell } from "@/components/common/NotificationBell";
 

@@ -25,12 +25,12 @@ import {
   OrderExpiredView,
   OrderCancelledView,
   ModalCancel,
-} from '@/features/paymentTransactions';
-import { PAYMENT_METHOD_CODES } from '@/features/paymentMethods';
+} from '@/modules/paymentTransactions';
+import { PAYMENT_METHOD_CODES } from '@/modules/paymentMethods';
 
-import { useMySubscriptions } from '@/features/account';
-import { useDefaultPaymentAccount } from '@/features/membership';
-import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { useMySubscriptions } from '@/modules/account';
+import { useDefaultPaymentAccount } from '@/modules/membership';
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore';
 import { Button } from '@/components/common';
 import { copyToClipboard, formatCurrency } from '@/core/utils';
 import { APP_ROUTES } from '@/core/config/routes';

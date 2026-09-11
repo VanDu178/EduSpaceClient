@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { MembershipPlanList } from '@/features/membership';
+import { MembershipPlanList } from '@/modules/membership';
 
 export const metadata: Metadata = {
   title: 'Gói Hội Viên & Bảng Giá | TradeVerse',

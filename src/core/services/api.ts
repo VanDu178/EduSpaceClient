@@ -1,5 +1,5 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { useAuthStore } from '@/features/auth/stores/useAuthStore';
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore';
 import { getQueryClient } from '@/components/providers/ReactQueryProvider';
 import { ERROR_CACHE_INVALIDATE_MAP } from '@/core/config/errorCacheMap';
 

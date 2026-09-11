@@ -16,7 +16,7 @@ import {
   ArrowTrendingDownIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/common";
-import { changePasswordApi, PasswordStrengthIndicator } from "@/features/auth";
+import { changePasswordApi, PasswordStrengthIndicator } from "@/modules/auth";
 
 export default function ChangePasswordPage() {
   const [loading, setLoading] = useState(false);

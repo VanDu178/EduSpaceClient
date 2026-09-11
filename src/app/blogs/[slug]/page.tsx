@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { BlogDetailPage, getBlogBySlugApi, extractPlainText } from '@/features/blogs';
+import { BlogDetailPage, getBlogBySlugApi, extractPlainText } from '@/modules/blogs';
 
 export async function generateMetadata({
   params,

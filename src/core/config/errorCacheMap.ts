@@ -1,6 +1,6 @@
-import { MEMBERSHIP_QUERY_KEYS } from '@/features/membership/hooks';
+import { MEMBERSHIP_QUERY_KEYS } from '@/modules/membership/hooks';
 import { APP_ROUTES } from './routes';
-import { PAYMENT_METHODS_QUERY_KEYS } from '@/features/paymentMethods';
+import { PAYMENT_METHODS_QUERY_KEYS } from '@/modules/paymentMethods';
 
 export interface ErrorCacheRule {
   queryKeys: readonly (readonly unknown[])[];

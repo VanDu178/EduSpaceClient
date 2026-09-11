@@ -1,6 +1,6 @@
 "use client";
 
-import { GuestGuard } from "@/features/auth";
+import { GuestGuard } from "@/modules/auth";
 
 interface GuestLayoutProps {
   children: React.ReactNode;

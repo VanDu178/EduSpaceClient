@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { SupportChatWidget } from "@/features/chatSupport";
+import { SupportChatWidget } from "@/modules/chatSupport";
 import { SocketProvider } from "@/core/config/socket/SocketContext";
 import { NotificationProvider } from "@/core/contexts";
 import { Toaster } from "react-hot-toast";

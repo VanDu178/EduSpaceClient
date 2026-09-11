@@ -23,7 +23,7 @@ import {
   useGoogleLoginMutation,
   useAuthStore,
   PasswordStrengthIndicator,
-} from "@/features/auth";
+} from "@/modules/auth";
 import { APP_ROUTES } from "@/core/config/routes";
 
 function RegisterContent() {
