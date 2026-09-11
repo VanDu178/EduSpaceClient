@@ -118,9 +118,8 @@ export const SupportChatWidget = () => {
                 toast.dismiss(t.id);
                 setIsOpen(true);
               }}
-              className={`${
-                t.visible ? 'animate-enter' : 'animate-leave'
-              } max-w-sm w-full bg-white shadow-xl rounded-xl pointer-events-auto border border-sky-100 p-4 flex gap-3 items-start backdrop-blur-md cursor-pointer hover:bg-sky-50/50 transition-colors`}
+              className={`${t.visible ? 'animate-enter' : 'animate-leave'
+                } max-w-sm w-full bg-white shadow-xl rounded-xl pointer-events-auto border border-sky-100 p-4 flex gap-3 items-start backdrop-blur-md cursor-pointer hover:bg-sky-50/50 transition-colors`}
             >
               <div className="p-2 bg-sky-50 rounded-lg shrink-0 text-sky-600">
                 <ChatBubbleLeftRightIcon className="w-5 h-5" />
@@ -264,7 +263,7 @@ export const SupportChatWidget = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       {/* Floating Toggle Button */}
       {!isOpen && (
         <button
@@ -272,10 +271,10 @@ export const SupportChatWidget = () => {
             setIsOpen(true);
             checkAdminPresence();
           }}
-          className="flex items-center space-x-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold px-4.5 py-3 rounded-full transition-all duration-200 cursor-pointer border border-sky-500"
+          className="flex items-center space-x-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold px-4.5 py-3 rounded-full transition-all duration-200 cursor-pointer border border-sky-500 shadow-lg"
         >
           <ChatBubbleLeftRightIcon className="w-5 h-5" />
-          <span className="text-sm font-medium">Hỗ trợ Live Chat</span>
+          <span className="text-sm font-medium">Hỗ trợ</span>
           {isAdminOnline && (
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-white"></span>
           )}
@@ -284,7 +283,7 @@ export const SupportChatWidget = () => {
 
       {/* Main Chat Window */}
       {isOpen && (
-        <div className="w-[380px] sm:w-[420px] h-[560px] bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden text-slate-800">
+        <div className="w-[calc(100vw-2rem)] sm:w-[400px] max-w-[400px] h-[520px] sm:h-[560px] max-h-[calc(100vh-5rem)] bg-white border border-slate-200 rounded-2xl flex flex-col overflow-hidden text-slate-800 shadow-2xl">
           {/* Header Light */}
           <div className="bg-slate-50 border-b border-slate-200 p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">

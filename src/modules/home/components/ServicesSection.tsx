@@ -53,24 +53,24 @@ export function ServicesSection() {
                   <button
                     type="button"
                     onClick={() => handleTabChange("tradingview")}
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${activeTab === "tradingview"
-                      ? "bg-white text-indigo-600 border border-zinc-200/80"
-                      : "text-zinc-600 hover:text-zinc-900"
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${activeTab === "tradingview"
+                      ? "bg-white text-primary border border-zinc-200/80 shadow-xs"
+                      : "text-zinc-500 hover:text-zinc-900"
                       }`}
                   >
-                    <SparklesIcon className="w-4 h-4 text-indigo-600" />
-                    <span>Tài Khoản TradingView</span>
+                    <SparklesIcon className={`w-4 h-4 shrink-0 transition-colors ${activeTab === "tradingview" ? "text-primary" : "text-zinc-400"}`} />
+                    <span className="truncate">Tài Khoản TradingView</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleTabChange("bot")}
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${activeTab === "bot"
-                      ? "bg-white text-indigo-600 border border-zinc-200/80"
-                      : "text-zinc-600 hover:text-zinc-900"
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3 py-2 sm:px-3.5 sm:py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${activeTab === "bot"
+                      ? "bg-white text-primary border border-zinc-200/80 shadow-xs"
+                      : "text-zinc-500 hover:text-zinc-900"
                       }`}
                   >
-                    <CodeBracketIcon className="w-4 h-4 text-indigo-600" />
-                    <span>Lập Trình &amp; Bot</span>
+                    <CodeBracketIcon className={`w-4 h-4 shrink-0 transition-colors ${activeTab === "bot" ? "text-primary" : "text-zinc-400"}`} />
+                    <span className="truncate">Lập Trình &amp; Bot</span>
                   </button>
                 </div>
               </div>
@@ -81,17 +81,17 @@ export function ServicesSection() {
                 {activeTab === "tradingview" && (
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* Clean Top Status Banner */}
-                    <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-xl bg-indigo-50/60 border border-indigo-100/80 text-zinc-900 gap-2">
+                    <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-xl bg-primary-light/60 border border-primary/20 text-zinc-900 gap-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+                        {/* <div className="w-8 h-8 rounded-lg bg-primary-light flex items-center justify-center text-primary shrink-0">
                           <CheckBadgeIcon className="w-5 h-5" />
-                        </div>
+                        </div> */}
                         <div>
                           <h4 className="text-xs sm:text-sm font-bold text-zinc-900">Tài khoản TradingView Premium</h4>
-                          <p className="text-[11px] text-zinc-500">Đầy đủ tính năng cao cấp • Sử dụng ổn định</p>
+                          <p className="text-[11px] text-zinc-500">Đầy đủ tính năng cao cấp & Ổn định</p>
                         </div>
                       </div>
-                      <span className="text-[11px] font-bold text-indigo-600 bg-indigo-100/80 border border-indigo-200/60 px-2.5 py-1 rounded-full shrink-0">
+                      <span className="text-[11px] font-bold text-primary bg-primary-light border border-primary/30 px-2.5 py-1 rounded-full shrink-0">
                         Tiết kiệm 70%
                       </span>
                     </div>
@@ -99,13 +99,12 @@ export function ServicesSection() {
                     {/* Seamless Feature List - No Nested Inner Boxes */}
                     <div className="divide-y divide-zinc-100 text-xs">
                       <div className="py-2.5 first:pt-1 last:pb-1 flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-primary-light/60 flex items-center justify-center text-primary shrink-0 mt-0.5">
                           <UserGroupIcon className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
                             <h5 className="font-semibold text-zinc-900 text-xs">Gói Private &amp; Shared</h5>
-                            <span className="text-[10px] font-medium text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded">Bảo Mật</span>
                           </div>
                           <p className="text-[11px] text-zinc-500 leading-relaxed">
                             Lựa chọn linh hoạt giữa tài khoản Private riêng tư 100% bảo mật hoặc Shared tối ưu ngân sách.
@@ -114,13 +113,12 @@ export function ServicesSection() {
                       </div>
 
                       <div className="py-2.5 flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-primary-light/60 flex items-center justify-center text-primary shrink-0 mt-0.5">
                           <ComputerDesktopIcon className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
                             <h5 className="font-semibold text-zinc-900 text-xs">Đăng Nhập Đồng Thời</h5>
-                            <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded">Multi-Device</span>
                           </div>
                           <p className="text-[11px] text-zinc-500 leading-relaxed">
                             Cho phép tài khoản hoạt động cùng lúc trên nhiều thiết bị (PC, Mobile, Tablet) mà không bị out.
@@ -129,13 +127,12 @@ export function ServicesSection() {
                       </div>
 
                       <div className="py-2.5 flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-primary-light/60 flex items-center justify-center text-primary shrink-0 mt-0.5">
                           <GlobeAltIcon className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
                             <h5 className="font-semibold text-zinc-900 text-xs">Sử Dụng Trực Tiếp</h5>
-                            <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded">Chính Chủ</span>
                           </div>
                           <p className="text-[11px] text-zinc-500 leading-relaxed">
                             Đăng nhập trực tiếp, không cần cài extension hay phần mềm trung gian.
@@ -144,13 +141,12 @@ export function ServicesSection() {
                       </div>
 
                       <div className="py-2.5 flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600 shrink-0 mt-0.5">
+                        <div className="w-7 h-7 rounded-lg bg-primary-light/60 flex items-center justify-center text-primary shrink-0 mt-0.5">
                           <ShieldCheckIcon className="w-4 h-4" />
                         </div>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
                             <h5 className="font-semibold text-zinc-900 text-xs">Bảo Hành Trọn Thời Gian</h5>
-                            <span className="text-[10px] font-medium text-purple-700 bg-purple-50 px-1.5 py-0.2 rounded">1-Đổi-1</span>
                           </div>
                           <p className="text-[11px] text-zinc-500 leading-relaxed">
                             Hỗ trợ kỹ thuật 24/7 và cam kết đổi mới tức thì nếu phát sinh sự cố trong suốt chu kỳ sử dụng.
@@ -165,48 +161,48 @@ export function ServicesSection() {
                 {activeTab === "bot" && (
                   <div className="space-y-4 animate-in fade-in duration-300">
                     {/* macOS IDE Code Studio Window Simulation */}
-                    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-3.5 space-y-3 text-xs text-zinc-300 font-mono">
-                      <div className="flex items-center justify-between border-b border-zinc-800 pb-2 text-[11px] text-zinc-400">
-                        <div className="flex items-center gap-2">
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-3 sm:p-3.5 space-y-3 text-xs text-zinc-300 font-mono">
+                      <div className="flex items-center justify-between border-b border-zinc-800 pb-2 text-[11px] text-zinc-400 gap-2 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0 overflow-hidden">
                           {/* macOS Window Controls */}
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
                             <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
                             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
                           </div>
-                          <span className="text-zinc-600">|</span>
-                          <CommandLineIcon className="w-3.5 h-3.5 text-indigo-400" />
-                          <span className="text-zinc-200 font-medium">wyckoff_box_strategy.pine</span>
+                          <span className="text-zinc-600 shrink-0">|</span>
+                          <CommandLineIcon className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span className="text-zinc-200 font-medium truncate text-[10px] sm:text-[11px]">wyckoff_box_strategy.pine</span>
                         </div>
-                        <span className="text-[10px] text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2 py-0.5 rounded font-sans font-semibold">
+                        <span className="text-[10px] text-primary bg-cyan-950/80 border border-cyan-800/80 px-2 py-0.5 rounded font-sans font-semibold shrink-0 whitespace-nowrap">
                           PineScript v5 ✓
                         </span>
                       </div>
 
                       <div className="space-y-1 text-[11px] leading-relaxed overflow-x-auto">
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">1</span>
-                          <span><span className="text-purple-400">//@version=5</span></span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">1</span>
+                          <span><span className="text-cyan-400">//@version=5</span></span>
                         </div>
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">2</span>
-                          <span><span className="text-blue-400">strategy</span>(<span className="text-emerald-300">&quot;Wyckoff Box Strategy&quot;</span>, overlay=<span className="text-amber-300">true</span>)</span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">2</span>
+                          <span><span className="text-cyan-400 font-semibold">strategy</span>(<span className="text-emerald-300">&quot;Wyckoff Box Strategy&quot;</span>, overlay=<span className="text-amber-300">true</span>)</span>
                         </div>
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">3</span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">3</span>
                           <span className="text-zinc-500">// Wyckoff Accumulation &amp; Breakout Box</span>
                         </div>
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">4</span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">4</span>
                           <span>box_high = ta.highest(high, <span className="text-amber-300">20</span>)[<span className="text-amber-300">1</span>]</span>
                         </div>
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">5</span>
-                          <span><span className="text-blue-400">if</span> (ta.crossover(close, box_high) <span className="text-blue-400">and</span> volume &gt; ta.sma(volume, <span className="text-amber-300">20</span>))</span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">5</span>
+                          <span><span className="text-cyan-400 font-semibold">if</span> (ta.crossover(close, box_high) <span className="text-cyan-400 font-semibold">and</span> volume &gt; ta.sma(volume, <span className="text-amber-300">20</span>))</span>
                         </div>
-                        <div className="flex gap-3">
-                          <span className="text-zinc-600 select-none w-4 text-right">6</span>
-                          <span className="pl-4"><span className="text-blue-400">strategy.entry</span>(<span className="text-emerald-300">&quot;Wyckoff SOS Long&quot;</span>, strategy.long)</span>
+                        <div className="flex gap-3 whitespace-nowrap">
+                          <span className="text-zinc-600 select-none w-4 text-right shrink-0">6</span>
+                          <span className="pl-4"><span className="text-cyan-400 font-semibold">strategy.entry</span>(<span className="text-emerald-300">&quot;Wyckoff SOS Long&quot;</span>, strategy.long)</span>
                         </div>
                       </div>
                     </div>
@@ -250,7 +246,7 @@ export function ServicesSection() {
                         </div>
                         <div>
                           <div className="text-zinc-500 text-[10px]">Tỉ Lệ R : R</div>
-                          <div className="font-bold text-indigo-600 mt-0.5 text-xs sm:text-sm">1 : 3</div>
+                          <div className="font-bold text-primary mt-0.5 text-xs sm:text-sm">1 : 3</div>
                         </div>
                         <div>
                           <div className="text-zinc-500 text-[10px]">Tổng Lệnh</div>

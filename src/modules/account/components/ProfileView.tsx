@@ -190,28 +190,25 @@ export function ProfileView({ activeSubscription, onNavigateTab }: ProfileViewPr
           </div>
         )}
 
-        {/* Security Status Section */}
-        <div className="pt-6 border-t border-slate-100 space-y-4">
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-slate-50/70 border border-slate-100 rounded-xl">
-              <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-slate-900">Phương thức xác thực</p>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  {isGoogleAccount ? 'Đăng nhập thông qua tài khoản Google OAuth 2.0' : 'Đăng nhập thông qua Email & Mật khẩu chuẩn'}
-                </p>
-              </div>
+        {/* Seamless Security Status Notice (Zero Border Box Layout) */}
+        <div className="pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-600">
+          <div className="flex items-start gap-2.5">
+            <CheckCircleIcon className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-slate-900">Phương thức xác thực</p>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                {isGoogleAccount ? 'Đăng nhập thông qua tài khoản Google OAuth 2.0' : 'Đăng nhập thông qua Email & Mật khẩu chuẩn'}
+              </p>
             </div>
+          </div>
 
-            <div className="flex items-start gap-3 p-4 bg-slate-50/70 border border-slate-100 rounded-xl">
-              <LockClosedIcon className="w-5 h-5 text-sky-500 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <p className="text-xs font-semibold text-slate-900">Mã hóa bảo vệ</p>
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Mật khẩu của bạn luôn được bảo vệ & mã hóa an toàn bằng thuật toán.
-                </p>
-              </div>
+          <div className="flex items-start gap-2.5">
+            <LockClosedIcon className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-semibold text-slate-900">Mã hóa bảo vệ</p>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
+                Mật khẩu của bạn luôn được bảo vệ &amp; mã hóa an toàn bằng thuật toán.
+              </p>
             </div>
           </div>
         </div>

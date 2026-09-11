@@ -81,19 +81,19 @@ export function MembershipPlanList() {
 
       {/* 3. Membership Plan Cards Container */}
       {isLoading ? (
-        <div className="flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch justify-center">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 animate-pulse h-96 w-full md:w-[calc(33.333%-1.5rem)] md:max-w-sm"
+              className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 animate-pulse h-96 w-full"
             >
-              <div className="h-6 bg-gray-200 rounded w-1/2" />
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-10 bg-gray-100 rounded w-full my-4" />
+              <div className="h-6 bg-slate-200 rounded w-1/2" />
+              <div className="h-4 bg-slate-200 rounded w-3/4" />
+              <div className="h-10 bg-slate-100 rounded w-full my-4" />
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-full" />
-                <div className="h-4 bg-gray-200 rounded w-full" />
-                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                <div className="h-4 bg-slate-200 rounded w-full" />
+                <div className="h-4 bg-slate-200 rounded w-full" />
+                <div className="h-4 bg-slate-200 rounded w-2/3" />
               </div>
             </div>
           ))}
@@ -101,9 +101,9 @@ export function MembershipPlanList() {
       ) : plans.length === 0 ? (
         <MembershipPlanEmpty />
       ) : (
-        <div className="flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch justify-center">
           {plans.map((plan) => (
-            <div key={plan.id} className="w-full md:w-[calc(33.333%-1.5rem)] md:max-w-sm flex">
+            <div key={plan.id} className="w-full flex">
               <MembershipPlanCard
                 plan={plan}
                 billingCycle={billingCycle}
@@ -117,26 +117,34 @@ export function MembershipPlanList() {
       )}
 
       {/* 4. Trust & Security Badges */}
-      <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
-        <div className="flex items-center gap-3 justify-center sm:justify-start">
-          <ShieldCheckIcon className="w-8 h-8 text-primary shrink-0" />
-          <div>
-            <h4 className="text-xs sm:text-sm font-bold text-gray-900">Bảo mật tuyệt đối</h4>
-            <p className="text-xs text-gray-600">Thanh toán mã hóa an toàn qua cổng ngân hàng & QR</p>
+      <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="flex items-start gap-3.5 text-left">
+          <div className="p-2 bg-sky-50 text-sky-600 rounded-xl border border-sky-100 shrink-0">
+            <ShieldCheckIcon className="w-6 h-6" />
+          </div>
+          <div className="space-y-0.5">
+            <h4 className="text-sm font-bold text-slate-900">Bảo mật tuyệt đối</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">Thanh toán mã hóa an toàn qua cổng ngân hàng & QR</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 justify-center sm:justify-start">
-          <QuestionMarkCircleIcon className="w-8 h-8 text-primary shrink-0" />
-          <div>
-            <h4 className="text-xs sm:text-sm font-bold text-gray-900">Hỗ trợ nhanh chóng</h4>
-            <p className="text-xs text-gray-600">Đội ngũ chuyên viên TradeVerse hỗ trợ 24/7</p>
+
+        <div className="flex items-start gap-3.5 text-left">
+          <div className="p-2 bg-sky-50 text-sky-600 rounded-xl border border-sky-100 shrink-0">
+            <QuestionMarkCircleIcon className="w-6 h-6" />
+          </div>
+          <div className="space-y-0.5">
+            <h4 className="text-sm font-bold text-slate-900">Hỗ trợ nhanh chóng</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">Đội ngũ chuyên viên TradeVerse hỗ trợ 24/7</p>
           </div>
         </div>
-        <div className="flex items-center gap-3 justify-center sm:justify-start">
-          <CheckIcon className="w-8 h-8 text-primary shrink-0" />
-          <div>
-            <h4 className="text-xs sm:text-sm font-bold text-gray-900">Linh hoạt kích hoạt</h4>
-            <p className="text-xs text-gray-600">Quyền truy cập tự động nâng cấp ngay sau thanh toán</p>
+
+        <div className="flex items-start gap-3.5 text-left">
+          <div className="p-2 bg-sky-50 text-sky-600 rounded-xl border border-sky-100 shrink-0">
+            <CheckIcon className="w-6 h-6" />
+          </div>
+          <div className="space-y-0.5">
+            <h4 className="text-sm font-bold text-slate-900">Linh hoạt kích hoạt</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">Quyền truy cập tự động nâng cấp ngay sau thanh toán</p>
           </div>
         </div>
       </div>

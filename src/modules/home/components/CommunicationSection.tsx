@@ -113,18 +113,19 @@ export function CommunicationSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+            className="flex justify-center lg:justify-start"
           >
-            <ul className="space-y-3 text-xs sm:text-sm text-zinc-600 text-left pt-1">
-              <li className="flex items-center gap-3">
-                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0" />
+            <ul className="space-y-3 text-xs sm:text-sm text-zinc-600 text-left pt-1 max-w-xl w-full mx-auto lg:mx-0">
+              <li className="flex items-start gap-3">
+                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                 <span>100+ Bài viết, tài liệu, video được chia sẻ miễn phí</span>
               </li>
-              <li className="flex items-center gap-3">
-                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0" />
+              <li className="flex items-start gap-3">
+                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                 <span>Cùng nhau thảo luận, trao đổi kiến thức kinh nghiệm về thị trường</span>
               </li>
-              <li className="flex items-center gap-3">
-                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0" />
+              <li className="flex items-start gap-3">
+                <CheckCircleIcon className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                 <span>Các khóa học chuyên sâu được chia sẻ trực tiếp bởi người có kinh nghiệm thực tế</span>
               </li>
             </ul>
@@ -166,21 +167,21 @@ export function CommunicationSection() {
           >
             <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden group">
               {/* Telegram App Header with Realtime Animated Counter */}
-              <div className="bg-[#0088cc] text-white p-3.5 sm:p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center font-bold text-white shrink-0">
-                    <PaperAirplaneIcon className="w-5 h-5 -rotate-45 -translate-y-0.5" />
+              <div className="bg-[#0088cc] text-white p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                  <div className="flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 border border-white/30 items-center justify-center font-bold text-white shrink-0">
+                    <PaperAirplaneIcon className="w-4 h-4 sm:w-5 sm:h-5 -rotate-45 -translate-y-0.5" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-sm flex items-center gap-1.5 leading-tight text-white">
-                      <span>TradeVerse Community Chat</span>
-                      <span className="w-4 h-4 rounded-full bg-white/25 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 leading-tight text-white">
+                      <span className="truncate">TradeVerse Community Chat</span>
+                      <span className="hidden sm:flex w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white/25 text-white items-center justify-center text-[9px] sm:text-[10px] font-bold shrink-0">✓</span>
                     </h4>
-                    <p className="text-[11px] text-sky-100 flex items-center gap-2 mt-0.5">
+                    <p className="text-[10px] sm:text-[11px] text-sky-100 flex items-center gap-1.5 sm:gap-2 mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
                       <span>{memberCount.toLocaleString()} thành viên</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1 text-emerald-200 font-medium">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="hidden sm:inline-flex items-center gap-1 text-emerald-200 font-medium">
+                        <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
                         <span className="transition-all duration-300">{onlineCount} online</span>
                       </span>
                     </p>
@@ -190,7 +191,7 @@ export function CommunicationSection() {
                   href="https://t.me"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white text-xs font-semibold transition-all hover:scale-105"
+                  className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 text-white text-[11px] sm:text-xs font-semibold transition-all hover:scale-105 shrink-0 whitespace-nowrap"
                 >
                   Tham gia
                 </a>
@@ -198,16 +199,16 @@ export function CommunicationSection() {
 
               {/* Typing indicator alert sub-header */}
               {activeAuthor && (
-                <div className="bg-sky-50 px-4 py-1 border-b border-sky-100 text-[11px] text-sky-700 flex items-center gap-2 animate-fadeIn">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping" />
-                  <span>
+                <div className="bg-sky-50 px-3 sm:px-4 py-1 border-b border-sky-100 text-[10px] sm:text-[11px] text-sky-700 flex items-center gap-1.5 sm:gap-2 animate-fadeIn truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping shrink-0" />
+                  <span className="truncate">
                     <strong className="font-semibold text-zinc-900">{activeAuthor}</strong> đang soạn tin nhắn...
                   </span>
                 </div>
               )}
 
               {/* Telegram Messages Body with Staggered Slide-in Animation */}
-              <div className="bg-[#f4f6f8] p-4 min-h-[250px] max-h-[270px] overflow-hidden relative border-y border-zinc-200/80">
+              <div className="bg-[#f4f6f8] p-3 sm:p-4 min-h-[250px] max-h-[270px] overflow-hidden relative border-y border-zinc-200/80">
                 {/* Fade overlays top & bottom */}
                 <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-b from-[#f4f6f8] to-transparent pointer-events-none z-10" />
                 <div className="absolute bottom-0 inset-x-0 h-3 bg-gradient-to-t from-[#f4f6f8] to-transparent pointer-events-none z-10" />
@@ -216,12 +217,12 @@ export function CommunicationSection() {
                   {displayedMessages.map((msg) => (
                     <div
                       key={msg.uniqueId}
-                      className="flex items-start gap-2.5 animate-slide-up-fade transition-all duration-300 transform"
+                      className="flex items-start gap-2 sm:gap-2.5 animate-slide-up-fade transition-all duration-300 transform"
                     >
                       <div className={`w-7 h-7 rounded-full ${msg.bg} text-white font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5`}>
                         {msg.avatar}
                       </div>
-                      <div className="flex-1 max-w-[88%] bg-white border border-zinc-200 rounded-2xl rounded-tl-sm p-3 text-xs space-y-1">
+                      <div className="flex-1 max-w-[88%] bg-white border border-zinc-200 rounded-2xl rounded-tl-sm p-2.5 sm:p-3 text-xs space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold text-sky-600 flex items-center gap-1.5 text-[11px]">
                             {msg.author}
@@ -236,12 +237,12 @@ export function CommunicationSection() {
                               </span>
                             )}
                           </span>
-                          <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                          <span className="text-[10px] text-zinc-400 flex items-center gap-1 shrink-0">
                             <span>{msg.time}</span>
                             <span className="text-sky-500 font-bold">✓✓</span>
                           </span>
                         </div>
-                        <p className="text-zinc-800 leading-relaxed font-sans">{msg.text}</p>
+                        <p className="text-zinc-800 leading-relaxed font-sans text-xs sm:text-xs">{msg.text}</p>
                       </div>
                     </div>
                   ))}
@@ -249,20 +250,20 @@ export function CommunicationSection() {
               </div>
 
               {/* Telegram Input Bar with Character-by-Character Typing Cursor */}
-              <div className="bg-white p-3 border-t border-zinc-200 flex items-center gap-3">
-                <div className="flex-1 bg-zinc-100 border border-zinc-200/80 rounded-full px-4 py-2 text-xs text-zinc-800 flex items-center justify-between min-h-[36px]">
+              <div className="bg-white p-2.5 sm:p-3 border-t border-zinc-200 flex items-center gap-2 sm:gap-3">
+                <div className="flex-1 bg-zinc-100 border border-zinc-200/80 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 text-xs text-zinc-800 flex items-center justify-between min-h-[36px] min-w-0">
                   {typedText ? (
-                    <span className="flex items-center text-zinc-900">
-                      <span>{typedText}</span>
-                      <span className="inline-block w-1.5 h-3.5 bg-sky-500 animate-blink ml-0.5 align-middle rounded-sm" />
+                    <span className="flex items-center text-zinc-900 truncate">
+                      <span className="truncate">{typedText}</span>
+                      <span className="inline-block w-1.5 h-3.5 bg-sky-500 animate-blink ml-0.5 align-middle rounded-sm shrink-0" />
                     </span>
                   ) : (
-                    <span className="text-zinc-400 flex items-center gap-1.5">
-                      <span>Nhập tin nhắn thảo luận...</span>
-                      <span className="inline-block w-1.5 h-3.5 bg-zinc-400 animate-blink ml-0.5 align-middle rounded-sm" />
+                    <span className="text-zinc-400 flex items-center gap-1.5 truncate">
+                      <span className="truncate">Nhập tin nhắn thảo luận...</span>
+                      <span className="inline-block w-1.5 h-3.5 bg-zinc-400 animate-blink ml-0.5 align-middle rounded-sm shrink-0" />
                     </span>
                   )}
-                  <span className="text-zinc-400 text-xs shrink-0">💬</span>
+                  <span className="text-zinc-400 text-xs shrink-0 ml-1">💬</span>
                 </div>
                 <button
                   type="button"

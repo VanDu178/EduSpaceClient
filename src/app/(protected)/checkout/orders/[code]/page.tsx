@@ -485,25 +485,27 @@ function OrderDetailContent() {
                   </div>
 
                   {/* Transfer Info Details */}
-                  <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200 space-y-3 text-xs">
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                      <span className="text-gray-500 font-medium">Ngân hàng thụ hưởng:</span>
-                      <span className="text-sm font-bold text-gray-900">
+                  <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3 text-xs">
+                    {/* Bank Name */}
+                    <div className="flex justify-between items-start gap-2.5 pb-2.5 border-b border-slate-200/70">
+                      <span className="text-slate-500 font-medium shrink-0 pt-0.5">Ngân hàng:</span>
+                      <span className="text-xs sm:text-sm font-bold text-slate-900 text-right">
                         {bankName || '---'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                      <span className="text-gray-500 font-medium">Số tài khoản:</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-sm font-bold text-gray-900">
+                    {/* Account No */}
+                    <div className="flex justify-between items-center gap-2.5 pb-2.5 border-b border-slate-200/70">
+                      <span className="text-slate-500 font-medium shrink-0">Số tài khoản:</span>
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <span className="font-mono text-xs sm:text-sm font-bold text-slate-900">
                           {accountNo || '---'}
                         </span>
                         {accountNo && (
                           <button
                             type="button"
                             onClick={() => copyToClipboard(accountNo, 'Đã sao chép số tài khoản!')}
-                            className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
+                            className="p-1 text-slate-500 hover:text-sky-600 transition-colors cursor-pointer"
                             title="Sao chép số tài khoản"
                           >
                             <ClipboardDocumentIcon className="w-4 h-4" />
@@ -512,23 +514,25 @@ function OrderDetailContent() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                      <span className="text-gray-500 font-medium">Chủ tài khoản:</span>
-                      <span className="text-sm font-bold text-gray-900 uppercase">
+                    {/* Account Holder */}
+                    <div className="flex justify-between items-center gap-2.5 pb-2.5 border-b border-slate-200/70">
+                      <span className="text-slate-500 font-medium shrink-0">Chủ tài khoản:</span>
+                      <span className="text-xs sm:text-sm font-bold text-slate-900 uppercase text-right">
                         {accountHolder || '---'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                      <span className="text-gray-500 font-medium">Số tiền thanh toán:</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-sm font-bold text-gray-900">
+                    {/* Amount */}
+                    <div className="flex justify-between items-center gap-2.5 pb-2.5 border-b border-slate-200/70">
+                      <span className="text-slate-500 font-medium shrink-0">Số tiền thanh toán:</span>
+                      <div className="flex items-center gap-1.5 justify-end">
+                        <span className="text-xs sm:text-sm font-bold text-primary">
                           {formatCurrency(displayAmount)}
                         </span>
                         <button
                           type="button"
                           onClick={() => copyToClipboard(String(displayAmount || 0), 'Đã sao chép số tiền thanh toán!')}
-                          className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
+                          className="p-1 text-slate-500 hover:text-sky-600 transition-colors cursor-pointer"
                           title="Sao chép số tiền thanh toán"
                         >
                           <ClipboardDocumentIcon className="w-4 h-4" />
@@ -536,21 +540,21 @@ function OrderDetailContent() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-gray-500 font-medium">Nội dung chuyển khoản:</span>
-                        <span className="text-[10px] px-1.5 py-0.2 font-semibold text-amber-800 bg-amber-100/90 rounded border border-amber-200 uppercase">
-                          Bắt buộc
-                        </span>
+                    {/* Transfer Content */}
+                    <div className="flex justify-between items-start gap-2.5 pb-2.5 border-b border-slate-200/70">
+                      <div className="flex items-center gap-0.5 shrink-0 pt-0.5">
+                        <span className="text-slate-500 font-medium">Nội dung chuyển khoản</span>
+                        <span className="text-rose-500 font-bold text-sm leading-none ml-0.5">*</span>
+                        <span className="text-slate-500 font-medium">:</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-sm font-bold text-gray-900 tracking-wider">
+                      <div className="flex items-center gap-1.5 justify-end pt-0.5">
+                        <span className="font-mono text-xs sm:text-sm font-bold text-slate-900 tracking-wider text-right">
                           {transaction.transferContent}
                         </span>
                         <button
                           type="button"
                           onClick={() => copyToClipboard(transaction.transferContent, 'Đã sao chép nội dung chuyển khoản!')}
-                          className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
+                          className="p-1 text-slate-500 hover:text-sky-600 transition-colors cursor-pointer"
                           title="Sao chép nội dung chuyển khoản"
                         >
                           <ClipboardDocumentIcon className="w-4 h-4" />
@@ -558,7 +562,7 @@ function OrderDetailContent() {
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-amber-900 leading-tight pt-0.5">
+                    <p className="text-[11px] text-amber-900 leading-tight pt-1">
                       ⚠️ <strong className="font-semibold text-amber-950">Lưu ý:</strong> Vui lòng giữ <strong className="font-bold text-amber-950">chính xác tuyệt đối nội dung chuyển khoản trên</strong> để gói tự động kích hoạt.
                     </p>
                   </div>
@@ -617,7 +621,7 @@ function OrderDetailContent() {
                   </div>
                   <div className="flex justify-between">
                     <span>Phương thức:</span>
-                    <span className="font-semibold text-emerald-700">VietQR Chuyển khoản</span>
+                    <span className="font-semibold text-primary">VietQR Chuyển khoản</span>
                   </div>
                 </div>
 

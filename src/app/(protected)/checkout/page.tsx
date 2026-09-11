@@ -565,7 +565,7 @@ function CheckoutContent() {
 
                   <div className="pt-2 border-t border-emerald-200/80 text-[11px] text-emerald-900 space-y-1">
                     <div className="flex justify-between">
-                      <span className="text-emerald-700">Ngân hàng thụ hưởng:</span>
+                      <span className="text-emerald-700">Ngân hàng:</span>
                       <span className="font-bold">
                         {paymentAccount?.bankName || (paymentAccount as any)?.bank?.name || (paymentAccount as any)?.bank?.shortName || paymentAccount?.bankCode || '---'}
                       </span>

@@ -48,6 +48,6 @@ Tổ chức thư mục chuẩn bên trong `src/`:
 
 ## 5. Domain Skills Index (Chỉ mục Quy chuẩn Chuyên sâu)
 Các quy tắc chi tiết theo từng lĩnh vực được quản lý tập trung tại `.agents/skills/`:
-- 🎨 **[ui-design-system](file:///.agents/skills/ui-design-system/SKILL.md):** Typography scale, Cấm đổ bóng shadow, Khóa nút khi loading, Quy chuẩn sinh mascot.
+- 🎨 **[ui-design-system](file:///.agents/skills/ui-design-system/SKILL.md):** Typography scale, Cấm đổ bóng shadow, Khóa nút khi loading, Quy chuẩn sinh mascot, Responsive breakpoints (Tailwind CSS Mobile-First).
 - 🏷️ **[state-and-data-conventions](file:///.agents/skills/state-and-data-conventions/SKILL.md):** Naming conventions, Chuẩn hóa Search Params (`params`/`DEFAULT_PARAMS`), Socket Event Constants.
 - 🤖 **[agent-automation](file:///.agents/skills/agent-automation/SKILL.md):** Architecture-first scanning, Self-healing test, Long-term session logging, Proactive Rule Proposing.

@@ -48,3 +48,31 @@ Khi thiết kế hoặc sinh ảnh linh vật (Mascot):
 2. **Không chứa chữ / logo thương hiệu:** Không để bất kỳ chữ hay logo nào trên linh vật.
 3. **Linh vật gốc đồng bộ:** Robot 3D trắng viền xanh cyan, mắt & miệng cười phát sáng xanh cyan.
 4. **Biến đổi tư thế:** Linh hoạt theo bối cảnh trang web (đứng, lơ lửng, ngồi tên lửa, tương tác HUD).
+
+---
+
+## 5. Responsive Design Standards & Tailwind CSS Breakpoints
+Áp dụng phương pháp **Mobile-First** chuẩn hóa theo Tailwind CSS. Không dùng CSS media queries thủ công.
+
+### Bảng Quy Chuẩn Breakpoints & Kiểm Trực DevTools
+
+| Nhóm thiết bị | Kích thước đề xuất (W × H) | Tailwind Prefix | Thiết bị mẫu DevTools | Mục đích & Tiêu chuẩn kiểm tra |
+| :--- | :--- | :--- | :--- | :--- |
+| **Mobile nhỏ** | 375 × 667 (hoặc 360 × 800) | `Base` (Mặc định) / `xs:` (375px) | iPhone SE / Samsung Galaxy S8+ | Màn hình hẹp: kiểm tra vỡ layout, tràn text, nút bấm dính nhau, font size tối thiểu 12px-14px. |
+| **Mobile chuẩn** | 390 × 844 (hoặc 412 × 915) | `Base` / `sm:` (640px) | iPhone 12/13/14 Pro hoặc Pixel 7 | Kích thước phổ biến nhất hiện nay của phần lớn smartphone. Đảm bảo nút full-width, drawer/hamburger navigation mượt mà. |
+| **Tablet (Dọc)** | 768 × 1024 | `md:` (768px) | iPad Mini / iPad Air (dọc) | **Vùng chuyển tiếp (Transition):** Chuyển từ layout 1 cột (mobile) sang multi-column (tablet/desktop), sidebar thu gọn hoặc menu ngang. |
+| **Laptop / Desktop** | 1280 × 800 (hoặc 1440 × 900) | `lg:` (1024px) / `xl:` (1280px) / `2xl:` (1536px) | DevTools Custom Responsive | Kiểm tra `max-width` container (`max-w-7xl`, `max-w-6xl`), grid hiển thị đủ 3-4 cột, khoảng cách spacing hài hòa (`gap-6`, `gap-8`). |
+
+### Nguyên Tắc Lập Trình Responsive với Tailwind CSS
+1. **Mobile-First Workflow:**
+   - Luôn định nghĩa style mặc định cho màn hình nhỏ nhất (Mobile) trước.
+   - Sử dụng các breakpoint modifiers (`xs:`, `sm:`, `md:`, `lg:`, `xl:`, `2xl:`) để ghi đè mở rộng layout khi kích thước màn hình tăng lên.
+   - *Ví dụ:* `className="w-full md:w-1/2 lg:w-1/3"` (Mặc định 100%, từ 768px là 50%, từ 1024px là 33.3%).
+2. **Grid & Multi-Column Rules:**
+   - Mobile (`< 768px`): 1 cột (`grid-cols-1`).
+   - Tablet (`md: 768px`): 2 cột (`md:grid-cols-2`).
+   - Desktop (`xl: 1280px`): 3 hoặc 4 cột (`xl:grid-cols-3` / `xl:grid-cols-4`).
+3. **Responsive Container & Spacing:**
+   - Padding lề trang: `px-4 sm:px-6 lg:px-8`.
+   - Dynamic Gaps: `gap-4 sm:gap-6 lg:gap-8`.
+

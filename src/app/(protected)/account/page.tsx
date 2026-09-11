@@ -54,7 +54,7 @@ function AccountConsoleContent() {
         <ConsoleHeader activeTab={activeTab} />
 
         {/* Console Main Body Grid */}
-        <div className="flex flex-col md:flex-row items-start gap-6">
+        <div className="flex flex-col lg:flex-row items-start gap-6">
           {/* Left Sidebar */}
           <ConsoleSidebar activeTab={activeTab} onSelectTab={handleSelectTab} />
 

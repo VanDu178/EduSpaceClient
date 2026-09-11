@@ -5,6 +5,9 @@ export * from './SubscriptionView';
 export * from './ProfileView';
 export * from './TransactionHistoryView';
 export * from './SupportView';
+export * from './PayVietQrModal';
+export * from './CancelTransactionModal';
+
 
 
 

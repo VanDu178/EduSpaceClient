@@ -7,18 +7,18 @@ import {
   XCircleIcon,
   ArrowPathIcon,
   ClockIcon,
-  QrCodeIcon,
   ArrowDownTrayIcon,
   CreditCardIcon,
   ClipboardDocumentIcon,
   EllipsisVerticalIcon,
-  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
-import { Table, Tag, Button, Modal, Empty, Dropdown, MenuProps, Tooltip, Popconfirm } from 'antd';
+import { Table, Tag, Button, Empty, Dropdown, MenuProps, Tooltip } from 'antd';
 import { formatDate, copyToClipboard, formatCurrency } from '@/core/utils';
 import toast from 'react-hot-toast';
-import { useCreatePaymentTransaction, ModalCancel } from '@/modules/paymentTransactions';
+import { useCreatePaymentTransaction } from '@/modules/paymentTransactions';
 import { BillingCycle } from '@/modules/membership/types';
+import { PayVietQrModal } from './PayVietQrModal';
+import { CancelTransactionModal } from './CancelTransactionModal';
 
 export function TransactionHistoryView() {
   const { data: subData } = useMySubscriptions();
@@ -36,15 +36,6 @@ export function TransactionHistoryView() {
   const [cancelModalTx, setCancelModalTx] = useState<UserTransactionItem | null>(null);
   const [isPayModalOpen, setIsPayModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-
-  const cancelTxPaidAmount = Number((cancelModalTx as any)?.paidAmount || Math.max(0, Number(cancelModalTx?.amount || 0) - Number((cancelModalTx as any)?.remainingAmount || 0)));
-
-  const isSelectedPartiallyPaid = selectedTx?.status === 'partially_paid';
-  const modalTxRemaining = Number((selectedTx as any)?.remainingAmount || Math.max(0, Number(selectedTx?.amount || 0) - Number((selectedTx as any)?.paidAmount || 0)));
-  const modalDisplayAmount = isSelectedPartiallyPaid ? modalTxRemaining : Number(selectedTx?.amount || 0);
-  const modalQrCodeUrl = isSelectedPartiallyPaid && selectedTx?.qrCodeUrl
-    ? selectedTx.qrCodeUrl.replace(/amount=\d+/, `amount=${modalDisplayAmount}`)
-    : selectedTx?.qrCodeUrl;
 
   const handleReSubscribe = async (record: UserTransactionItem) => {
     const planId = record.plan?.id;
@@ -112,14 +103,15 @@ export function TransactionHistoryView() {
     {
       title: 'Mã hóa đơn',
       key: 'code',
+      width: 140,
       render: (record: UserTransactionItem) => {
         return (
-          <div className="flex items-center gap-1.5">
-            <span className="font-mono font-bold text-primary text-xs">{record?.code}</span>
+          <div className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="font-mono font-bold text-sky-600 text-xs">{record?.code}</span>
             {record?.code && (
               <button
                 onClick={() => copyToClipboard(record.code, 'Đã sao chép mã hóa đơn!')}
-                className="p-1 text-primary hover:bg-primary-light/50 rounded transition-colors"
+                className="p-1 text-sky-600 hover:bg-sky-50 rounded transition-colors"
                 title="Sao chép mã hóa đơn"
               >
                 <ClipboardDocumentIcon className="w-3.5 h-3.5" />
@@ -132,8 +124,9 @@ export function TransactionHistoryView() {
     {
       title: 'Gói dịch vụ',
       key: 'planName',
+      width: 130,
       render: (record: UserTransactionItem) => (
-        <span className="font-semibold text-slate-900 text-xs">
+        <span className="font-semibold text-slate-900 text-xs whitespace-nowrap">
           {record.plan?.name || 'Gói hội viên'}
         </span>
       ),
@@ -141,10 +134,11 @@ export function TransactionHistoryView() {
     {
       title: 'Chu kỳ',
       key: 'billingCycle',
+      width: 100,
       render: (record: UserTransactionItem) => {
         const isYearly = record.billingCycle === 'annually' || record.billingCycle === 'yearly';
         return (
-          <Tag color={isYearly ? 'purple' : 'blue'} className="!rounded-md font-medium text-[11px]">
+          <Tag color={isYearly ? 'purple' : 'blue'} className="!rounded-md font-medium text-[11px] !m-0">
             {isYearly ? 'Hàng năm' : 'Hàng tháng'}
           </Tag>
         );
@@ -154,8 +148,9 @@ export function TransactionHistoryView() {
       title: 'Số tiền',
       dataIndex: 'amount',
       key: 'amount',
+      width: 110,
       render: (amount: number) => (
-        <span className="font-bold text-slate-900 text-xs">
+        <span className="font-bold text-slate-900 text-xs whitespace-nowrap">
           {formatCurrency(amount)}
         </span>
       ),
@@ -163,8 +158,9 @@ export function TransactionHistoryView() {
     {
       title: 'Thời gian',
       key: 'dates',
+      width: 160,
       render: (record: UserTransactionItem) => (
-        <div className="text-xs space-y-0.5">
+        <div className="text-xs space-y-0.5 whitespace-nowrap">
           <div className="text-slate-700">Tạo: {formatDate(record.createdAt)}</div>
           {record.paidAt ? (
             <div className="text-emerald-600 text-[11px] font-medium">Thanh toán: {formatDate(record.paidAt)}</div>
@@ -178,13 +174,14 @@ export function TransactionHistoryView() {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      width: 150,
       render: (_: string, record: UserTransactionItem) => {
         const isSuccess = record.status === 'completed' || record.status === 'overpaid';
         const isExpired = record.status === 'expired' || (Boolean(record.expiredAt && new Date(record.expiredAt) < new Date()) && !isSuccess);
 
         if (isSuccess) {
           return (
-            <Tag color="success" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
+            <Tag color="success" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px] !m-0">
               <span className="flex items-center gap-1">
                 <CheckCircleIcon className="w-3.5 h-3.5" />
                 Thành công
@@ -194,24 +191,24 @@ export function TransactionHistoryView() {
         }
         if (isExpired) {
           return (
-            <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px]">
+            <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px] !m-0">
               Đã hết hạn
             </Tag>
           );
         }
         if (record.status === 'partially_paid') {
           return (
-            <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
+            <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px] !m-0">
               <span className="flex items-center gap-1">
                 <ClockIcon className="w-3.5 h-3.5" />
-                Đã thanh toán một phần
+                Thanh toán 1 phần
               </span>
             </Tag>
           );
         }
         if (record.status === 'pending' || record.status === 'pending_payment') {
           return (
-            <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
+            <Tag color="warning" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px] !m-0">
               <span className="flex items-center gap-1">
                 <ClockIcon className="w-3.5 h-3.5" />
                 Chờ thanh toán
@@ -221,7 +218,7 @@ export function TransactionHistoryView() {
         }
         if (record.status === 'cancelled') {
           return (
-            <Tag color="error" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px]">
+            <Tag color="error" className="!rounded-full border-none font-medium px-2.5 py-0.5 text-[11px] !m-0">
               <span className="flex items-center gap-1">
                 <XCircleIcon className="w-3.5 h-3.5" />
                 Đã hủy
@@ -230,7 +227,7 @@ export function TransactionHistoryView() {
           );
         }
         return (
-          <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px]">
+          <Tag color="default" className="!rounded-full font-medium px-2.5 py-0.5 text-[11px] !m-0">
             {record.status}
           </Tag>
         );
@@ -241,7 +238,7 @@ export function TransactionHistoryView() {
       key: 'action',
       fixed: 'right' as const,
       align: 'center' as const,
-      width: 90,
+      width: 80,
       render: (record: UserTransactionItem) => {
         const isDownloading = downloadInvoicePdf.isPending && downloadInvoicePdf.variables === record.code;
         const isReSubscribing = createPaymentTransaction.isPending && Number(createPaymentTransaction.variables?.planId) === Number(record.plan?.id);
@@ -324,49 +321,48 @@ export function TransactionHistoryView() {
   ];
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-6">
-      {/* Header & Filter Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div>
-          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <CurrencyDollarIcon className="w-5 h-5 text-sky-600" />
-            Hóa đơn thanh toán
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 space-y-5">
+      {/* Header & Filter Section */}
+      <div className="space-y-3 border-b border-slate-200 pb-4">
+        {/* Row 1: Title & Refresh Button */}
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            <CurrencyDollarIcon className="w-5 h-5 text-sky-600 shrink-0" />
+            <span>Hóa đơn thanh toán</span>
           </h3>
-        </div>
-
-        <div className="flex items-center gap-2">
           <Button
             type="primary"
             size="small"
             onClick={() => refetch()}
             disabled={isLoading || isFetching}
             icon={<ArrowPathIcon className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />}
-            className="!rounded-lg text-xs font-medium"
+            className="!rounded-lg text-xs font-medium shrink-0"
           >
             Làm mới
           </Button>
+        </div>
 
-          {/* Filter Status Buttons */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 overflow-x-auto">
-            {[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'completed', label: 'Thành công' },
-              { key: 'pending', label: 'Chờ thanh toán' },
-              { key: 'cancelled', label: 'Đã hủy' },
-              { key: 'expired', label: 'Đã hết hạn' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilterStatus(tab.key)}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${filterStatus === tab.key
-                  ? 'bg-white text-slate-900 font-semibold border border-slate-200'
-                  : 'text-slate-600 hover:text-slate-900'
-                  }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        {/* Row 2: Filter Status Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto max-w-full no-scrollbar py-0.5">
+          {[
+            { key: 'all', label: 'Tất cả' },
+            { key: 'completed', label: 'Thành công' },
+            { key: 'pending', label: 'Chờ thanh toán' },
+            { key: 'cancelled', label: 'Đã hủy' },
+            { key: 'expired', label: 'Đã hết hạn' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setFilterStatus(tab.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                filterStatus === tab.key
+                  ? 'bg-sky-600 text-white font-semibold'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -407,163 +403,25 @@ export function TransactionHistoryView() {
             dataSource={filteredItems}
             columns={columns}
             rowKey="id"
-            pagination={{ pageSize: 8 }}
+            pagination={{ pageSize: 8, responsive: true }}
+            scroll={{ x: 790 }}
             className="custom-table text-xs"
           />
         </div>
       )}
 
       {/* Pay VietQR Modal */}
-      <Modal
-        title={
-          <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
-            <QrCodeIcon className="w-5 h-5 text-emerald-600" />
-            Thanh toán VietQR cho Hóa đơn #{selectedTx?.code}
-          </div>
-        }
-        open={isPayModalOpen}
-        onCancel={() => setIsPayModalOpen(false)}
-        width={680}
-        footer={[
-          <Button key="close" onClick={() => setIsPayModalOpen(false)} className="!rounded-lg text-xs font-medium">
-            Đóng
-          </Button>,
-        ]}
-      >
-        {selectedTx && (
-          <div className="space-y-4 pt-3 text-xs">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
-              {/* Left Column: VietQR Code */}
-              {modalQrCodeUrl && (
-                <div className="md:col-span-5 bg-slate-50/80 rounded-2xl border border-slate-100 p-4 text-center flex flex-col items-center justify-center space-y-2.5">
-                  <div className="bg-white p-2 rounded-xl border border-slate-200/80">
-                    <img
-                      src={modalQrCodeUrl}
-                      alt="Mã VietQR"
-                      className="w-40 h-40 object-contain mx-auto"
-                    />
-                  </div>
-                  <span>Quét mã VietQR bằng ứng dụng Ngân hàng / Ví điện tử</span>
-                </div>
-              )}
-
-              {/* Right Column: Flat List Details */}
-              <div className={`${modalQrCodeUrl ? 'md:col-span-7' : 'md:col-span-12'} space-y-3`}>
-                <div className="font-semibold text-slate-900 pb-1 text-xs flex items-center justify-between border-b border-slate-100">
-                  <span>Thông tin chuyển khoản thủ công</span>
-                  <span className="text-[11px] text-slate-400 font-normal">Chuyển khoản 24/7</span>
-                </div>
-
-                <div className="divide-y divide-slate-100 text-xs sm:text-sm">
-                  {/* Bank Name */}
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-500">Ngân hàng:</span>
-                    <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                      {selectedTx.paymentAccount?.bank?.name}
-                    </span>
-                  </div>
-
-                  {/* Account No */}
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-500">Số tài khoản:</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">
-                        {selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888'}
-                      </span>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(
-                            selectedTx.paymentAccount?.accountNo || selectedTx.accountNo || '190368888888',
-                            'Đã sao chép số tài khoản!'
-                          )
-                        }
-                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
-                        title="Sao chép"
-                      >
-                        <ClipboardDocumentIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Account Holder */}
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-500">Chủ tài khoản:</span>
-                    <span className="font-bold text-slate-900 uppercase text-xs sm:text-sm">
-                      {selectedTx.paymentAccount?.accountHolder || selectedTx.accountHolder || 'TRADEVERSE GLOBAL'}
-                    </span>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-500">Số tiền thanh toán:</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900 text-xs sm:text-sm">
-                        {formatCurrency(modalDisplayAmount)}
-                      </span>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(String(modalDisplayAmount || 0), 'Đã sao chép số tiền!')
-                        }
-                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
-                        title="Sao chép"
-                      >
-                        <ClipboardDocumentIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Transfer Content */}
-                  <div className="flex justify-between items-center py-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-slate-500">Nội dung chuyển khoản:</span>
-                      <span className="text-[10px] px-1.5 py-0.5 font-semibold text-amber-800 bg-amber-100 rounded border border-amber-200 uppercase">
-                        Bắt buộc
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-slate-900 text-xs sm:text-sm">
-                        {selectedTx.transferContent || selectedTx.code}
-                      </span>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(
-                            selectedTx.transferContent || selectedTx.code,
-                            'Đã sao chép nội dung chuyển khoản!'
-                          )
-                        }
-                        className="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors"
-                        title="Sao chép nội dung"
-                      >
-                        <ClipboardDocumentIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Note banner at bottom */}
-            <div className="p-2.5 bg-amber-50/80 rounded-xl border border-amber-200/70 text-[11px] text-amber-900 leading-tight">
-              ⚠️ <strong className="font-semibold text-amber-950">Lưu ý:</strong> Vui lòng giữ <strong className="font-bold text-amber-950">chính xác tuyệt đối nội dung chuyển khoản trên</strong> để hệ thống tự động kích hoạt giao dịch.
-            </div>
-          </div>
-        )}
-      </Modal>
+      <PayVietQrModal
+        isOpen={isPayModalOpen}
+        onClose={() => setIsPayModalOpen(false)}
+        selectedTx={selectedTx}
+      />
 
       {/* Confirmation Modal for Transaction Cancellation */}
-      <ModalCancel
-        isOpen={Boolean(cancelModalTx)}
+      <CancelTransactionModal
+        cancelModalTx={cancelModalTx}
         onClose={() => setCancelModalTx(null)}
-        onConfirm={async () => {
-          if (cancelModalTx) {
-            await handleCancelTx(cancelModalTx.code);
-            setCancelModalTx(null);
-          }
-        }}
-        code={cancelModalTx?.code}
-        planName={cancelModalTx?.plan?.name}
-        status={cancelModalTx?.status}
-        paidAmount={cancelTxPaidAmount}
+        onConfirm={handleCancelTx}
         isLoading={cancelTransaction.isPending}
       />
     </div>

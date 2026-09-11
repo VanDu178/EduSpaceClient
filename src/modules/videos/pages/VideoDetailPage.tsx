@@ -325,59 +325,63 @@ export function VideoDetailPage() {
             {video.title}
           </h1>
 
-          {/* 3. Creator Bar with Views & Date inline + Badges */}
-          <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-y border-gray-100">
-            {/* Left: Author & Views / Date */}
+          {/* 3. YouTube-Style Channel & Badges Row */}
+          <div className="flex flex-wrap items-center justify-between gap-4 py-1.5 border-b border-zinc-100 pb-3">
+            {/* Left: Avatar + Channel Info */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-light text-primary border border-primary/20 flex items-center justify-center font-bold text-base shrink-0">
+              <div className="w-10 h-10 rounded-full bg-primary text-white border border-primary/20 flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
                 {authorName?.charAt(0).toUpperCase()}
               </div>
-              <div className="space-y-0.5">
-                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight">
-                  {authorName}
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight flex items-center gap-1.5">
+                  <span>{authorName}</span>
+                  <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-sky-500 text-white text-[9px] font-bold" title="Tác giả bài giảng">✓</span>
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <EyeIcon className="w-3.5 h-3.5 text-gray-400" />
-                    {video.views ?? 0} lượt xem
-                  </span>
-                  <span className="text-gray-300">·</span>
-                  <span className="flex items-center gap-1">
-                    <CalendarIcon className="w-3.5 h-3.5 text-gray-400" />
-                    {formattedDate}
-                  </span>
-                </div>
+                <p className="text-xs text-slate-500">Giảng viên TradeVerse</p>
               </div>
             </div>
 
-            {/* Right: Badges (Video Type & Paid / Free Status) */}
+            {/* Right: Badges */}
             <div className="flex flex-wrap items-center gap-2">
               {isProcessing && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200/80 rounded-md">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-sky-700 bg-sky-50 border border-sky-200/80 rounded-full">
                   <ArrowPathIcon className="w-3.5 h-3.5 animate-spin text-sky-600" />
-                  Đang chuyển đổi HLS
+                  Đang xử lý HLS
                 </span>
               )}
-              <span className="px-2.5 py-1 text-xs font-medium text-primary bg-primary-light/60 border border-primary/20 rounded-md">
+              <span className="px-3 py-1.5 text-xs font-semibold text-primary bg-primary-light border border-primary/20 rounded-full">
                 {video.videoType?.name || 'Bài giảng'}
               </span>
               {video.isPremium ? (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200/80 rounded-md">
-                  Trả phí
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200/80 rounded-full">
+                  ★ Trả phí
                 </span>
               ) : (
-                <span className="px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200/80 rounded-md">
+                <span className="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/80 rounded-full">
                   Miễn phí
                 </span>
               )}
             </div>
           </div>
 
-          {/* 4. Simple Clean Description Box (No Extra Nested Boxes) */}
+          {/* 4. Views & Date Line (OUTSIDE the box) */}
+          <div className="flex items-center gap-2.5 text-xs sm:text-sm text-zinc-600 font-medium pt-1">
+            <span className="flex items-center gap-1 text-zinc-800 font-semibold">
+              <EyeIcon className="w-4 h-4 text-zinc-400" />
+              <span>{video.views ?? 0} lượt xem</span>
+            </span>
+            <span className="text-zinc-300 select-none">•</span>
+            <span className="flex items-center gap-1">
+              <CalendarIcon className="w-4 h-4 text-zinc-400" />
+              <span>Đã đăng ngày {formattedDate}</span>
+            </span>
+          </div>
+
+          {/* 5. Description Text Box */}
           {video.description && (
-            <div className="bg-gray-100/70 border border-gray-200/60 rounded-2xl p-4 sm:p-5 space-y-2 hover:bg-gray-100/90 transition-colors">
+            <div className="bg-zinc-100/90 hover:bg-zinc-100 border border-zinc-200/60 rounded-2xl p-4 sm:p-4.5 space-y-2 transition-colors">
               <p
-                className={`text-xs sm:text-sm text-gray-800 leading-relaxed whitespace-pre-line ${!isDescriptionExpanded ? 'line-clamp-3' : ''
+                className={`text-xs sm:text-sm text-zinc-700 leading-relaxed whitespace-pre-line ${!isDescriptionExpanded ? 'line-clamp-3' : ''
                   }`}
               >
                 {video.description}
@@ -386,7 +390,7 @@ export function VideoDetailPage() {
                 <button
                   type="button"
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="text-xs font-bold text-gray-900 hover:underline flex items-center gap-1 pt-1 cursor-pointer"
+                  className="text-xs font-bold text-zinc-900 hover:underline flex items-center gap-1 pt-1 cursor-pointer"
                 >
                   {isDescriptionExpanded ? (
                     <>
@@ -395,7 +399,7 @@ export function VideoDetailPage() {
                     </>
                   ) : (
                     <>
-                      <span>Hiện thêm</span>
+                      <span>... hiện thêm</span>
                       <ChevronDownIcon className="w-3.5 h-3.5" />
                     </>
                   )}

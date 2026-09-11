@@ -10,7 +10,7 @@ export function ConsoleHeader({ activeTab }: ConsoleHeaderProps) {
   const currentTitle = TAB_TITLE_MAP[activeTab];
 
   return (
-    <div className="pb-4 mb-6 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div className="pb-3 lg:pb-4 mb-0 lg:mb-6 border-b-0 lg:border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
       <div className="space-y-1.5">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">

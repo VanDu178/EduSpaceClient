@@ -1,22 +1,56 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/common";
 
 export function CtaSection() {
   return (
-    <section id="cta" className="w-full bg-white pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="max-w-4xl mx-auto relative">
+    <section id="cta" className="w-full bg-white pt-16 sm:pt-20 pb-12 sm:pb-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-t border-zinc-200/60">
+      <div className="max-w-6xl mx-auto relative">
+        {/* Left Side Mascot Visual Cluster (Quant AI Robot) */}
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 left-0 lg:left-2 xl:left-6 pointer-events-none opacity-90 max-w-[120px] xl:max-w-[150px] z-10 hidden lg:block"
+        >
+          <div className="relative group">
+            <Image
+              src="/images/mascot-quant-robot.png"
+              alt="TradeVerse Quant AI Robot Mascot"
+              width={150}
+              height={150}
+              className="w-full h-auto object-contain"
+            />
+          </div>
+        </motion.div>
+
+        {/* Right Side Mascot Visual Cluster (TradeVerse Logo Mascot) */}
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+          className="absolute bottom-0 right-0 lg:right-2 xl:right-6 pointer-events-none opacity-90 max-w-[120px] xl:max-w-[150px] z-10 hidden lg:block"
+        >
+          <div className="relative group">
+            <Image
+              src="/images/logo.png"
+              alt="TradeVerse Logo Mascot"
+              width={150}
+              height={150}
+              className="w-full h-auto object-contain"
+            />
+          </div>
+        </motion.div>
+
+        {/* Main CTA Content (100% Restored Original Content) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          {/* Main CTA Content */}
-          <div className="relative p-6 sm:p-10 text-center z-10">
-            {/* Center Content */}
+          <div className="relative p-6 sm:p-10 text-center z-20">
             <div className="max-w-2xl mx-auto space-y-4">
               {/* Main Heading */}
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-zinc-900 leading-[1.2]">
@@ -26,7 +60,7 @@ export function CtaSection() {
 
               {/* Subtitle */}
               <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed max-w-xl mx-auto">
-                Cùng thảo luận kiến thức, kinh nghiệm & các khóa học chuyên sâu về trading
+                Cùng thảo luận kiến thức, kinh nghiệm &amp; các khóa học chuyên sâu về trading
               </p>
 
               {/* 3 Action Buttons */}
@@ -73,4 +107,9 @@ export function CtaSection() {
     </section>
   );
 }
+
+
+
+
+
 

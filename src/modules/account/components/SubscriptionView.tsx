@@ -122,21 +122,21 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden divide-y divide-slate-100">
+    <div className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden divide-y divide-slate-100">
       {/* SECTION 1: Active Subscription Overview Header */}
-      <div className="p-6 sm:p-8 space-y-6">
+      <div className="p-5 sm:p-7 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+          <div className="space-y-1 text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {planName}
             </h2>
           </div>
 
-          <div className="shrink-0 flex items-center gap-3">
-            <Link href="/pricing">
+          <div className="w-full sm:w-auto shrink-0 flex items-center justify-center">
+            <Link href="/pricing" className="w-full sm:w-auto">
               <Button
                 type="primary"
-                className="!rounded-xl font-medium h-10 px-5 flex items-center gap-2 border-none bg-sky-600 hover:!bg-sky-500 text-sm"
+                className="w-full sm:w-auto !rounded-xl font-medium h-10 px-5 flex items-center justify-center gap-2 border-none bg-sky-600 hover:!bg-sky-500 text-sm cursor-pointer"
                 icon={isPaidUser ? <RocketLaunchIcon className="w-4 h-4" /> : <SparklesIcon className="w-4 h-4 text-amber-300" />}
               >
                 {isPaidUser ? 'Khám phá gói mới' : 'Nâng cấp ngay'}
@@ -146,43 +146,43 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
           </div>
         </div>
 
-        {/* Inline Key Metrics & Timeline */}
-        <div className="space-y-4 pt-2">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/70 pt-1 sm:pt-0">
+        {/* Responsive Key Metrics Cards Grid (1 col mobile, 2 cols tablet, 3 cols desktop) */}
+        <div className="space-y-4 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
             {/* Metric 1 */}
-            <div className="flex items-center gap-3.5 sm:pr-4">
+            <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/70 border border-slate-100 rounded-xl">
               <div className="w-10 h-10 rounded-lg bg-sky-100/80 border border-sky-200/60 flex items-center justify-center shrink-0">
                 <CheckCircleIcon className="w-5 h-5 text-sky-600" />
               </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase text-slate-500 tracking-wider">Trạng thái gói</p>
-                <p className="text-sm font-bold text-slate-900 mt-0.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider truncate">Trạng thái gói</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 truncate">
                   {isPaidUser ? 'Đang hoạt động' : 'Hết hạn'}
                 </p>
               </div>
             </div>
 
             {/* Metric 2 */}
-            <div className="flex items-center gap-3.5 sm:px-4 pt-3 sm:pt-0">
+            <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/70 border border-slate-100 rounded-xl">
               <div className="w-10 h-10 rounded-lg bg-amber-100/80 border border-amber-200/60 flex items-center justify-center shrink-0">
                 <ClockIcon className="w-5 h-5 text-amber-600" />
               </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase text-slate-500 tracking-wider">Thời gian sử dụng</p>
-                <p className="text-sm font-bold text-slate-900 mt-0.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider truncate">Thời gian sử dụng</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 truncate">
                   {isPaidUser ? `${daysRemaining} ngày còn lại` : 'Không giới hạn'}
                 </p>
               </div>
             </div>
 
             {/* Metric 3 */}
-            <div className="flex items-center gap-3.5 sm:pl-4 pt-3 sm:pt-0">
+            <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/70 border border-slate-100 rounded-xl sm:col-span-2 lg:col-span-1">
               <div className="w-10 h-10 rounded-lg bg-slate-200/70 border border-slate-300/60 flex items-center justify-center shrink-0">
                 <CalendarIcon className="w-5 h-5 text-slate-600" />
               </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase text-slate-500 tracking-wider">Hạn hiệu lực</p>
-                <p className="text-sm font-bold text-slate-900 mt-0.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase text-slate-400 tracking-wider truncate">Hạn hiệu lực</p>
+                <p className="text-xs sm:text-sm font-bold text-slate-900 mt-0.5 truncate">
                   {isPaidUser ? endDateStr : 'Vô thời hạn'}
                 </p>
               </div>
@@ -209,21 +209,19 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
         </div>
       </div>
 
-      {/* SECTION 2: Clean Integrated Features Checklist */}
-      <div className="p-6 sm:p-8 space-y-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <ShieldCheckIcon className="w-5 h-5 text-sky-600" />
-              Đặc quyền & Tính năng khả dụng
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Danh sách các tính năng được mở khóa trong tài khoản TradeVerse của bạn.
-            </p>
-          </div>
+      {/* SECTION 2: Features Checklist */}
+      <div className="p-5 sm:p-7 space-y-4">
+        <div>
+          <h3 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
+            <ShieldCheckIcon className="w-5 h-5 text-sky-600" />
+            Đặc quyền &amp; Tính năng khả dụng
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Danh sách các tính năng được mở khóa trong tài khoản TradeVerse của bạn.
+          </p>
         </div>
 
-        {/* Clean, Non-Boxy Feature Checklist */}
+        {/* Responsive Features List */}
         {isDataLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
             {[1, 2, 3, 4].map((i) => (
@@ -231,13 +229,13 @@ export function SubscriptionView({ activeSubscription, isLoading = false }: Subs
             ))}
           </div>
         ) : currentFeatures.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3.5 gap-x-8 py-1">
+          <ul className="grid grid-cols-1 lg:grid-cols-2 gap-3 py-1">
             {currentFeatures.map((feature, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+              <li key={idx} className="flex items-start gap-3 p-3 bg-slate-50/60 border border-slate-100/80 rounded-xl">
+                <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0 mt-0.5">
                   <CheckIcon className="w-3.5 h-3.5 text-emerald-600 stroke-[2.5]" />
                 </div>
-                <span className="text-sm font-medium text-slate-700">{feature}</span>
+                <span className="text-xs sm:text-sm font-medium text-slate-700 leading-relaxed">{feature}</span>
               </li>
             ))}
           </ul>
