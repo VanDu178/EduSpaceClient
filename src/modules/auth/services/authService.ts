@@ -1,4 +1,4 @@
-import api from '@/core/services/api';
+import api, { executeSharedRefreshToken } from '@/core/services/api';
 import {
   RegisterDTO,
   LoginDTO,
@@ -46,8 +46,11 @@ export const getMeApi = async (): Promise<User> => {
 };
 
 export const refreshTokenApi = async (): Promise<AuthResponse> => {
-  const response = await api.post('/auth/refresh', {}, { withCredentials: true });
-  return response.data.data;
+  const result = await executeSharedRefreshToken();
+  return {
+    accessToken: result.accessToken,
+    user: result.user,
+  };
 };
 
 export const logoutApi = async (): Promise<void> => {

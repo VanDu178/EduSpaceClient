@@ -13,3 +13,23 @@ export function formatDuration(seconds: number): string {
   }
   return `${pad(mins)}:${pad(secs)}`;
 }
+
+
+/**
+ * Trích xuất YouTube Embed URL an toàn từ ID hoặc URL gốc
+ */
+export function getYoutubeEmbedUrl(youtubeVideoId?: string | null, rawUrl?: string | null): string | null {
+  if (youtubeVideoId && /^[\w-]{11}$/.test(youtubeVideoId.trim())) {
+    return `https://www.youtube.com/embed/${youtubeVideoId.trim()}?autoplay=1&enablejsapi=1`;
+  }
+  if (!rawUrl) return null;
+  const trimmed = rawUrl.trim();
+  if (/^[\w-]{11}$/.test(trimmed)) {
+    return `https://www.youtube.com/embed/${trimmed}?autoplay=1&enablejsapi=1`;
+  }
+  const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+  if (match && match[1]) {
+    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&enablejsapi=1`;
+  }
+  return null;
+}

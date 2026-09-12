@@ -19,46 +19,46 @@ function formatMediaUrl(url?: string | null): string | null {
  */
 function normalizeVideo(raw: any): Video {
   if (!raw) return raw;
-  const youtubeVideoId = raw.youtubeVideoId || raw.youtube_video_id || raw.youtubeId || null;
-  const rawVideoUrl = raw.videoUrl || raw.video_url || raw.url || raw.storagePath || raw.storage_path || null;
-  const rawThumbnailUrl = raw.thumbnailUrl || raw.thumbnail_url || raw.coverUrl || raw.cover_url || null;
+  const youtubeVideoId = raw.youtubeVideoId || null;
+  const rawVideoUrl = raw.videoUrl || null;
+  const rawThumbnailUrl = raw.thumbnailUrl || null;
 
   const videoUrl = formatMediaUrl(rawVideoUrl);
   const thumbnailUrl = formatMediaUrl(rawThumbnailUrl);
 
   return {
     ...raw,
-    id: String(raw.id || raw._id || ''),
+    id: String(raw.id || ''),
     code: raw.code || '',
     title: raw.title || '',
     slug: raw.slug || '',
     description: raw.description || null,
     thumbnailUrl,
     videoUrl,
-    storagePath: raw.storagePath || raw.storage_path || null,
+    storagePath: raw.storagePath || null,
     youtubeVideoId,
     sourceType:
       raw.sourceType ||
-      raw.source_type ||
-      (youtubeVideoId || (rawVideoUrl && (rawVideoUrl.includes('youtube.com') || rawVideoUrl.includes('youtu.be')))
+      (youtubeVideoId || (rawVideoUrl && (rawVideoUrl.includes('youtube.com')))
         ? VIDEO_SOURCE_TYPES.YOUTUBE
         : VIDEO_SOURCE_TYPES.DIRECT_UPLOAD),
     duration: typeof raw.duration === 'number' ? raw.duration : Number(raw.duration || 0),
-    isPremium: Boolean(raw.isPremium ?? raw.is_premium ?? false),
-    teaserDuration: raw.teaserDuration ?? raw.teaser_duration ?? 0,
+    isPremium: Boolean(raw.isPremium),
+    teaserDuration: raw.teaserDuration || 0,
     views: raw.views ?? 0,
     status: raw.status || VIDEO_STATUS.PUBLISHED,
-    processStatus: raw.processStatus || raw.process_status || (raw.status === PROCESS_STATUS.PROCESSING ? PROCESS_STATUS.PROCESSING : PROCESS_STATUS.READY),
-    videoTypeId: raw.videoTypeId || raw.video_type_id || raw.videoType?.id || 1,
-    videoType: raw.videoType || raw.video_type,
+    processStatus: raw.processStatus || (raw.status === PROCESS_STATUS.PROCESSING ? PROCESS_STATUS.PROCESSING : PROCESS_STATUS.READY),
+    videoTypeId: raw.videoTypeId || raw.videoType?.id || 1,
+    videoType: raw.videoType,
     creator: raw.creator,
-    createdAt: raw.createdAt || raw.created_at || new Date().toISOString(),
-    updatedAt: raw.updatedAt || raw.updated_at || new Date().toISOString(),
+    createdAt: raw.createdAt || new Date().toISOString(),
+    updatedAt: raw.updatedAt || new Date().toISOString(),
+    hasFullAccess: typeof raw.hasFullAccess === 'boolean' ? raw.hasFullAccess : undefined,
   };
 }
 
 /**
- * Lấy danh sách Video có phân trang, lọc và tìm kiếm từ Backend (Public API)
+ * Lấy danh sách Video có phân trang, lọc và tìm kiếm từ Backend dành cho Client (Public / Optional Auth)
  */
 export async function getVideosApi(
   params?: GetVideosParams

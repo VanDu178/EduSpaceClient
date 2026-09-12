@@ -8,7 +8,6 @@ interface FailedRequestItem {
   reject: (error: unknown) => void;
 }
 
-import { APP_ROUTES } from '@/core/config/routes';
 
 // Khởi tạo instance Axios dùng chung
 const api = axios.create({
@@ -66,6 +65,61 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Biến lưu trữ Single-Flight Refresh Promise dùng chung toàn bộ ứng dụng Client
+let refreshPromise: Promise<{ accessToken: string; user: any }> | null = null;
+
+/**
+ * Thực thi làm mới Access Token duy nhất (Single-Flight Deduplication).
+ * Tất cả các cuộc gọi refresh (từ AuthProvider hoặc từ Axios Interceptors)
+ * đều sử dụng chung một Promise duy nhất để tránh gửi trùng request HTTP.
+ */
+export const executeSharedRefreshToken = async (): Promise<{ accessToken: string; user: any }> => {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const response = await axios.post(
+        `${api.defaults.baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      );
+
+      const { accessToken, user } = response.data.data;
+
+      // Cập nhật Access Token & User mới vào Zustand RAM store
+      useAuthStore.getState().setAccessToken(accessToken);
+      if (user) {
+        useAuthStore.getState().setUser(user);
+      }
+
+      // Cập nhật Authorization header mặc định của api instance
+      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+      return { accessToken, user };
+    } catch (error: any) {
+      // Dọn dẹp triệt để Header & giải phóng Zombie Session trong Zustand RAM store
+      delete api.defaults.headers.common['Authorization'];
+      useAuthStore.getState().setAuth(null, null);
+
+      const status = error?.response?.status;
+      // Nếu không phải lỗi 4xx (ví dụ lỗi mạng ERR_NETWORK hoặc Server 5xx): bật cờ lỗi mạng
+      if (!status || status < 400 || status >= 500) {
+        useAuthStore.getState().setNetworkError(true);
+      }
+      // Lưu ý: Lỗi 4xx (người dùng chưa đăng nhập / cookie hết hạn) được xử lý bởi AuthGuard cho các route protected.
+      // Không gọi window.location.href cứng ở đây để giữ khách ở lại xem nội dung trên các trang public.
+
+      throw error;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+};
 
 // Response Interceptor: Tự động bắt lỗi 401 để refresh token và gọi lại request cũ
 api.interceptors.response.use(
@@ -144,23 +198,7 @@ api.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      // Gọi API refresh token (HttpOnly Cookie được gửi kèm tự động)
-      const response = await axios.post(
-        `${api.defaults.baseURL}/auth/refresh`,
-        {},
-        { withCredentials: true }
-      );
-
-      const { accessToken, user } = response.data.data;
-
-      // Cập nhật Access Token & User mới vào Zustand RAM store
-      useAuthStore.getState().setAccessToken(accessToken);
-      if (user) {
-        useAuthStore.getState().setUser(user);
-      }
-
-      // Cập nhật Authorization header mặc định của api instance
-      api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      const { accessToken } = await executeSharedRefreshToken();
 
       // Xử lý hàng đợi
       processQueue(null, accessToken);
@@ -170,22 +208,6 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError: any) {
       processQueue(refreshError, null);
-
-      // Giải phóng hoàn toàn session trong Zustand RAM store ngay lập tức
-      useAuthStore.getState().setAuth(null, null);
-      useAuthStore.getState().logout().catch(() => { });
-
-      const status = refreshError?.response?.status;
-      // Nếu Refresh Token thực sự bị từ chối (4xx: hết hạn / thiếu cookie / bị thu hồi / tài khoản bị khóa)
-      if (status && status >= 400 && status < 500) {
-        if (typeof window !== 'undefined' && window.location.pathname !== APP_ROUTES.LOGIN) {
-          window.location.href = APP_ROUTES.LOGIN;
-        }
-      } else {
-        // Nếu refresh lỗi do rớt mạng hay server 5xx: bật flag lỗi mạng
-        useAuthStore.getState().setNetworkError(true);
-      }
-
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

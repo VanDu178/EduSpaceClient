@@ -112,9 +112,9 @@ export function HlsPlayer({
               const responseCode = data.response?.code;
               const responseData = data.response?.data as any;
               if (responseCode === 400 && responseData?.errorCode === 'VIDEO_PROCESSING') {
-                setErrorMessage('Video đang được hệ thống chuyển đổi luồng phát HLS (Vui lòng thử lại sau 1-2 phút)');
+                setErrorMessage('Video đang được xử lý, vui lòng quay lại sau');
               } else {
-                setErrorMessage('Lỗi kết nối tải dữ liệu luồng phát video HLS');
+                setErrorMessage('Lỗi kết nối tải dữ liệu');
                 hls.startLoad();
               }
               break;
@@ -124,7 +124,7 @@ export function HlsPlayer({
               break;
             default:
               hls.destroy();
-              setErrorMessage('Không thể phát luồng video HLS');
+              setErrorMessage('Không thể phát video');
               break;
           }
         }
@@ -137,7 +137,7 @@ export function HlsPlayer({
         if (autoPlay) videoElement.play().catch(() => { });
       });
     } else {
-      setErrorMessage('Trình duyệt của bạn không hỗ trợ công nghệ phát video HLS');
+      setErrorMessage('Trình duyệt của bạn không hỗ trợ phát video');
     }
 
     return () => {

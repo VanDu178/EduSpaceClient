@@ -28,6 +28,11 @@ interface ViewChatProps {
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }
 
+interface PendingFileItem {
+  file: File;
+  previewUrl: string;
+}
+
 export function ViewChat({
   conversation,
   messages,
@@ -43,20 +48,20 @@ export function ViewChat({
   messagesEndRef,
 }: ViewChatProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [pendingAttachments, setPendingAttachments] = useState<string[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<PendingFileItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  const pendingAttachmentsRef = useRef<string[]>([]);
+  const pendingFilesRef = useRef<PendingFileItem[]>([]);
   React.useEffect(() => {
-    pendingAttachmentsRef.current = pendingAttachments;
-  }, [pendingAttachments]);
+    pendingFilesRef.current = pendingFiles;
+  }, [pendingFiles]);
 
-  // Cleanup unsent image attachments on unmount (e.g. closing chat widget)
+  // Cleanup Blob Preview URLs on unmount (Không upload rác lên Supabase khi chưa ấn Gửi)
   React.useEffect(() => {
     return () => {
-      if (pendingAttachmentsRef.current.length > 0) {
-        pendingAttachmentsRef.current.forEach((url) => {
-          uploadService.deleteFile(url).catch((err) => console.error('Lỗi tự động xóa ảnh rác:', err));
+      if (pendingFilesRef.current.length > 0) {
+        pendingFilesRef.current.forEach((item) => {
+          URL.revokeObjectURL(item.previewUrl);
         });
       }
     };
@@ -64,7 +69,7 @@ export function ViewChat({
 
   const isInputDisabled = isSending || isStartingChat || isUploading || redirectCountdown !== null;
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     const file = files[0];
@@ -75,37 +80,42 @@ export function ViewChat({
       return;
     }
 
-    try {
-      setIsUploading(true);
-      const url = await uploadService.uploadSingleFile(file, 'support-chat');
-      if (url) {
-        setPendingAttachments((prev) => [...prev, url]);
-        toast.success('Đã tải hình ảnh thành công.');
-      }
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Có lỗi xảy ra khi tải ảnh.');
-    } finally {
-      setIsUploading(false);
-    }
+    const previewUrl = URL.createObjectURL(file);
+    setPendingFiles((prev) => [...prev, { file, previewUrl }]);
   };
 
-  const handleRemoveAttachment = async (index: number) => {
-    const targetUrl = pendingAttachments[index];
-    setPendingAttachments((prev) => prev.filter((_, i) => i !== index));
-    if (targetUrl) {
-      try {
-        await uploadService.deleteFile(targetUrl);
-      } catch (err) {
-        console.error('Lỗi xóa file ảnh khỏi storage:', err);
-      }
+  const handleRemoveAttachment = (index: number) => {
+    const targetItem = pendingFiles[index];
+    if (targetItem) {
+      URL.revokeObjectURL(targetItem.previewUrl);
     }
+    setPendingFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() && pendingAttachments.length === 0) return;
-    onSendMessage(e, pendingAttachments.length > 0 ? pendingAttachments : undefined);
-    setPendingAttachments([]);
+    if (!inputText.trim() && pendingFiles.length === 0) return;
+
+    let uploadedUrls: string[] = [];
+    if (pendingFiles.length > 0) {
+      try {
+        setIsUploading(true);
+        const rawFiles = pendingFiles.map((item) => item.file);
+        uploadedUrls = await uploadService.uploadMultipleFiles(rawFiles, 'support-chat');
+      } catch (err: any) {
+        toast.error(err?.response?.data?.message || 'Có lỗi xảy ra khi tải ảnh.');
+        setIsUploading(false);
+        return;
+      } finally {
+        setIsUploading(false);
+      }
+    }
+
+    onSendMessage(e, uploadedUrls.length > 0 ? uploadedUrls : undefined);
+
+    // Dọn dẹp Blob Preview URLs sau khi đã gửi thành công
+    pendingFiles.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    setPendingFiles([]);
   };
 
   return (
@@ -148,65 +158,64 @@ export function ViewChat({
         {isStartingChat && conversation && (
           <div className="bg-sky-50 border border-sky-200 text-sky-800 text-xs px-3 py-2 rounded-xl flex items-center justify-center space-x-2 animate-pulse font-medium">
             <ArrowPathIcon className="w-4 h-4 animate-spin text-sky-600" />
-            <span>Đang kết nối tới admin...</span>
+            <span>Đang kết nối tới nhân viên hỗ trợ...</span>
           </div>
         )}
 
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex flex-col ${
-              msg.senderType === 'USER' ? 'items-end' : msg.senderType === 'SYSTEM' ? 'items-center' : 'items-start'
-            }`}
-          >
-            {msg.senderType === 'SYSTEM' ? (
-              <div className="bg-slate-200/80 border border-slate-300 text-slate-600 text-xs px-3 py-1.5 rounded-full my-1 font-medium">
-                {msg.content}
-              </div>
-            ) : (
+        {messages.map((msg) => {
+          const isUser = msg.senderType === 'USER';
+          return (
+            <div
+              key={msg.id}
+              className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+            >
               <div
-                className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                  msg.senderType === 'USER'
-                    ? 'bg-sky-600 text-white rounded-br-none border border-sky-500'
-                    : 'bg-white text-slate-800 rounded-bl-none border border-slate-200'
+                className={`max-w-[85%] rounded-2xl p-3 text-sm space-y-2 ${
+                  isUser
+                    ? 'bg-sky-600 text-white rounded-br-none shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none shadow-xs'
                 }`}
               >
+                {msg.content && <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>}
+
                 {msg.attachments && msg.attachments.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-1.5">
-                    {msg.attachments.map((imgUrl, idx) => (
-                      <img
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {msg.attachments.map((attUrl, idx) => (
+                      <a
                         key={idx}
-                        src={imgUrl}
-                        alt="Attachment"
-                        onClick={() => window.open(imgUrl, '_blank')}
-                        className="rounded-lg object-cover max-w-[180px] max-h-[180px] border border-slate-200 cursor-pointer hover:opacity-90 transition"
-                      />
+                        href={attUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block rounded-lg overflow-hidden border border-slate-200/40 hover:opacity-90 transition"
+                      >
+                        <img
+                          src={attUrl}
+                          alt="attachment"
+                          className="w-36 h-28 object-cover rounded-lg"
+                        />
+                      </a>
                     ))}
                   </div>
                 )}
-                {msg.content && <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>}
-                <span
-                  className={`text-[10px] block text-right mt-1 opacity-75 ${
-                    msg.senderType === 'USER' ? 'text-sky-100' : 'text-slate-400'
-                  }`}
-                >
-                  {new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                </span>
               </div>
-            )}
-          </div>
-        ))}
+              <span className="text-[10px] text-slate-400 mt-1 px-1 font-medium">
+                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            </div>
+          );
+        })}
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* Chat Input Bar Light */}
       <form onSubmit={handleSubmit} className="p-3 bg-white border-t border-slate-200 flex flex-col space-y-2">
         {/* Pending Image Attachments Preview */}
-        {pendingAttachments.length > 0 && (
+        {pendingFiles.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-1">
-            {pendingAttachments.map((url, index) => (
+            {pendingFiles.map((item, index) => (
               <div key={index} className="relative group w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-slate-100">
-                <img src={url} alt="preview" className="w-full h-full object-cover" />
+                <img src={item.previewUrl} alt="preview" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => handleRemoveAttachment(index)}
@@ -256,9 +265,9 @@ export function ViewChat({
           />
           <button
             type="submit"
-            disabled={isInputDisabled || (!inputText.trim() && pendingAttachments.length === 0)}
+            disabled={isInputDisabled || (!inputText.trim() && pendingFiles.length === 0)}
             className={`p-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl transition ${
-              isInputDisabled || (!inputText.trim() && pendingAttachments.length === 0) ? 'pointer-events-none opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              isInputDisabled || (!inputText.trim() && pendingFiles.length === 0) ? 'pointer-events-none opacity-50 cursor-not-allowed' : 'cursor-pointer'
             }`}
           >
             {isStartingChat || isSending ? (

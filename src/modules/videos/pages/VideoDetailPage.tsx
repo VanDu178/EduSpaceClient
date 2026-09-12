@@ -7,9 +7,7 @@ import Image from 'next/image';
 import {
   ArrowLeftIcon,
   PlayIcon,
-  SparklesIcon,
   EyeIcon,
-  UserIcon,
   CalendarIcon,
   ArrowRightIcon,
   ArrowPathIcon,
@@ -18,30 +16,15 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
 } from '@heroicons/react/24/outline';
-import { useVideoDetail, useVideoAccess, useVideos } from '../hooks/useVideos';
+import { useVideoDetail, useVideos } from '../hooks/useVideos';
 import { HlsPlayer } from '../components/HlsPlayer';
-import { formatDuration } from '../utils';
+import { VideoAccessCallout } from '../components/VideoAccessCallout';
+import { formatDuration, getYoutubeEmbedUrl } from '../utils';
 import { Button } from '@/components/common/Button';
 import { formatDate } from '@/core/utils';
+import { useAuthStore } from '@/modules/auth/stores/useAuthStore';
 
-/**
- * Trích xuất YouTube Embed URL an toàn từ ID hoặc URL gốc
- */
-function getYoutubeEmbedUrl(youtubeVideoId?: string | null, rawUrl?: string | null): string | null {
-  if (youtubeVideoId && /^[\w-]{11}$/.test(youtubeVideoId.trim())) {
-    return `https://www.youtube.com/embed/${youtubeVideoId.trim()}?autoplay=1&enablejsapi=1`;
-  }
-  if (!rawUrl) return null;
-  const trimmed = rawUrl.trim();
-  if (/^[\w-]{11}$/.test(trimmed)) {
-    return `https://www.youtube.com/embed/${trimmed}?autoplay=1&enablejsapi=1`;
-  }
-  const match = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
-  if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&enablejsapi=1`;
-  }
-  return null;
-}
+
 
 export function VideoDetailPage() {
   const params = useParams();
@@ -49,6 +32,7 @@ export function VideoDetailPage() {
   const id = params?.id as string;
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const { accessToken } = useAuthStore();
   const [isTeaserLimitReached, setIsTeaserLimitReached] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -65,9 +49,13 @@ export function VideoDetailPage() {
 
   const relatedVideos = (relatedData?.videos || []).filter((v) => v.id !== id);
 
-  // 3. Phân quyền xem video
-  const accessResult = useVideoAccess(video);
-  const { hasFullAccess, isTeaser, teaserDuration, reason } = accessResult;
+  // 3. Phân quyền xem video (được đánh giá trực tiếp từ Backend API response)
+  const hasFullAccess = video ? video.hasFullAccess : false;
+  const isTeaser = video ? (video.isPremium && !hasFullAccess) : false;
+  const teaserDuration = video?.teaserDuration || 0;
+  const reason = !hasFullAccess
+    ? (!accessToken ? 'NOT_LOGGED_IN' : 'FEATURE_NOT_IN_PLAN')
+    : 'FREE_VIDEO';
 
   // Reset state khi đổi ID video
   useEffect(() => {
@@ -76,24 +64,29 @@ export function VideoDetailPage() {
     setIsDescriptionExpanded(false);
   }, [id]);
 
-  // YouTube / Embed Teaser Timer
+  // YouTube Embed Teaser Listener: Lắng nghe sự kiện kết thúc mốc Teaser từ YouTube Iframe API (Tránh đếm ngầm khi Pause)
   useEffect(() => {
     if (!video || hasFullAccess || !isTeaser || teaserDuration <= 0 || isTeaserLimitReached) {
       return;
     }
 
-    const interval = setInterval(() => {
-      setElapsedSeconds((prev) => {
-        const next = prev + 1;
-        if (next >= teaserDuration) {
+    const handleMessage = (event: MessageEvent) => {
+      if (!event.origin.includes('youtube.com') && !event.origin.includes('youtube-nocookie.com')) {
+        return;
+      }
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        // event === 'onStateChange', info === 0 đại diện cho YT.PlayerState.ENDED (Đã phát tới mốc ?end=)
+        if (data && data.event === 'onStateChange' && data.info === 0) {
           setIsTeaserLimitReached(true);
-          clearInterval(interval);
         }
-        return next;
-      });
-    }, 1000);
+      } catch {
+        // Bỏ qua các sự kiện không phải JSON chuẩn của YouTube
+      }
+    };
 
-    return () => clearInterval(interval);
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, [video, hasFullAccess, isTeaser, teaserDuration, isTeaserLimitReached]);
 
   // Handle URL redirect cho Callout
@@ -187,6 +180,10 @@ export function VideoDetailPage() {
   const isProcessing = video.processStatus === 'processing' || (video.status as string) === 'processing';
   const youtubeEmbedUrl = getYoutubeEmbedUrl(video.youtubeVideoId, video.videoUrl);
   const isYoutube = video.sourceType === 'youtube' || Boolean(youtubeEmbedUrl);
+  const isIframeEmbed = Boolean(
+    video.videoUrl && (video.videoUrl.includes('iframe.mediadelivery.net') || video.videoUrl.includes('/embed/'))
+  );
+  const embedUrl = isYoutube ? youtubeEmbedUrl : (isIframeEmbed ? video.videoUrl : null);
   const authorName = video.creator?.name;
   const formattedDate = formatDate(video.createdAt);
 
@@ -199,7 +196,7 @@ export function VideoDetailPage() {
           className="inline-flex items-center gap-2 font-medium text-gray-600 hover:text-primary transition-colors"
         >
           <ArrowLeftIcon className="w-4 h-4" />
-          Tất cả video
+          Quay lại danh sách
         </Link>
         <div className="flex items-center gap-1.5 text-gray-400">
           <Link href="/" className="hover:text-gray-700">Trang chủ</Link>
@@ -216,23 +213,6 @@ export function VideoDetailPage() {
         <div className="lg:col-span-8 space-y-4">
           {/* 1. Main Video Player Container (16:9 Aspect Ratio) */}
           <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-gray-200">
-            {/* Teaser Mode Top Warning Banner */}
-            {!hasFullAccess && isTeaser && teaserDuration > 0 && !isTeaserLimitReached && !isProcessing && (
-              <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-slate-950/90 to-transparent p-3.5 flex items-center justify-between text-xs text-white">
-                <div className="flex items-center gap-2 font-medium text-amber-300 bg-amber-950/90 px-3 py-1 rounded-lg border border-amber-500/40">
-                  <SparklesIcon className="w-4 h-4 text-amber-400 animate-pulse" />
-                  <span>Chế độ xem thử: <strong>{teaserDuration} giây</strong></span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleCalloutAction}
-                  className="text-xs font-semibold text-sky-300 hover:text-white transition-colors underline cursor-pointer"
-                >
-                  {reason === 'NOT_LOGGED_IN' ? 'Đăng nhập để xem full' : 'Nâng cấp gói ngay'}
-                </button>
-              </div>
-            )}
-
             {/* Video Player: HLS Transcoding State vs YouTube Embed vs HTML5 Direct Storage */}
             {isProcessing ? (
               <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center space-y-4">
@@ -248,9 +228,20 @@ export function VideoDetailPage() {
                   </p>
                 </div>
               </div>
-            ) : isYoutube && youtubeEmbedUrl ? (
+            ) : video.isPremium && !hasFullAccess && (!video.teaserDuration || video.teaserDuration <= 0) ? (
+              <VideoAccessCallout
+                title="Bài giảng dành riêng cho Hội viên"
+                description={
+                  reason === 'NOT_LOGGED_IN'
+                    ? 'Bạn chưa đăng nhập. Vui lòng đăng nhập tài khoản EduSpace để truy cập thư viện bài giảng cao cấp.'
+                    : 'Nâng cấp Gói Hội Viên để sở hữu đặc quyền xem toàn bộ thư viện video bài giảng & phân tích kỹ thuật nâng cao!'
+                }
+                actionText={reason === 'NOT_LOGGED_IN' ? 'Đăng nhập ngay' : 'Xem các Gói Hội Viên'}
+                onAction={handleCalloutAction}
+              />
+            ) : embedUrl ? (
               <iframe
-                src={youtubeEmbedUrl}
+                src={embedUrl}
                 title={video.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -269,54 +260,24 @@ export function VideoDetailPage() {
             ) : (
               <div className="p-8 text-center text-slate-400 space-y-2 flex flex-col items-center justify-center h-full">
                 <PlayIcon className="w-12 h-12 text-slate-600" />
-                <p className="text-sm">Video hiện đang cập nhật luồng phát trực tuyến...</p>
+                <p className="text-sm">Video hiện đang không được hỗ trợ...</p>
               </div>
             )}
 
             {/* Callout Overlay (Hết thời lượng xem thử) */}
             {isTeaserLimitReached && (
-              <div className="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md p-6 flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                  <LockClosedIcon className="w-7 h-7" />
-                </div>
-                <div className="space-y-2 max-w-md">
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Đã hết thời lượng xem thử
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    {reason === 'NOT_LOGGED_IN'
-                      ? 'Bạn đang xem video ở chế độ dùng thử. Vui lòng đăng nhập tài khoản TradeVerse để tiếp tục xem trọn bộ bài giảng.'
-                      : 'Nâng cấp Gói Hội Viên để sở hữu đặc quyền xem toàn bộ thư viện video bài giảng & phân tích kỹ thuật nâng cao!'}
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 w-full max-w-sm">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="md"
-                    rounded="xl"
-                    fullWidth
-                    onClick={handleCalloutAction}
-                    rightIcon={<ArrowRightIcon className="w-4 h-4" />}
-                    className="font-semibold cursor-pointer"
-                  >
-                    {reason === 'NOT_LOGGED_IN' ? 'Đăng nhập ngay' : 'Xem các Gói Hội Viên'}
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="md"
-                    rounded="xl"
-                    onClick={handleReplayTeaser}
-                    leftIcon={<ArrowPathIcon className="w-4 h-4" />}
-                    className="w-full sm:w-auto px-6 !bg-slate-900/80 !text-slate-300 hover:!text-white hover:!bg-slate-800 !border-slate-700/80 transition-all font-semibold whitespace-nowrap shrink-0"
-                  >
-                    Xem lại bản xem thử
-                  </Button>
-                </div>
-              </div>
+              <VideoAccessCallout
+                title="Đã hết thời lượng xem thử"
+                description={
+                  reason === 'NOT_LOGGED_IN'
+                    ? 'Bạn đang xem video ở chế độ dùng thử. Vui lòng đăng nhập tài khoản EduSpace để tiếp tục xem trọn bộ bài giảng.'
+                    : 'Nâng cấp Gói Hội Viên để sở hữu đặc quyền xem toàn bộ thư viện video bài giảng & phân tích kỹ thuật nâng cao!'
+                }
+                actionText={reason === 'NOT_LOGGED_IN' ? 'Đăng nhập ngay' : 'Xem các Gói Hội Viên'}
+                onAction={handleCalloutAction}
+                showReplay={true}
+                onReplayTeaser={handleReplayTeaser}
+              />
             )}
           </div>
 

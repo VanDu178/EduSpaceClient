@@ -92,7 +92,6 @@ export function ViewDetail({
     }));
 
     setCommentFiles((prev) => [...prev, ...newFiles]);
-    toast.success(`Đã thêm ${newFiles.length} ảnh đính kèm.`);
   };
 
   const isMaxReached = commentFiles.length >= MAX_IMAGES;

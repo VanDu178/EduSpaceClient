@@ -40,6 +40,7 @@ export interface Video {
   creator?: VideoCreator;
   createdAt: string;
   updatedAt: string;
+  hasFullAccess?: boolean;
 }
 
 export interface GetVideosParams {
