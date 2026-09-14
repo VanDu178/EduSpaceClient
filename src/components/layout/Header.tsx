@@ -113,7 +113,6 @@ export const Header = () => {
             </span>
           </Link>
 
-          {/* Center: Nav links using Antd Menu */}
           <nav className="hidden lg:flex items-center">
             <Menu
               mode="horizontal"
