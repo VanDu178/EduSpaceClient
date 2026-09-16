@@ -18,6 +18,20 @@ interface SocketProviderProps {
   children: React.ReactNode;
 }
 
+const getSocketUrl = (): string | undefined => {
+  const socketEnv = process.env.NEXT_PUBLIC_SOCKET_URL;
+  if (socketEnv) {
+    try {
+      return new URL(socketEnv).origin;
+    } catch {
+      if (socketEnv.startsWith('/')) return undefined;
+      return socketEnv;
+    }
+  }
+
+  return undefined;
+};
+
 export const SocketProvider = ({ children }: SocketProviderProps) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -28,7 +42,7 @@ export const SocketProvider = ({ children }: SocketProviderProps) => {
     const token = storeAccessToken || (typeof window !== 'undefined'
       ? localStorage.getItem('accessToken') || localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
       : null);
-    const socketUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000';
+    const socketUrl = getSocketUrl();
 
     if (!token) {
       if (socketRef.current) {
