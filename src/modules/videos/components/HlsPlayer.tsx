@@ -66,20 +66,20 @@ export function HlsPlayer({
                 maxBufferLength: 30, // Chỉ buffer trước 30 giây để tiết kiệm tài nguyên
                 maxMaxBufferLength: 60,
                 enableWorker: true,
-                xhrSetup: (xhr: XMLHttpRequest, url: string) => {
-                    const bunnyCdnHost =
-                        process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME;
-                    const isExternalCdn =
-                        url.includes('b-cdn.net') ||
-                        url.includes('bunnycdn') ||
-                        url.includes('cloudfront') ||
-                        (bunnyCdnHost && url.includes(bunnyCdnHost));
-                    if (!isExternalCdn) {
-                        xhr.withCredentials = true;
-                    } else {
-                        xhr.withCredentials = false;
-                    }
-                },
+                // xhrSetup: (xhr: XMLHttpRequest, url: string) => {
+                //     const bunnyCdnHost =
+                //         process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME;
+                //     const isExternalCdn =
+                //         url.includes('b-cdn.net') ||
+                //         url.includes('bunnycdn') ||
+                //         url.includes('cloudfront') ||
+                //         (bunnyCdnHost && url.includes(bunnyCdnHost));
+                //     if (!isExternalCdn) {
+                //         xhr.withCredentials = true;
+                //     } else {
+                //         xhr.withCredentials = false;
+                //     }
+                // },
             });
 
             hlsRef.current = hls;
